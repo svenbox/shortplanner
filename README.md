@@ -1,83 +1,87 @@
 # Shortplanner
 
-Stripboard, call sheets, dagsmanus och produktionsbudget för filmproduktion — självhostat, en container, en SQLite-fil, ett lösenord.
+**English** · [Svenska](README.sv.md)
 
-Byggt för korta, låg­budget­produktioner där en enda person (ofta 1:e AD eller producent) sköter schemat, och resten av teamet bara behöver läsa det på en telefon utan täckning.
+Stripboard, call sheets, sides and a film-stock budget for film production — self-hosted, one container, one SQLite file, one password.
+
+Built for short, low-budget productions where a single person (often the 1st AD or producer) runs the schedule, and the rest of the team just needs to read it on a phone with no signal.
+
+> **Note:** the application interface is currently Swedish only. This README is translated; the app itself is not (yet). Feature names below give the Swedish tab label in parentheses.
 
 ![Stripboard](docs/screenshots/stripboard.png)
 ![Call sheet](docs/screenshots/callsheet.png)
 
-## Funktioner
+## Features
 
-- **Stripboard** — dra och släpp strips, automatiskt beräknade starttider, färgkodning INT/EXT, dag/natt, rast/lunch och förflyttning, sid- och tidssummor per dag. Importera scener från ett importerat manus, eller från en stripboard-JSON (från en annan Shortplanner-installation).
-- **Call sheets** — genereras från en stripboarddag med ett klick, redigeras sedan fritt. Väder hämtas automatiskt (SMHI/MET Norway), kallningstider för skådespelare räknas fram från schemat, platser med QR-koder till Google Maps, redigeringsläge som skyddar mot råkade ändringar.
-- **Manus** — importera ett manus (PDF eller Fountain), se varje scens status mot planen (schemalagd/boneyard/saknas).
-- **Dagsmanus** — sidor för varje inspelningsdag, härledda live ur manus + stripboard, tryckoptimerade (A5).
-- **Rullplan** — budget för fysisk film (16mm): skärmtid, skjutförhållande, rullar, med en utfallskolumn du fyller i vid wrap och ett budget-burn-block (budget/förbrukat/kvar).
-- **DPR** — daglig produktionsrapport genererad från call sheeten: scenstatus, sidor tagna, faktiska tider.
-- **Skådespelarregister** — ett litet register (ID, roll, namn) som driver en multi-check-dropdown i både stripboardets Roller-kolumn och call sheetens schema.
-- **Delning** — en skrivskyddad länk per projekt, ingen inloggning krävs för mottagaren, respekterar sajtens av/på-flaggor.
-- **Platser med QR** — koordinater, parkering/toalett/faciliteter och säkerhetsnoteringar per inspelningsplats. Skriver du ut call sheeten blir varje plats en skannbar QR-kod till Google Maps.
-- **Offline-läsning** — installera som app (PWA); senast hämtad call sheet/stripboard/dagsmanus går att läsa utan täckning på inspelningsplatsen.
-- **Sajtinställningar** — företagsnamn/logga (ersätter Shortplanners inbyggda), stäng av flikar (Rullplan/DPR) du inte använder.
-- **Projekt & versioner** — flera produktioner i samma installation; arbetet sparas löpande, namngivna versioner fryser ett läge du kan återgå till. Optimistisk låsning varnar om samma projekt redigeras på flera enheter samtidigt.
+- **Stripboard** — drag-and-drop strips, automatically calculated start times, colour coding for INT/EXT, day/night, meals and company moves, page and time totals per day. Import scenes from an imported script, or from a stripboard JSON file (from another Shortplanner install).
+- **Call sheets** (*Call sheets*) — generated from a stripboard day with one click, then freely editable. Weather is fetched automatically (SMHI / MET Norway), cast call times are derived from the schedule, locations carry QR codes to Google Maps, and an edit toggle guards against accidental changes.
+- **Script** (*Manus*) — import a script (PDF or Fountain) and see each scene's status against the plan (scheduled / boneyard / missing).
+- **Sides** (*Dagsmanus*) — pages for each shooting day, derived live from script + stripboard, print-optimised (A5).
+- **Reel budget** (*Rullplan*) — a budget for physical film stock (16 mm): screen time, shooting ratio, reels, with an actuals column you fill in at wrap and a budget-burn block (budget / used / remaining).
+- **DPR** — daily production report generated from the call sheet: scene status, pages shot, actual times.
+- **Cast register** (*Skådespelare*) — a small register (ID, role, name) that drives a multi-check dropdown in both the stripboard's cast column and the call sheet's schedule.
+- **Sharing** (*Dela*) — one read-only link per project, no login required for the recipient, respecting the site's feature on/off flags.
+- **Locations with QR** — coordinates, parking / toilet / facilities and a safety note per location. Print the call sheet and every location becomes a scannable QR code to Google Maps.
+- **Offline reading** — install as an app (PWA); the most recently fetched call sheet / stripboard / sides can be read with no signal on location.
+- **Site settings** (*Inställningar*) — company name / logo (replacing Shortplanner's built-in one), turn off tabs (Reel budget / DPR) you don't use.
+- **Projects & versions** — several productions in one install; work is saved continuously, named versions freeze a state you can return to. Optimistic locking warns if the same project is edited on more than one device at once.
 
 ---
 
-## 1. Förberedelser på servern
+## 1. Server prerequisites
 
-Peka DNS mot serverns IP:
+Point DNS at the server's IP:
 
 ```
-shortplanner.example.com.   A   <serverns IPv4>
-shortplanner.example.com.   AAAA <serverns IPv6, om du har>
+shortplanner.example.com.   A    <server IPv4>
+shortplanner.example.com.   AAAA <server IPv6, if you have one>
 ```
 
-Kräver Docker och Docker Compose-pluginet:
+Requires Docker and the Docker Compose plugin:
 
 ```bash
 docker --version
 docker compose version
 ```
 
-## 2. Installera
+## 2. Install
 
 ```bash
-# lägg katalogen på servern, t.ex. /opt/shortplanner
+# put the directory on the server, e.g. /opt/shortplanner
 git clone https://github.com/Svenbox/shortplanner.git /opt/shortplanner
 cd /opt/shortplanner
 
 cp .env.example .env
-nano .env          # sätt APP_PASSWORD
+nano .env          # set APP_PASSWORD
 ```
 
-Generera gärna ett riktigt lösenord och en sessionshemlighet:
+Generate a real password and a session secret while you're at it:
 
 ```bash
 openssl rand -base64 24   # -> APP_PASSWORD
 openssl rand -hex 32      # -> SESSION_SECRET
 ```
 
-Starta:
+Start:
 
 ```bash
 docker compose up -d --build
-docker compose logs -f    # ska säga "Shortplanner kör på port 3000"
+docker compose logs -f    # should say "Shortplanner kör på port 3000"
 ```
 
-Appen lyssnar nu på `127.0.0.1:8080` — bara lokalt på servern. Nästa steg publicerar den.
+The app now listens on `127.0.0.1:8080` — local to the server only. The next step publishes it.
 
-## 3. Publicera med TLS
+## 3. Publish with TLS
 
-### Alternativ A: Caddy (enklast, sköter certifikat själv)
+### Option A: Caddy (simplest, handles certificates itself)
 
 ```bash
 sudo apt install caddy
-sudo cp deploy/Caddyfile /etc/caddy/Caddyfile     # eller klistra in blocket i din befintliga
+sudo cp deploy/Caddyfile /etc/caddy/Caddyfile     # or paste the block into your existing one
 sudo systemctl reload caddy
 ```
 
-### Alternativ B: Nginx
+### Option B: Nginx
 
 ```bash
 sudo cp deploy/nginx.conf /etc/nginx/sites-available/shortplanner.example.com
@@ -86,70 +90,70 @@ sudo certbot --nginx -d shortplanner.example.com
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-### Alternativ C: Traefik
+### Option C: Traefik
 
-Kör `deploy/docker-compose.traefik.yml` istället för `docker-compose.yml`. Det förutsätter ett externt nätverk `traefik` och en certresolver som heter `le`.
+Run `deploy/docker-compose.traefik.yml` instead of `docker-compose.yml`. It assumes an external network named `traefik` and a cert resolver named `le`.
 
-Öppna sedan **https://shortplanner.example.com** och logga in med lösenordet från `.env`.
+Then open **https://shortplanner.example.com** and log in with the password from `.env`.
 
-> Kör inte appen utan TLS över internet. Lösenordet skickas i klartext över HTTP, och sessionscookien sätts bara med `Secure`-flaggan när proxyn skickar `X-Forwarded-Proto: https`.
-
----
-
-## Så används appen
-
-**Projekt** är utgångsläget. Skapa ett tomt projekt, eller duplicera/importera ett befintligt. **Projektinfo** (i topplisten inne i ett projekt) håller grunduppgifter — titel, bolag, producent, regi, foto, 1:e AD, platschef, inspelningsdatum, format — som förifyller nya call sheets när de skapas.
-
-**⚙ Inställningar** (på projektlistan) gäller hela installationen: företagsnamn/logga för call sheets, och av/på för Rullplan- och DPR-flikarna om du inte använder dem.
-
-**Stripboard-fliken**
-
-- Dra i handtaget (⋮⋮) för att flytta en strip — inom en dag, mellan dagar, eller till och från banken *Ej schemalagt* längst ner.
-- Sidor, est. tid, I/E och DAG/NATT är dropdowns. I/E och DAG/NATT styr stripens färg.
-- Ändrar du est. tid räknas efterföljande starttider om automatiskt.
-- 🔒 låser en starttid så den inte flyttas vid omräkning. Skriver du in en tid manuellt låses den automatiskt — så behåller du medvetna luckor i dagen.
-- Dagar över 12 timmar flaggas gult i dagfoten.
-- **📥 Importera scener** skapar en strip per scen i ett importerat manus (i "Ej schemalagt", manusordning), eller läser in en hel stripboard-fil (JSON, från en annan Shortplanner-installation eller ett eget tidigare exporterat projekt).
-
-**Skapa call sheet →** i en dagfot bygger en call sheet av den dagen: schema med info-rader och totalrad, kallningstider (30 min före dagstart, mask 60 min före), arbetstid och rollista från scenernas roll-ID:n. Kör du knappen igen för samma dag uppdateras schemat medan platser, kontakter, väder och skådespelartider du fyllt i behålls.
-
-Skriv `MOS` i en scens set/rubrik-fält för att markera att den spelas in utan ljud — vedertagen branschterm ("Mit Out Sound"), ingen särskild funktion i appen men bra att känna till.
-
-**Manus-fliken.** Importera ett manus som PDF (numrerad tagningsmanus-konvention, scennummer i båda marginalerna) eller Fountain. Varje scen visar sin status mot den faktiska planen: schemalagd (med dag och tid), boneyard, eller saknas i planen. **↳ Skapa stripboard av scenerna** bygger strips av hela manuset på en gång om du hellre planerar utifrån manuset än tvärtom.
-
-**Dagsmanus-fliken** genererar tryckfärdiga sidor per inspelningsdag direkt ur manus + stripboardets ordning — ingen sparad kopia, ändrar du schemat speglas det direkt.
-
-**Rullplan-fliken** budgeterar fysisk film: skärmtid per scen (föreslås proportionellt mot manussidorna, override:as manuellt), skjutförhållande (redigerbart, standard 14:1), rullar (11 min/rulle). Slå på Redigera för att skriva in vad som faktiskt rullades per scen och markera en dag som wrappad — budget-burn-blocket visar då budget/förbrukat/kvar.
-
-**DPR-fliken** (Daglig produktionsrapport, internt — inte med i delade länkar) genereras från en dags call sheet: bocka av scener som klara/delvis/flyttade/strukna, sidor tagna, faktiska tider mot planerade.
-
-**Skådespelare.** Knappen **Skådespelare** i topplisten öppnar ett litet register: ID, roll/karaktär och (valfritt) skådespelarens namn. Lägg till och ta bort fritt, redigera roll/namn genom att klicka i fälten. ID:t är det du skriver i stripboardets Roller-kolumn.
-
-I både stripboardets Roller-kolumn och call sheetens schema är cast-fältet en knapp — klicka för att öppna en kryssruteslista över registret och välj en eller flera. Panelen stängs och sparar när du klickar utanför eller på **Klar**.
-
-**Väder.** I call sheetens väderrad hämtar **🔄 Hämta väder** en prognos från SMHI (fallback MET Norway/Yr.no) plus gryning/solnedgång, för kl 12:00 lokal tid (Stockholm, sommar-/vintertid hanteras) den dag call sheeten gäller — baserat på adressen till första platsen i PLATSER-listan, eller sjukhusets om ingen plats har en riktig adress ännu. Fungerar bara för datum inom den närmaste veckan eller så — längre fram finns ingen prognos ännu.
-
-**Kallningstider skådespelare.** Tabellen längst ner i call sheeten fylls i manuellt via **+ Lägg till skådespelare** (välj från registret eller skriv fritext), eller automatiskt via **🔄 Uppdatera från schema** — då räknas Call/Mask-Kostym/On set/Wrap fram per person utifrån deras faktiska första och sista scen den dagen (inte dagens allmänna starttid). Manuellt tillagda som inte förekommer i något scenschema rörs inte.
-
-**Call sheets-fliken** har en redigeringsknapp uppe till höger. Slå på den för att ändra fält och lägga till rader (inklusive "+ Lägg till skådespelare"); slå av den för att läsa och skriva ut. Platser och OBS-noteringar går att dra om i ordning i redigeringsläge — ta tag i handtaget (⋮⋮) till vänster om posten och släpp där du vill ha den; OBS-noteringar visas i två kolumner. Avdelningsrutor under Kallningstider går att ta bort med krysset i hörnet.
-
-**Sidtitel.** Webbläsarfliken (och därmed det föreslagna filnamnet när man skriver ut till PDF) speglar vad man tittar på — "Projektnamn – Stripboard", eller "Projektnamn – Call sheet – Måndag - Dag 1" och så vidare när man byter dag. Gäller både den inloggade appen och den publika delningslänken.
-
-**Platser.** Varje plats i PLATSER-blocket — och Akut/Sjukhus-rutan bredvid — kan få koordinater, parkering, toalett, övriga faciliteter och en säkerhetsnotering, alla tomma tills du fyller i dem i redigeringsläge. Koordinatfältet tar tre sorters inmatning: skriv in `65.67120, 21.98430` direkt (komma eller punkt som decimaltecken går båda bra), klistra in en hel Google Maps-länk (koordinaterna plockas ur `@lat,lng`, `?q=`, `?query=` eller den inbäddade `!3d!4d`-datan — en kort `maps.app.goo.gl`-länk utan synliga koordinater följs och löses upp server-sidan), eller klicka **📍 Från adress** för att slå upp koordinater automatiskt från adressfältet (Nominatim/OpenStreetMap). Koordinaterna är sanningen: så fort en plats har dem visas en klickbar "📍 Karta"-länk på skärmen, och vid utskrift ersätts länken av en QR-kod till samma Google Maps-position — genererad som inline-SVG i webbläsaren, ingen tredjepartstjänst inblandad. START/SLUT (dagens utgångspunkt/övernattning) ärvs mellan dagar och visar bara en kartnål på mobil tills du fäller ner adressen. Väntar du dålig mobiltäckning på en inspelningsplats, lägg till en **offline-varning** för den dagen — den påminner om att ladda ner offlinekartor i förväg, eftersom QR-koderna kräver nät för att slå upp adressen skannad.
-
-> Kontrollera alltid QR-koderna innan en plan går ut till teamet: skriv ut till PDF (eller på riktigt) och skanna varje kod, inte bara ett stickprov.
-
-**Dela.** Knappen **Dela** i topplisten genererar en skrivskyddad länk (`/share/<token>`) till projektets stripboard, call sheets, manus, dagsmanus och rullplan — ingen inloggning krävs för att se den, alla redigeringskontroller är borttagna, och DPR (internt) är aldrig med. **Ta bort delning** ogiltigförklarar länken direkt.
-
-**Versioner.** Allt sparas löpande — indikatorn uppe i topplisten visar *Sparat HH:MM*. När du vill frysa ett läge klickar du **Spara version** och namnger det. Vid **Återställ** sparas nuvarande läge automatiskt som *Före återställning* först, så du kan aldrig måla in dig i ett hörn. Redigerar samma projekt på två enheter samtidigt varnar appen och låter dig välja vilken version som gäller, istället för att tyst skriva över.
-
-**Offline.** Shortplanner går att installera som en app (PWA) från webbläsaren. Senast hämtade call sheet, stripboard och dagsmanus går att läsa utan nätverk — praktiskt på inspelningsplatser utan täckning. Att redigera kräver fortfarande nät.
+> Don't run the app without TLS over the internet. The password is sent in clear text over HTTP, and the session cookie is only set with the `Secure` flag when the proxy passes `X-Forwarded-Proto: https`.
 
 ---
 
-## Drift
+## How the app is used
 
-**Uppdatera till en ny version av koden**
+**Projects** is the starting point. Create an empty project, or duplicate / import an existing one. **Projektinfo** (*Project info*, in the top bar inside a project) holds the basics — title, company, producer, director, DP, 1st AD, location manager, shooting dates, format — which pre-fill new call sheets as they are created.
+
+**⚙ Inställningar** (*Settings*, on the project list) applies to the whole install: company name / logo for call sheets, and on/off for the Reel budget and DPR tabs if you don't use them.
+
+**The Stripboard tab**
+
+- Drag the handle (⋮⋮) to move a strip — within a day, between days, or to and from the *Ej schemalagt* (*Unscheduled*) bank at the bottom.
+- Pages, est. time, I/E and DAY/NIGHT are dropdowns. I/E and DAY/NIGHT drive the strip's colour.
+- Change the est. time and the following start times are recalculated automatically.
+- 🔒 locks a start time so it isn't moved on recalculation. Type a time in manually and it locks automatically — that's how you keep deliberate gaps in the day.
+- Days over 12 hours are flagged amber in the day footer.
+- **📥 Importera scener** (*Import scenes*) creates one strip per scene in an imported script (into "Ej schemalagt", in script order), or reads a whole stripboard file (JSON, from another Shortplanner install or a project you exported earlier).
+
+**Skapa call sheet →** (*Create call sheet*) in a day footer builds a call sheet from that day: schedule with info rows and a total row, call times (30 min before day start, hair/make-up 60 min before), working hours and a cast list from the scenes' role IDs. Run it again for the same day and the schedule is updated while the locations, contacts, weather and cast times you filled in are kept.
+
+Write `MOS` in a scene's set/heading field to mark that it is shot without sound — an established industry term ("Mit Out Sound"), with no special behaviour in the app but good to know.
+
+**The Script tab** (*Manus*). Import a script as a PDF (numbered shooting-script convention, scene numbers in both margins) or Fountain. Each scene shows its status against the actual plan: scheduled (with day and time), boneyard, or missing from the plan. **↳ Skapa stripboard av scenerna** (*Build stripboard from scenes*) turns the whole script into strips at once, if you'd rather plan from the script than the other way around.
+
+**The Sides tab** (*Dagsmanus*) generates print-ready pages per shooting day straight from the script + the stripboard order — no saved copy; change the schedule and it's mirrored immediately.
+
+**The Reel budget tab** (*Rullplan*) budgets physical film: screen time per scene (proposed proportional to the script pages, overridable by hand), shooting ratio (editable, default 14:1), reels (11 min/reel). Turn on Redigera (*Edit*) to enter what was actually rolled per scene and mark a day as wrapped — the budget-burn block then shows budget / used / remaining.
+
+**The DPR tab** (Daily Production Report, internal — not included in shared links) is generated from a day's call sheet: tick scenes off as done / partial / moved / cut, pages shot, actual vs planned times.
+
+**Cast.** The **Skådespelare** (*Cast*) button in the top bar opens a small register: ID, role/character and (optionally) the actor's name. Add and remove freely, edit role/name by clicking in the fields. The ID is what you write in the stripboard's cast column.
+
+In both the stripboard's cast column and the call sheet's schedule, the cast field is a button — click to open a checkbox list of the register and pick one or more. The panel closes and saves when you click outside it or on **Klar** (*Done*).
+
+**Weather.** In the call sheet's weather row, **🔄 Hämta väder** (*Fetch weather*) pulls a forecast from SMHI (fallback MET Norway / Yr.no) plus sunrise/sunset, for 12:00 local time (Stockholm; DST handled) on the day the call sheet applies — based on the address of the first location in the LOCATIONS list, or the hospital's if no location has a real address yet. It only works for dates within roughly the next week — there's no forecast further out yet.
+
+**Cast call times.** The table at the bottom of the call sheet is filled in manually via **+ Lägg till skådespelare** (*Add actor* — pick from the register or free text), or automatically via **🔄 Uppdatera från schema** (*Update from schedule*) — which derives Call / HMU / On set / Wrap per person from their actual first and last scene that day (not the day's general start time). People added manually who don't appear in any scene's schedule are left untouched.
+
+**The Call sheets tab** has an edit button top right. Turn it on to change fields and add rows (including "+ Lägg till skådespelare"); turn it off to read and print. Locations and notes can be reordered in edit mode — grab the handle (⋮⋮) to the left of the entry and drop it where you want it; notes are shown in two columns. Department boxes under the call times can be removed with the cross in the corner.
+
+**Page title.** The browser tab (and therefore the suggested filename when printing to PDF) mirrors what you're looking at — "Project name – Stripboard", or "Project name – Call sheet – Måndag - Dag 1" and so on as you switch days. This applies to both the logged-in app and the public share link.
+
+**Locations.** Each location in the LOCATIONS block — and the Emergency/Hospital box next to it — can be given coordinates, parking, toilet, other facilities and a safety note, all empty until you fill them in in edit mode. The coordinate field takes three kinds of input: type `65.67120, 21.98430` directly (comma or period as decimal separator, both fine), paste a whole Google Maps link (the coordinates are pulled from `@lat,lng`, `?q=`, `?query=` or the embedded `!3d!4d` data — a short `maps.app.goo.gl` link with no visible coordinates is followed and resolved server-side), or click **📍 Från adress** (*From address*) to look up coordinates automatically from the address field (Nominatim / OpenStreetMap). The coordinates are the source of truth: as soon as a location has them, a clickable "📍 Karta" (*Map*) link appears on screen, and on print the link is replaced by a QR code to the same Google Maps position — generated as inline SVG in the browser, no third-party service involved. START/END (the day's departure point / overnight stay) are inherited between days and only show a map pin on mobile until you expand the address. If you expect poor mobile coverage at a location, add an **offline warning** for that day — it reminds you to download offline maps in advance, since the QR codes need a network to resolve the scanned address.
+
+> Always check the QR codes before a plan goes out to the team: print to PDF (or for real) and scan every code, not just a sample.
+
+**Sharing.** The **Dela** (*Share*) button in the top bar generates a read-only link (`/share/<token>`) to the project's stripboard, call sheets, script, sides and reel budget — no login required to view it, all editing controls removed, and DPR (internal) never included. **Ta bort delning** (*Remove sharing*) invalidates the link immediately.
+
+**Versions.** Everything is saved continuously — the indicator in the top bar shows *Sparat HH:MM* (*Saved*). When you want to freeze a state, click **Spara version** (*Save version*) and name it. On **Återställ** (*Restore*), the current state is first saved automatically as *Före återställning* (*Before restore*), so you can never paint yourself into a corner. Edit the same project on two devices at once and the app warns you and lets you choose which version wins, instead of silently overwriting.
+
+**Offline.** Shortplanner can be installed as an app (PWA) from the browser. The most recently fetched call sheet, stripboard and sides can be read with no network — handy on locations with no coverage. Editing still requires a network.
+
+---
+
+## Operations
+
+**Update to a new version of the code**
 
 ```bash
 cd /opt/shortplanner
@@ -157,20 +161,20 @@ git pull
 docker compose up -d --build
 ```
 
-Databasen ligger i en namngiven volym och rörs inte av ombyggen.
+The database lives in a named volume and is untouched by rebuilds.
 
-**Versionshantering av koden.** Katalogen är ett git-repo — varje meningsfull kodändring bör committas, så att ett misstag går att slå upp och backa med `git log` / `git diff` / `git checkout -- <fil>`. Committa inte `.env` (redan i `.gitignore`).
+**Version control of the code.** The directory is a git repo — every meaningful code change should be committed, so a mistake can be looked up and reverted with `git log` / `git diff` / `git checkout -- <file>`. Don't commit `.env` (already in `.gitignore`).
 
-**Säkerhetskopiera**
+**Back up**
 
 ```bash
 docker run --rm -v shortplanner_shortplanner-data:/data -v "$PWD":/backup \
   alpine tar czf /backup/shortplanner-$(date +%F).tar.gz -C /data .
 ```
 
-Lägg den raden i cron en gång i veckan. Exportknappen i appen ger dessutom en JSON-fil per projekt inklusive alla versioner — bra att ha som separat kopia.
+Put that line in cron once a week. The Export button in the app additionally gives a JSON file per project including all versions — good to keep as a separate copy.
 
-**Återläs en säkerhetskopia**
+**Restore a backup**
 
 ```bash
 docker compose down
@@ -179,53 +183,53 @@ docker run --rm -v shortplanner_shortplanner-data:/data -v "$PWD":/backup \
 docker compose up -d
 ```
 
-**Byta lösenord**
+**Change the password**
 
-Ändra `APP_PASSWORD` i `.env` och kör `docker compose up -d`. Redan inloggade enheter fortsätter fungera tills sessionen går ut — vill du logga ut alla direkt byter du även `SESSION_SECRET`.
+Change `APP_PASSWORD` in `.env` and run `docker compose up -d`. Already-logged-in devices keep working until the session expires — to log everyone out immediately, also change `SESSION_SECRET`.
 
-**Loggar och status**
+**Logs and status**
 
 ```bash
 docker compose logs -f
-docker compose ps          # healthcheck syns i STATUS
+docker compose ps          # the healthcheck shows in STATUS
 ```
 
-**Om en ändring inte syns efter omstart** — kolla cachning innan du misstänker koden. Servern skickar `Cache-Control: no-cache` på statiska filer och sätter en `X-App-Version`-header (hash av tillgångarna) som klienten pollar mot — en flik som stått öppen visar en "ny version finns"-banner istället för att tyst köra gammal kod. En service worker cachar sidan för offline-läsning; den upptäcker och hämtar en ny version automatiskt, men om något ändå ser gammalt ut: `SW_DISABLED=1` i miljön får den att avregistrera sig själv.
+**If a change doesn't show up after a restart** — check caching before you suspect the code. The server sends `Cache-Control: no-cache` on static files and sets an `X-App-Version` header (a hash of the assets) that the client polls against — a tab left open shows a "new version available" banner instead of silently running old code. A service worker caches the page for offline reading; it detects and fetches a new version automatically, but if something still looks stale: `SW_DISABLED=1` in the environment makes it unregister itself.
 
 ---
 
-## Under huven
+## Under the hood
 
 | | |
 |---|---|
 | Server | Node 22, Express, better-sqlite3 |
-| Databas | SQLite i volymen `/data/shortplanner.db` (WAL) |
-| Inloggning | Ett lösenord från `APP_PASSWORD`, HMAC-signerad cookie, 30 dagar |
-| Bruteforce-skydd | 10 misslyckade försök per IP per 15 minuter |
-| Klient | Vanilla JS, inga byggsteg, ingen CDN, PWA med offline-cache |
+| Database | SQLite in the volume `/data/shortplanner.db` (WAL) |
+| Login | One password from `APP_PASSWORD`, HMAC-signed cookie, 30 days |
+| Brute-force protection | 10 failed attempts per IP per 15 minutes |
+| Client | Vanilla JS, no build step, no CDN, PWA with offline cache |
 
-**API** (allt kräver inloggningscookie utom login/version/site-public/share/logo)
+**API** (everything requires the login cookie except login / version / site-public / share / logo)
 
 ```
 POST   /api/login                        { password }
 POST   /api/logout
 GET    /api/me
-GET    /api/version                                        build-id, för klientens versionskoll
-GET    /api/site                                            sajtinställningar (auth)
+GET    /api/version                                        build id, for the client's version check
+GET    /api/site                                           site settings (auth)
 PUT    /api/site                         { ... }
-GET    /api/site/public                                     publik delmängd (namn/logga/flaggor/språk)
-POST   /api/site/logo                    { dataUrl }         data-URL png/jpg/svg/webp, max 2 MB
+GET    /api/site/public                                    public subset (name / logo / flags / language)
+POST   /api/site/logo                    { dataUrl }        data URL png/jpg/svg/webp, max 2 MB
 DELETE /api/site/logo
-GET    /logo                                                 publik, den uppladdade loggan (404 om ingen)
+GET    /logo                                               public, the uploaded logo (404 if none)
 GET    /api/projects
 POST   /api/projects                     { name }
 GET    /api/projects/:id
 PATCH  /api/projects/:id                 { name }
 DELETE /api/projects/:id
 POST   /api/projects/:id/duplicate
-POST   /api/projects/:id/share                              → { token, url } (skapar vid behov, annars befintlig)
-DELETE /api/projects/:id/share                               ogiltigförklarar delningslänken
-GET    /api/share/:token                                     publik, oautentiserad — stripboard/callsheet/script/site
+POST   /api/projects/:id/share                             → { token, url } (creates if needed, else existing)
+DELETE /api/projects/:id/share                             invalidates the share link
+GET    /api/share/:token                                   public, unauthenticated — stripboard/callsheet/script/site
 PUT    /api/projects/:id/doc/:kind       { data, baseUpdatedAt? }  kind = stripboard | callsheet | script | dpr | meta
 GET    /api/projects/:id/export
 POST   /api/projects/import
@@ -235,14 +239,14 @@ GET    /api/versions/:vid
 PATCH  /api/versions/:vid                { label, note }
 POST   /api/versions/:vid/restore
 DELETE /api/versions/:vid
-GET    /api/weather?address=&date=                          geokodar (Nominatim) → SMHI/MET Norway + sunrise-sunset.org
-GET    /api/geocode?address=                                 geokodar (Nominatim) → { lat, lng, place }
-GET    /api/resolve-maps-link?url=                           följer en kort Google Maps-länk, domän-allowlistad
+GET    /api/weather?address=&date=                         geocodes (Nominatim) → SMHI/MET Norway + sunrise-sunset.org
+GET    /api/geocode?address=                               geocodes (Nominatim) → { lat, lng, place }
+GET    /api/resolve-maps-link?url=                         follows a short Google Maps link, domain allow-listed
 ```
 
-`PUT .../doc/:kind` stödjer optimistisk låsning: skicka med `baseUpdatedAt` från senast hämtade dokument, servern svarar 409 om någon annan hunnit spara emellan.
+`PUT .../doc/:kind` supports optimistic locking: pass `baseUpdatedAt` from the last fetched document and the server responds 409 if someone else saved in between.
 
-## Köra lokalt utan Docker
+## Running locally without Docker
 
 ```bash
 npm install
@@ -252,10 +256,10 @@ APP_PASSWORD=test1234 DATA_DIR=./data PORT=3000 node server.js
 
 ---
 
-## Bidra
+## Contributing
 
-Buggrapporter och förslag är välkomna som issues. Se [CONTRIBUTING.md](CONTRIBUTING.md) för hur man kör projektet lokalt och skickar en pull request.
+Bug reports and suggestions are welcome as issues. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to run the project locally and send a pull request.
 
-## Licens
+## Licence
 
 [MIT](LICENSE).

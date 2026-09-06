@@ -1,12 +1,12 @@
-# Skärmdumpar
+# Screenshots
 
-Bilder som README refererar till. Alla från ett påhittat demoprojekt ("Skuggspel") — ingen riktig produktionsdata.
+Images the README references. All from a made-up demo project ("Skuggspel") — no real production data.
 
-| Fil | Vy |
+| File | View |
 |---|---|
-| `stripboard.png` | Stripboard-fliken |
-| `callsheet.png` | Call sheet-fliken |
-| `rullplan.png` | Rullplan-fliken |
-| `manus.png` | Manus-fliken |
+| `stripboard.png` | Stripboard tab |
+| `callsheet.png` | Call sheet tab |
+| `rullplan.png` | Reel budget tab (Rullplan) |
+| `manus.png` | Script tab (Manus) |
 
-Tagna vid 1400 px logiskt fönster med 2× pixeltäthet (≈2800 px breda) för skärpa på retina. Ladda om sidan innan du fotar så "ny version"-bannern inte kommer med.
+Taken at a 1400 px logical window with 2× pixel density (≈2800 px wide) for sharpness on retina. Reload the page before capturing so the "new version" banner isn't included.
