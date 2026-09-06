@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Shortplanner</title>
+<link rel="stylesheet" href="/css/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231a56db'/><rect x='6' y='9' width='20' height='4' fill='%23fff'/><rect x='6' y='15' width='20' height='4' fill='%23fbe38a'/><rect x='6' y='21' width='20' height='4' fill='%2379cfb0'/></svg>">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#1a56db">
+<link rel="apple-touch-icon" href="/icon.svg">
+</head>
+<body>
+
+<!-- inloggning -->
+<div id="login" class="login-wrap hidden">
+  <form class="login-card" id="loginForm" autocomplete="on">
+    <h1>Shortplanner</h1>
+    <p>Stripboard och call sheets. Ange lösenordet för att fortsätta.</p>
+    <input type="password" id="loginPw" placeholder="Lösenord" autocomplete="current-password" required>
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn btn-primary" type="submit" style="justify-content:center">Logga in</button>
+  </form>
+</div>
+
+<!-- appen -->
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div class="brand" onclick="App.goProjects()">Shortplanner<span>stripboard &amp; call sheets</span></div>
+    <div class="crumb" id="crumb"></div>
+    <div class="save-state" id="saveState"></div>
+    <div class="ml-auto" style="display:flex; gap:7px; flex-wrap:wrap;">
+      <button class="btn btn-sm" id="btnCast" onclick="App.openCast()">Skådespelare</button>
+      <button class="btn btn-sm" id="btnProjectSettings" onclick="App.openProjectSettings()">Projektinfo</button>
+      <button class="btn btn-sm" id="btnVersions" onclick="App.openVersions()">Versioner</button>
+      <button class="btn btn-sm" id="btnSaveVersion" onclick="App.openSaveVersion()">Spara version</button>
+      <button class="btn btn-sm" id="btnExport" onclick="App.exportProject()">Exportera</button>
+      <button class="btn btn-sm" id="btnShare" onclick="App.openShare()">Dela</button>
+      <button class="btn btn-sm btn-ghost" onclick="App.logout()">Logga ut</button>
+    </div>
+  </div>
+
+  <div class="tabbar hidden" id="tabbar">
+    <button class="tab active" data-tab="stripboard" onclick="App.setTab('stripboard')">Stripboard</button>
+    <button class="tab" data-tab="callsheet" onclick="App.setTab('callsheet')">Call sheets <span class="pill" id="csCount">0</span></button>
+    <button class="tab" data-tab="manus" onclick="App.setTab('manus')">Manus</button>
+    <button class="tab" data-tab="sides" onclick="App.setTab('sides')">Dagsmanus</button>
+    <button class="tab" data-tab="rullplan" onclick="App.setTab('rullplan')">Rullplan</button>
+    <button class="tab" data-tab="dpr" onclick="App.setTab('dpr')">DPR</button>
+    <button class="tab" data-tab="versions" onclick="App.setTab('versions')">Versioner <span class="pill" id="verCount">0</span></button>
+  </div>
+
+  <!-- projektlista -->
+  <div class="page page-narrow tabpanel active" id="view-projects">
+    <div class="page-head">
+      <h2>Projekt</h2>
+      <div class="ml-auto" style="display:flex; gap:7px;">
+        <button class="btn btn-add" onclick="App.openNewProject()">+ Nytt projekt</button>
+        <button class="btn" onclick="App.openImportProject()">Importera</button>
+        <button class="btn" id="btnSite" onclick="App.openSiteSettings()">⚙ Inställningar</button>
+      </div>
+    </div>
+    <div class="proj-grid" id="projGrid"></div>
+    <div class="empty-state hidden" id="projEmpty">Inga projekt ännu. Skapa ett för att komma igång.</div>
+  </div>
+
+  <!-- projektvy -->
+  <div id="view-project" class="hidden">
+    <div class="page tabpanel sb-scope" id="tab-stripboard"></div>
+    <div class="page tabpanel cs-scope" id="tab-callsheet"></div>
+    <div class="page tabpanel sc-scope" id="tab-manus"></div>
+    <div class="page tabpanel sc-scope" id="tab-sides"></div>
+    <div class="page tabpanel sc-scope" id="tab-rullplan"></div>
+    <div class="page tabpanel dpr-scope" id="tab-dpr"></div>
+    <div class="page page-narrow tabpanel" id="tab-versions">
+      <div class="page-head">
+        <h2>Versioner</h2>
+        <div class="ml-auto"><button class="btn btn-add" onclick="App.openSaveVersion()">+ Spara nuvarande läge</button></div>
+      </div>
+      <div class="ver-list" id="verList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- modaler -->
+<div class="overlay" id="ovNewProject">
+  <div class="modal">
+    <h3>Nytt projekt</h3>
+    <div><label for="npName">Namn</label><input type="text" id="npName" placeholder="Projektnamn"></div>
+    <p class="imp-hint">Skapar ett tomt projekt: en dag, inga scener. Vill du utgå från ett befintligt projekt, använd Duplicera eller Importera på projektlistan.</p>
+    <div class="modal-actions">
+      <button class="btn" onclick="App.closeOv('ovNewProject')">Avbryt</button>
+      <button class="btn btn-primary" onclick="App.createProject()">Skapa</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovCast">
+  <div class="modal">
+    <h3>Skådespelare</h3>
+    <p>ID-numret används i stripboardets "Roller"-kolumn och matchas automatiskt in i call sheetens kallningstider när du skapar en call sheet från en dag.</p>
+    <div class="cast-manage-list" id="castManageList"></div>
+    <div class="cast-manage-add">
+      <div>
+        <label for="cmRole">Roll / karaktär</label>
+        <input type="text" id="cmRole" placeholder="t.ex. Kvinnan" onkeydown="if(event.key==='Enter'){event.preventDefault();App.addCastMember();}">
+      </div>
+      <div>
+        <label for="cmName">Skådespelarens namn (valfritt)</label>
+        <input type="text" id="cmName" placeholder="Fylls i senare om okänt" onkeydown="if(event.key==='Enter'){event.preventDefault();App.addCastMember();}">
+      </div>
+      <button class="btn btn-primary" onclick="App.addCastMember()">+ Lägg till</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="App.closeOv('ovCast')">Stäng</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSaveVersion">
+  <div class="modal">
+    <h3>Spara version</h3>
+    <p>Fryser nuvarande stripboard och call sheets som en namngiven version. Du kan alltid återgå hit.</p>
+    <div><label for="svLabel">Namn</label><input type="text" id="svLabel" placeholder="t.ex. Finalplan v3"></div>
+    <div><label for="svNote">Anteckning (valfritt)</label><textarea id="svNote" placeholder="Vad ändrades?"></textarea></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="App.closeOv('ovSaveVersion')">Avbryt</button>
+      <button class="btn btn-primary" onclick="App.saveVersion()">Spara version</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovShare">
+  <div class="modal">
+    <h3>Dela skrivskyddad vy</h3>
+    <p>Alla med länken kan se stripboard och call sheets utan att logga in eller kunna redigera.</p>
+    <div><label for="shareLink">Länk</label><input type="text" id="shareLink" readonly onclick="this.select()"></div>
+    <div class="modal-actions">
+      <button class="btn btn-danger" onclick="App.revokeShare()">Ta bort delning</button>
+      <button class="btn" onclick="App.closeOv('ovShare')">Stäng</button>
+      <button class="btn btn-primary" onclick="App.copyShareLink()">Kopiera länk</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovImportProject">
+  <div class="modal">
+    <h3>Importera projekt</h3>
+    <p>Välj en JSON-fil som exporterats från Shortplanner, eller klistra in innehållet.</p>
+    <input type="file" id="ipFile" accept="application/json,.json">
+    <textarea id="ipText" placeholder='{"format": "shortplanner/project@1", ...}'></textarea>
+    <div class="modal-actions">
+      <button class="btn" onclick="App.closeOv('ovImportProject')">Avbryt</button>
+      <button class="btn btn-primary" onclick="App.importProject()">Importera</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovImportStrips">
+  <div class="modal">
+    <h3>Importera scener till stripboardet</h3>
+
+    <div class="imp-sec">
+      <strong>Från manuset</strong>
+      <p class="imp-hint" id="isManusInfo"></p>
+      <div class="radio-row" id="isMode">
+        <div class="radio-card sel" data-mode="append"><b>Lägg till nya</b>Hoppar över scennummer som redan finns.</div>
+        <div class="radio-card" data-mode="replace"><b>Ersätt alla</b>Tömmer stripboardet först.</div>
+      </div>
+      <button class="btn btn-primary" id="isManusBtn" onclick="App.stripsFromManus()">Skapa strips av manusets scener →</button>
+    </div>
+
+    <div class="imp-sec">
+      <strong>Från en stripboard-fil</strong>
+      <p class="imp-hint">JSON exporterad från Shortplanner (ett stripboard eller ett helt projekt). Ersätter nuvarande stripboard.</p>
+      <input type="file" id="isFile" accept="application/json,.json">
+      <textarea id="isText" placeholder="… eller klistra in JSON"></textarea>
+      <button class="btn" onclick="App.importStripsFile()">Läs in fil →</button>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="App.closeOv('ovImportStrips')">Stäng</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovProjectSettings">
+  <div class="modal">
+    <h3>Projektinfo</h3>
+    <p class="imp-hint">Förifyller nya call sheets när de skapas från stripboardet. Ändrar inte call sheets som redan finns.</p>
+    <div><label for="psTitle">Titel</label><input type="text" id="psTitle"></div>
+    <div><label for="psCompany">Produktionsbolag</label><input type="text" id="psCompany"></div>
+    <div><label for="psProducer">Producent</label><input type="text" id="psProducer"></div>
+    <div><label for="psProducerPhone">Producentens telefon</label><input type="text" id="psProducerPhone"></div>
+    <div><label for="psDirector">Regi</label><input type="text" id="psDirector"></div>
+    <div><label for="psDop">Foto (DoP)</label><input type="text" id="psDop"></div>
+    <div><label for="psFirstAD">1:e AD</label><input type="text" id="psFirstAD"></div>
+    <div><label for="psLocationManager">Platschef</label><input type="text" id="psLocationManager"></div>
+    <div style="display:flex; gap:10px;">
+      <div style="flex:1"><label for="psShootStart">Inspelning från</label><input type="date" id="psShootStart"></div>
+      <div style="flex:1"><label for="psShootEnd">till</label><input type="date" id="psShootEnd"></div>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <div style="flex:1"><label for="psFormat">Format</label><input type="text" id="psFormat" placeholder="16mm / digitalt"></div>
+      <div style="flex:1"><label for="psAspect">Bildförhållande</label><input type="text" id="psAspect" placeholder="1.85:1"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="App.closeOv('ovProjectSettings')">Avbryt</button>
+      <button class="btn btn-primary" onclick="App.saveProjectSettings()">Spara</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="ovSiteSettings">
+  <div class="modal">
+    <h3>Inställningar för sajten</h3>
+    <p class="imp-hint">Gäller hela installationen, inte ett enskilt projekt.</p>
+
+    <div class="imp-sec">
+      <strong>Företag</strong>
+      <div><label for="ssName">Namn</label><input type="text" id="ssName" placeholder="t.ex. Mitt produktionsbolag"></div>
+      <div><label for="ssOrg">Org.nr</label><input type="text" id="ssOrg"></div>
+      <div><label for="ssAddr">Adress</label><textarea id="ssAddr" style="min-height:48px"></textarea></div>
+      <div><label for="ssPhone">Telefon</label><input type="text" id="ssPhone"></div>
+      <div><label for="ssEmail">E-post</label><input type="text" id="ssEmail"></div>
+      <div><label for="ssWeb">Webb</label><input type="text" id="ssWeb"></div>
+    </div>
+
+    <div class="imp-sec">
+      <strong>Logotyp</strong>
+      <p class="imp-hint">Visas i call sheets. PNG/JPG/SVG, max 2 MB. Utan uppladdad logga används den inbyggda.</p>
+      <div id="ssLogoPreview" class="ss-logo-preview"></div>
+      <input type="file" id="ssLogoFile" accept="image/png,image/jpeg,image/svg+xml,image/webp">
+      <div style="display:flex; gap:8px;">
+        <button class="btn" onclick="App.uploadLogo()">Ladda upp</button>
+        <button class="btn btn-danger" onclick="App.removeLogo()">Ta bort logga</button>
+      </div>
+    </div>
+
+    <div class="imp-sec">
+      <strong>Flikar</strong>
+      <label class="ss-check"><input type="checkbox" id="ssRullplan"> Visa Rullplan-fliken</label>
+      <label class="ss-check"><input type="checkbox" id="ssDpr"> Visa DPR-fliken</label>
+    </div>
+
+    <div class="imp-sec">
+      <strong>Språk</strong>
+      <div><select id="ssLocale"><option value="sv">Svenska</option><option value="en">English</option></select></div>
+      <p class="imp-hint">Engelska är delvis översatt — redigeringsvyerna är svenska tills vidare.</p>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="App.closeOv('ovSiteSettings')">Avbryt</button>
+      <button class="btn btn-primary" onclick="App.saveSiteSettings()">Spara</button>
+    </div>
+  </div>
+</div>
+
+<div class="conflict-bar hidden" id="conflictBar">
+  <span>Projektet har ändrats på en annan enhet. Dina osparade ändringar här är kvar tills du väljer.</span>
+  <button class="btn btn-sm" onclick="App.reloadAfterConflict()">Ladda om</button>
+  <button class="btn btn-sm btn-danger" onclick="App.overwriteAfterConflict()">Skriv över ändå</button>
+</div>
+
+<div class="update-bar hidden" id="updateBar">
+  <span>En nyare version av Shortplanner finns.</span>
+  <button class="btn btn-sm btn-primary" onclick="location.reload()">Ladda om</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="/js/vendor/qrcode-generator.js"></script>
+<script src="/js/vendor/pdf.min.js"></script>
+<script src="/js/stripboard.js"></script>
+<script src="/js/callsheet.js"></script>
+<script src="/js/script.js"></script>
+<script src="/js/dpr.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>

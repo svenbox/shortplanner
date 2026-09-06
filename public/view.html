@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Shortplanner – delad vy</title>
+<link rel="stylesheet" href="/css/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231a56db'/><rect x='6' y='9' width='20' height='4' fill='%23fff'/><rect x='6' y='15' width='20' height='4' fill='%23fbe38a'/><rect x='6' y='21' width='20' height='4' fill='%2379cfb0'/></svg>">
+</head>
+<body>
+
+<div id="viewLoading" class="page page-narrow" style="text-align:center; padding-top:60px; color:var(--text-muted)">Laddar…</div>
+<div id="viewError" class="page page-narrow hidden" style="text-align:center; padding-top:60px; color:var(--danger)"></div>
+
+<div id="viewApp" class="hidden">
+  <div class="topbar">
+    <div class="brand">Shortplanner<span>delad, skrivskyddad vy</span></div>
+    <div class="crumb"><strong id="viewTitle"></strong></div>
+  </div>
+  <div class="share-freshness hidden" id="shareFreshness"></div>
+
+  <div class="tabbar" id="viewTabbar">
+    <button class="tab active" data-tab="stripboard" onclick="viewSetTab('stripboard')">Stripboard</button>
+    <button class="tab" data-tab="callsheet" onclick="viewSetTab('callsheet')">Call sheets</button>
+    <button class="tab" data-tab="manus" onclick="viewSetTab('manus')">Manus</button>
+    <button class="tab" data-tab="sides" onclick="viewSetTab('sides')">Dagsmanus</button>
+    <button class="tab" data-tab="rullplan" onclick="viewSetTab('rullplan')">Rullplan</button>
+  </div>
+
+  <div class="page tabpanel sb-scope active" id="view-stripboard"></div>
+  <div class="page tabpanel cs-scope" id="view-callsheet"></div>
+  <div class="page tabpanel sc-scope" id="view-manus"></div>
+  <div class="page tabpanel sc-scope" id="view-sides"></div>
+  <div class="page tabpanel sc-scope" id="view-rullplan"></div>
+</div>
+
+<div class="update-bar hidden" id="updateBar">
+  <span>En nyare version av sidan finns.</span>
+  <button class="btn btn-sm btn-primary" onclick="location.reload()">Ladda om</button>
+</div>
+
+<script src="/js/vendor/qrcode-generator.js"></script>
+<script src="/js/stripboard.js"></script>
+<script src="/js/callsheet.js"></script>
+<script src="/js/script.js"></script>
+<script src="/js/view.js"></script>
+</body>
+</html>

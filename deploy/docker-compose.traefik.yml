@@ -1,0 +1,23 @@
+# Alternativ compose för dig som redan kör Traefik.
+services:
+  shortplanner:
+    build: .
+    container_name: shortplanner
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - shortplanner-data:/data
+    networks: [traefik]
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.shortplanner.rule: "Host(`shortplanner.example.com`)"
+      traefik.http.routers.shortplanner.entrypoints: "websecure"
+      traefik.http.routers.shortplanner.tls.certresolver: "le"
+      traefik.http.services.shortplanner.loadbalancer.server.port: "3000"
+
+volumes:
+  shortplanner-data:
+
+networks:
+  traefik:
+    external: true

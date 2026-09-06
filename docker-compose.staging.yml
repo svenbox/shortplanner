@@ -1,0 +1,25 @@
+services:
+  shortplanner-staging:
+    build: .
+    container_name: shortplanner-staging
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: "3000"
+      DATA_DIR: "/data"
+      BUILD_ID: "${BUILD_ID:-}"
+    volumes:
+      - shortplanner-staging-data:/data
+    ports:
+      # Bind bara till localhost — TLS och publik åtkomst sköts av reverse proxy.
+      - "127.0.0.1:${HOST_PORT:-8091}:3000"
+    networks:
+      - default
+      - mediastack
+
+volumes:
+  shortplanner-staging-data:
+
+networks:
+  mediastack:
+    external: true

@@ -1,0 +1,30 @@
+services:
+  shortplanner:
+    build: .
+    # Använd hellre en byggd image om du bygger på annan maskin:
+    # image: ghcr.io/svenbox/shortplanner:latest
+    container_name: shortplanner
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PORT: "3000"
+      DATA_DIR: "/data"
+      # Lämna tom -> servern hashar de statiska filerna. Sätt t.ex.
+      # BUILD_ID=$(git rev-parse --short HEAD) före `docker compose up` om
+      # du hellre vill ha git-sha som versionsstämpel.
+      BUILD_ID: "${BUILD_ID:-}"
+    volumes:
+      - shortplanner-data:/data
+    ports:
+      # Bind bara till localhost — TLS och publik åtkomst sköts av reverse proxy.
+      - "127.0.0.1:${HOST_PORT:-8090}:3000"
+    networks:
+      - default
+      - mediastack
+
+volumes:
+  shortplanner-data:
+
+networks:
+  mediastack:
+    external: true

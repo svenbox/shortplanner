@@ -1,0 +1,17 @@
+# /etc/caddy/Caddyfile
+# Caddy fixar Let's Encrypt-certifikat automatiskt.
+# Peka först shortplanner.example.com (A/AAAA) mot serverns IP.
+
+shortplanner.example.com {
+	encode zstd gzip
+
+	# Skydda mot inbäddning på andra sajter
+	header {
+		X-Frame-Options "SAMEORIGIN"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		Strict-Transport-Security "max-age=31536000"
+	}
+
+	reverse_proxy 127.0.0.1:8080
+}
