@@ -47,6 +47,11 @@ if (!projectCols.includes("share_token")) {
   db.exec("ALTER TABLE projects ADD COLUMN share_token TEXT");
 }
 db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_projects_share_token ON projects(share_token) WHERE share_token IS NOT NULL");
+/* Vilka komponenter en delningslänk visar. JSON-array; NULL = alla
+   (bakåtkompatibelt — gamla delningar visar allt som förr). */
+if (!projectCols.includes("share_components")) {
+  db.exec("ALTER TABLE projects ADD COLUMN share_components TEXT");
+}
 
 /* Versioner fryste ursprungligen bara stripboard + callsheet. Manus och DPR
    läggs till additivt -- gamla rader har NULL, vilket vid återställning

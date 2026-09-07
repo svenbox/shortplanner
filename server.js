@@ -4,6 +4,12 @@ const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
 const { db, sessionSecret, getSiteConfig, setSiteConfig, DATA_DIR } = require("./db");
+const {
+  now, EMPTY_STRIPBOARD, EMPTY_CALLSHEET, EMPTY_SCRIPT, EMPTY_DPR, EMPTY_META,
+  getDoc, putDoc, docUpdatedAtMap, shareUpdatedAt,
+  listVersions, createVersion, restoreVersion, importProject
+} = require("./store");
+const { validateDoc, validateImport, validateShareComponents, IMPORT_FORMAT, SHARE_COMPONENTS } = require("./validate");
 
 const PORT = parseInt(process.env.PORT || "3000", 10);
 const PASSWORD = process.env.APP_PASSWORD || "";
@@ -60,7 +66,6 @@ app.use((req, res, next) => {
 });
 
 /* ---------- hjälpare ---------- */
-const now = () => new Date().toISOString();
 const b64u = (b) => Buffer.from(b).toString("base64url");
 
 function sign(payload) {
@@ -119,23 +124,7 @@ function auth(req, res, next) {
   res.status(401).json({ error: "Ej inloggad" });
 }
 
-/* ---------- startdata ---------- */
-const EMPTY_STRIPBOARD = () => ({
-  production: { film: "", version: "", producent: "", regi: "" },
-  cast: [],
-  days: [{ label: "Dag 1", date: "", start: "08:00", strips: [] }],
-  unscheduled: []
-});
-const EMPTY_CALLSHEET = () => ({
-  production: { film: "", producent: "", producent_tel: "", regi: "", foto: "", ad: "", platschef: "" },
-  days: []
-});
-const EMPTY_SCRIPT = () => ({
-  id: null, projectId: null, title: "", draft: "", draftDate: "",
-  source: null, importedAt: null, scenes: []
-});
-const EMPTY_DPR = () => ({ id: null, projectId: null, days: [] });
-const EMPTY_META = () => ({ title: "", company: "", producer: "", producerPhone: "", director: "", dop: "", firstAD: "", locationManager: "", shootStart: "", shootEnd: "", format: "", aspectRatio: "" });
+/* startdata (EMPTY_*) och dok-/versionslagret bor i ./store */
 
 /* ---------- auth-endpoints ---------- */
 app.post("/api/login", (req, res) => {
@@ -279,19 +268,39 @@ app.post("/api/projects/:id/duplicate", auth, (req, res) => {
 /* ---------- delning (skrivskyddad visning) ---------- */
 function genShareToken() { return crypto.randomBytes(18).toString("base64url"); }
 
+/* NULL i share_components = alla (bakåtkompatibelt). */
+function shareComponentsOf(p) {
+  if (!p.share_components) return SHARE_COMPONENTS.slice();
+  try {
+    const arr = JSON.parse(p.share_components);
+    return SHARE_COMPONENTS.filter(c => Array.isArray(arr) && arr.includes(c));
+  } catch (_) { return SHARE_COMPONENTS.slice(); }
+}
+
 app.post("/api/projects/:id/share", auth, (req, res) => {
   const p = db.prepare("SELECT * FROM projects WHERE id = ?").get(req.params.id);
   if (!p) return res.status(404).json({ error: "Finns inte" });
-  let token = p.share_token;
-  if (!token) {
-    token = genShareToken();
-    db.prepare("UPDATE projects SET share_token = ? WHERE id = ?").run(token, p.id);
+
+  let components;
+  try {
+    // Ingen "components" i body → första delningen, allt på. Annars: rensa listan.
+    components = "components" in (req.body || {})
+      ? validateShareComponents(req.body.components)
+      : (p.share_components ? shareComponentsOf(p) : SHARE_COMPONENTS.slice());
+  } catch (e) {
+    return res.status(e.status || 400).json({ error: e.message });
   }
-  res.json({ token, url: `${req.protocol}://${req.get("host")}/share/${token}` });
+
+  let token = p.share_token;
+  if (!token) token = genShareToken();
+  db.prepare("UPDATE projects SET share_token = ?, share_components = ? WHERE id = ?")
+    .run(token, JSON.stringify(components), p.id);
+
+  res.json({ token, url: `${req.protocol}://${req.get("host")}/share/${token}`, components });
 });
 
 app.delete("/api/projects/:id/share", auth, (req, res) => {
-  db.prepare("UPDATE projects SET share_token = NULL WHERE id = ?").run(req.params.id);
+  db.prepare("UPDATE projects SET share_token = NULL, share_components = NULL WHERE id = ?").run(req.params.id);
   res.json({ ok: true });
 });
 
@@ -299,11 +308,16 @@ app.get("/api/share/:token", (req, res) => {
   const p = db.prepare("SELECT * FROM projects WHERE share_token = ?").get(req.params.token);
   if (!p) return res.status(404).json({ error: "Länken är ogiltig eller borttagen" });
   const sc = getSiteConfig();
+  const comps = shareComponentsOf(p);
+  const has = (c) => comps.includes(c);
+  // Manus/Dagsmanus/Rullplan bygger alla på script-doket
+  const needsScript = has("manus") || has("sides") || has("rullplan");
   res.json({
     project: { id: p.id, name: p.name },
-    stripboard: getDoc(p.id, "stripboard") || EMPTY_STRIPBOARD(),
-    callsheet: getDoc(p.id, "callsheet") || EMPTY_CALLSHEET(),
-    script: getDoc(p.id, "script") || EMPTY_SCRIPT(),
+    components: comps,
+    stripboard: has("stripboard") ? (getDoc(p.id, "stripboard") || EMPTY_STRIPBOARD()) : EMPTY_STRIPBOARD(),
+    callsheet: has("callsheet") ? (getDoc(p.id, "callsheet") || EMPTY_CALLSHEET()) : EMPTY_CALLSHEET(),
+    script: needsScript ? (getDoc(p.id, "script") || EMPTY_SCRIPT()) : EMPTY_SCRIPT(),
     site: { company: { name: sc.company.name }, hasLogo: !!(sc.logo && sc.logo.ext), features: sc.features, locale: sc.locale },
     updatedAt: shareUpdatedAt(p.id)
   });
@@ -331,6 +345,11 @@ app.put("/api/projects/:id/doc/:kind", auth, (req, res) => {
   if (!p) return res.status(404).json({ error: "Finns inte" });
   const data = req.body && req.body.data;
   if (!data || typeof data !== "object") return res.status(400).json({ error: "Saknar data" });
+  try {
+    validateDoc(kind, data);
+  } catch (e) {
+    return res.status(e.status || 400).json({ error: "Ogiltigt " + kind + "-dokument: " + e.message });
+  }
   /* Optimistisk låsning: klienten skickar med den updated_at den senast kände
      till för dokumentet. Har en annan enhet hunnit spara emellan stämmer den
      inte -> 409 istället för tyst överskrivning. baseUpdatedAt utelämnas av
@@ -353,19 +372,7 @@ app.get("/api/projects/:id/versions", auth, (req, res) => res.json(listVersions(
 app.post("/api/projects/:id/versions", auth, (req, res) => {
   const p = db.prepare("SELECT id FROM projects WHERE id = ?").get(req.params.id);
   if (!p) return res.status(404).json({ error: "Finns inte" });
-  const label = String((req.body && req.body.label) || "").trim() || ("Version " + (listVersions(p.id).length + 1));
-  const note = String((req.body && req.body.note) || "").trim();
-  const ts = now();
-  const info = db.prepare(`INSERT INTO versions (project_id, label, note, stripboard, callsheet, script, dpr, created_at)
-    VALUES (?,?,?,?,?,?,?,?)`).run(
-    p.id, label, note,
-    JSON.stringify(getDoc(p.id, "stripboard") || EMPTY_STRIPBOARD()),
-    JSON.stringify(getDoc(p.id, "callsheet") || EMPTY_CALLSHEET()),
-    JSON.stringify(getDoc(p.id, "script") || EMPTY_SCRIPT()),
-    JSON.stringify(getDoc(p.id, "dpr") || EMPTY_DPR()),
-    ts);
-  db.prepare("UPDATE projects SET updated_at = ? WHERE id = ?").run(ts, p.id);
-  res.json({ id: info.lastInsertRowid, label, note, created_at: ts });
+  res.json(createVersion(p.id, req.body && req.body.label, req.body && req.body.note));
 });
 
 app.get("/api/versions/:vid", auth, (req, res) => {
@@ -381,25 +388,15 @@ app.get("/api/versions/:vid", auth, (req, res) => {
 });
 
 app.post("/api/versions/:vid/restore", auth, (req, res) => {
-  const v = db.prepare("SELECT * FROM versions WHERE id = ?").get(req.params.vid);
-  if (!v) return res.status(404).json({ error: "Finns inte" });
-  /* spara nuvarande arbetsläge först så inget går förlorat */
-  const ts = now();
-  db.prepare(`INSERT INTO versions (project_id, label, note, stripboard, callsheet, script, dpr, created_at)
-    VALUES (?,?,?,?,?,?,?,?)`).run(
-    v.project_id, "Före återställning", "Automatiskt sparad innan »" + v.label + "« återställdes",
-    JSON.stringify(getDoc(v.project_id, "stripboard") || EMPTY_STRIPBOARD()),
-    JSON.stringify(getDoc(v.project_id, "callsheet") || EMPTY_CALLSHEET()),
-    JSON.stringify(getDoc(v.project_id, "script") || EMPTY_SCRIPT()),
-    JSON.stringify(getDoc(v.project_id, "dpr") || EMPTY_DPR()),
-    ts);
-  putDoc(v.project_id, "stripboard", JSON.parse(v.stripboard));
-  putDoc(v.project_id, "callsheet", JSON.parse(v.callsheet));
-  /* Äldre versioner (från innan Manus/DPR frystes) har NULL här -- lämna
-     nuvarande Manus/DPR orörda i så fall istället för att nolla dem. */
-  if (v.script) putDoc(v.project_id, "script", JSON.parse(v.script));
-  if (v.dpr) putDoc(v.project_id, "dpr", JSON.parse(v.dpr));
-  res.json({ ok: true });
+  /* Säkerhetskopian + återläsningen av alla dokument körs som EN atomär
+     transaktion i store.restoreVersion — allt eller inget. */
+  try {
+    res.json(restoreVersion(req.params.vid));
+  } catch (e) {
+    if (e && e.code === "NOT_FOUND") return res.status(404).json({ error: "Finns inte" });
+    console.error("restore misslyckades:", e);
+    return res.status(500).json({ error: "Återställning misslyckades — inget ändrades" });
+  }
 });
 
 app.patch("/api/versions/:vid", auth, (req, res) => {
@@ -421,7 +418,7 @@ app.get("/api/projects/:id/export", auth, (req, res) => {
   const p = db.prepare("SELECT * FROM projects WHERE id = ?").get(req.params.id);
   if (!p) return res.status(404).json({ error: "Finns inte" });
   const payload = {
-    format: "shortplanner/project@1",
+    format: IMPORT_FORMAT,
     name: p.name,
     exported_at: now(),
     stripboard: getDoc(p.id, "stripboard"),
@@ -443,62 +440,25 @@ app.get("/api/projects/:id/export", auth, (req, res) => {
 });
 
 app.post("/api/projects/import", auth, (req, res) => {
-  const b = req.body || {};
-  if (!b.stripboard) return res.status(400).json({ error: "Filen saknar stripboard" });
-  const ts = now();
-  const name = String(b.name || "Importerat projekt").trim();
-  const id = db.prepare("INSERT INTO projects (name, created_at, updated_at) VALUES (?,?,?)").run(name, ts, ts).lastInsertRowid;
-  putDoc(id, "stripboard", b.stripboard);
-  putDoc(id, "callsheet", b.callsheet || EMPTY_CALLSHEET());
-  if (b.script) putDoc(id, "script", b.script);
-  if (b.dpr) putDoc(id, "dpr", b.dpr);
-  if (b.meta) putDoc(id, "meta", b.meta);
-  (b.versions || []).forEach(v => {
-    db.prepare(`INSERT INTO versions (project_id, label, note, stripboard, callsheet, script, dpr, created_at) VALUES (?,?,?,?,?,?,?,?)`)
-      .run(id, String(v.label || "Version"), String(v.note || ""),
-        JSON.stringify(v.stripboard || {}), JSON.stringify(v.callsheet || {}),
-        v.script ? JSON.stringify(v.script) : null, v.dpr ? JSON.stringify(v.dpr) : null,
-        String(v.created_at || ts));
-  });
-  res.json({ id, name });
+  /* Hela payloaden valideras (struktur + storleksgränser) INNAN något rör
+     databasen. Aldrig lita på JSON bara för att den parsade. */
+  try {
+    validateImport(req.body || {});
+  } catch (e) {
+    return res.status(e.status || 400).json({ error: "Kan inte importera: " + e.message });
+  }
+  /* Skapandet körs som EN transaktion i store.importProject — går något
+     fel skapas inget projekt alls. */
+  try {
+    res.json(importProject(req.body));
+  } catch (e) {
+    console.error("import misslyckades:", e);
+    return res.status(500).json({ error: "Importen misslyckades — inget skapades" });
+  }
 });
 
-/* ---------- doc-hjälpare ---------- */
-function getDoc(projectId, kind) {
-  const r = db.prepare("SELECT data FROM docs WHERE project_id = ? AND kind = ?").get(projectId, kind);
-  if (!r) return null;
-  try { return JSON.parse(r.data); } catch { return null; }
-}
-function putDoc(projectId, kind, obj) {
-  const ts = now();
-  db.prepare(`INSERT INTO docs (project_id, kind, data, updated_at) VALUES (?,?,?,?)
-    ON CONFLICT(project_id, kind) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at`)
-    .run(projectId, kind, JSON.stringify(obj), ts);
-  db.prepare("UPDATE projects SET updated_at = ? WHERE id = ?").run(ts, projectId);
-  return ts;
-}
-/* Per-dokument updated_at -- klienten får den vid projektöppning och skickar
-   tillbaka den vid varje spar, så servern kan upptäcka att en annan enhet
-   hunnit spara samma dokument emellan (optimistisk låsning i PUT .../doc/:kind). */
-/* Senaste ändringstidpunkten över alla dokument i projektet -- share-vyn
-   pollar den för att veta om den behöver hämta om datat (ISO-strängar
-   sorteras lexikalt = kronologiskt). */
-function shareUpdatedAt(projectId) {
-  const vals = Object.values(docUpdatedAtMap(projectId));
-  return vals.length ? vals.sort().slice(-1)[0] : null;
-}
-function docUpdatedAtMap(projectId) {
-  const map = {};
-  for (const r of db.prepare("SELECT kind, updated_at FROM docs WHERE project_id = ?").all(projectId)) {
-    map[r.kind] = r.updated_at;
-  }
-  return map;
-}
-function listVersions(projectId) {
-  return db.prepare(`SELECT id, label, note, created_at,
-      length(stripboard) AS sb_size, length(callsheet) AS cs_size
-    FROM versions WHERE project_id = ? ORDER BY created_at DESC, id DESC`).all(projectId);
-}
+/* doc-hjälpare (getDoc/putDoc/docUpdatedAtMap/shareUpdatedAt/listVersions)
+   och versionslogiken bor i ./store */
 
 /* ---------- väder ---------- */
 const WEATHER_UA = "Shortplanner/1.0 (self-hosted stripboard-verktyg; kontakt: " + (process.env.WEATHER_CONTACT || "ej angiven, se WEATHER_CONTACT i .env") + ")";

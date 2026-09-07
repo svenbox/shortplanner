@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# Ingen automatisk deploy. Den här pipelinen bygger och testar bara.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint & tester
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installera beroenden
+        run: npm ci
+
+      - name: Statisk koll (node --check på all förstapartskod)
+        run: npm run lint
+
+      - name: Kör testsviten
+        run: npm test
+
+  docker:
+    name: Docker-bygge & smoke-test
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bygg image
+        run: docker build -t shortplanner:ci .
+
+      - name: Starta containern
+        run: |
+          docker run -d --name sp \
+            -e APP_PASSWORD=ci-test-password \
+            -e PORT=3000 \
+            -p 3000:3000 \
+            shortplanner:ci
+
+      - name: Vänta tills den svarar
+        run: |
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3000/api/version >/dev/null; then
+              echo "uppe efter ${i}s"; exit 0
+            fi
+            sleep 1
+          done
+          echo "servern kom aldrig upp"; docker logs sp; exit 1
+
+      - name: Smoke-test
+        run: |
+          set -euo pipefail
+
+          echo "1) /api/version returnerar en build-id"
+          curl -fsS http://127.0.0.1:3000/api/version | grep -q '"version"'
+
+          echo "2) skyddad endpoint kräver inloggning"
+          code=$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/api/projects)
+          test "$code" = "401"
+
+          echo "3) fel lösenord nekas"
+          code=$(curl -s -o /dev/null -w '%{http_code}' -X POST http://127.0.0.1:3000/api/login \
+            -H 'Content-Type: application/json' -d '{"password":"fel"}')
+          test "$code" = "401"
+
+          echo "4) rätt lösenord loggar in, cookie funkar, projekt kan skapas och läsas"
+          curl -fsS -c cookies.txt -X POST http://127.0.0.1:3000/api/login \
+            -H 'Content-Type: application/json' -d '{"password":"ci-test-password"}' >/dev/null
+          pid=$(curl -fsS -b cookies.txt -X POST http://127.0.0.1:3000/api/projects \
+            -H 'Content-Type: application/json' -d '{"name":"ci-smoke"}' \
+            | node -e 'process.stdin.on("data",d=>console.log(JSON.parse(d).id))')
+          test -n "$pid"
+          curl -fsS -b cookies.txt "http://127.0.0.1:3000/api/projects/$pid" | grep -q '"stripboard"'
+
+          echo "5) statiska filer serveras"
+          curl -fsS http://127.0.0.1:3000/js/stripboard-core.js | grep -q "SBCore"
+
+          echo "alla smoke-tester gröna"
+
+      - name: Containerloggar (alltid)
+        if: always()
+        run: docker logs sp || true
+
+      - name: Städa
+        if: always()
+        run: docker rm -f sp || true

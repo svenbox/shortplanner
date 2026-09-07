@@ -19,7 +19,7 @@ function notify() { opts.onChange(DATA); }
 const SBCore = window.SBCore;
 const {
   parseEst, fmtEst, parsePages, fmtPages, t2m, m2t,
-  dateSv, dateShort, todayIso, daysBetween, closestDayIndex,
+  dateSv, dateShort, todayIso, daysBetween, addDays, closestDayIndex,
   stripClass, dayTotals, recalcDay
 } = SBCore;
 
@@ -270,8 +270,7 @@ function addStrip(di, type) {
 }
 function addDay() {
   const last = DATA.days[DATA.days.length - 1];
-  let date = "";
-  if (last && last.date) { const d = new Date(last.date + "T12:00:00"); d.setDate(d.getDate() + 1); date = d.toISOString().slice(0, 10); }
+  const date = (last && last.date) ? addDays(last.date, 1) : "";
   DATA.days.push({ label: "Dag " + (DATA.days.length + 1), date, start: "08:00", strips: [] });
   notify(); render();
 }

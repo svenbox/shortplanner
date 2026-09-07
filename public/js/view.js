@@ -72,9 +72,13 @@
     }
   }
 
+  function firstVisibleTab() {
+    const t = document.querySelector('#viewTabbar .tab:not([hidden])');
+    return t ? t.dataset.tab : "stripboard";
+  }
   function setTab(name) {
     const target = document.querySelector('#viewTabbar .tab[data-tab="' + name + '"]');
-    if (target && target.hidden) name = "stripboard";
+    if (!target || target.hidden) name = firstVisibleTab();
     activeTab = name;
     document.querySelectorAll("#viewTabbar .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
     ["stripboard", "callsheet", "manus", "sides", "rullplan"].forEach(n =>
@@ -123,12 +127,18 @@
     lastUpdatedAt = d.updatedAt || null;
     projectName = d.project.name;
     document.getElementById("viewTitle").textContent = d.project.name;
-    /* Sajtens feature-flaggor: göm avstängda flikar även i delade vyn. */
+    /* Två saker gömmer en flik i delade vyn:
+       1. sajtens feature-flaggor (rullplan/dpr/manus avstängda globalt)
+       2. vilka komponenter just den här delningslänken valt att visa
+          (d.components; saknas → alla, bakåtkompatibelt). */
     const f = (d.site && d.site.features) || {};
-    ["rullplan", "dpr", "manus", "sides"].forEach(k => {
-      const key = (k === "sides") ? "manus" : k;
-      const tab = document.querySelector('#viewTabbar .tab[data-tab="' + k + '"]');
-      if (tab) tab.hidden = f[key] === false;
+    const comps = Array.isArray(d.components) ? d.components : ["stripboard", "callsheet", "manus", "sides", "rullplan"];
+    document.querySelectorAll("#viewTabbar .tab").forEach(tab => {
+      const k = tab.dataset.tab;
+      const featureKey = (k === "sides") ? "manus" : k;
+      const offByFeature = f[featureKey] === false;
+      const offByShare = !comps.includes(k);   // dpr finns inte i comps → alltid dold (som förr)
+      tab.hidden = offByFeature || offByShare;
     });
     SB.mount(document.getElementById("view-stripboard"), d.stripboard, { readOnly: true });
     CS.mount(document.getElementById("view-callsheet"), d.callsheet, {

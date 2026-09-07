@@ -134,7 +134,16 @@
 <div class="overlay" id="ovShare">
   <div class="modal">
     <h3>Dela skrivskyddad vy</h3>
-    <p>Alla med länken kan se stripboard och call sheets utan att logga in eller kunna redigera.</p>
+    <p>Alla med länken kan se de valda komponenterna utan att logga in eller kunna redigera. DPR delas aldrig.</p>
+    <div class="imp-sec">
+      <strong>Vad som delas</strong>
+      <label class="ss-check"><input type="checkbox" id="shrStripboard" onchange="App.updateShareComponents()"> Stripboard</label>
+      <label class="ss-check"><input type="checkbox" id="shrCallsheet" onchange="App.updateShareComponents()"> Call sheet</label>
+      <label class="ss-check"><input type="checkbox" id="shrManus" onchange="App.updateShareComponents()"> Manus</label>
+      <label class="ss-check"><input type="checkbox" id="shrSides" onchange="App.updateShareComponents()"> Dagsmanus</label>
+      <label class="ss-check"><input type="checkbox" id="shrRullplan" onchange="App.updateShareComponents()"> Rullplan</label>
+      <p class="imp-hint" id="shrHint"></p>
+    </div>
     <div><label for="shareLink">Länk</label><input type="text" id="shareLink" readonly onclick="this.select()"></div>
     <div class="modal-actions">
       <button class="btn btn-danger" onclick="App.revokeShare()">Ta bort delning</button>

@@ -630,7 +630,11 @@ async function restoreVersion(id) {
   const v = state.versions.find(x => x.id === id);
   if (!confirm(`Återställ "${v ? v.label : id}"?\n\nNuvarande läge sparas automatiskt som en egen version först.`)) return;
   await flushSave(true);
-  await api("POST", `/api/versions/${id}/restore`, {});
+  try {
+    await api("POST", `/api/versions/${id}/restore`, {});
+  } catch (e) {
+    return alert("Kunde inte återställa: " + e.message + "\n\nInget ändrades.");
+  }
   toast("Version återställd");
   await openProject(state.project.id);
   setTab("stripboard");
@@ -802,13 +806,39 @@ function shareUrlFor() {
     ? location.origin + "/share/" + state.project.share_token
     : null;
 }
+const SHARE_BOXES = { shrStripboard: "stripboard", shrCallsheet: "callsheet", shrManus: "manus", shrSides: "sides", shrRullplan: "rullplan" };
+function setShareBoxes(components) {
+  const on = new Set(components || Object.values(SHARE_BOXES));
+  Object.entries(SHARE_BOXES).forEach(([id, key]) => { $(id).checked = on.has(key); });
+  updateShareHint();
+}
+function readShareBoxes() {
+  return Object.entries(SHARE_BOXES).filter(([id]) => $(id).checked).map(([, key]) => key);
+}
+function updateShareHint() {
+  const n = readShareBoxes().length;
+  $("shrHint").textContent = n === 5 ? "Hela projektet delas (utom DPR)."
+    : n === 0 ? "Välj minst en komponent."
+    : `${n} av 5 komponenter delas.`;
+}
 async function openShare() {
   const r = await api("POST", `/api/projects/${state.project.id}/share`, {});
   state.project.share_token = r.token;
   $("shareLink").value = r.url;
+  setShareBoxes(r.components);
   openOv("ovShare");
   setTimeout(() => $("shareLink").select(), 50);
   remountCallSheet();
+}
+async function updateShareComponents() {
+  updateShareHint();
+  const components = readShareBoxes();
+  if (!components.length) return;   // servern skulle avvisa; vänta på ett giltigt val
+  try {
+    const r = await api("POST", `/api/projects/${state.project.id}/share`, { components });
+    state.project.share_token = r.token;
+    $("shareLink").value = r.url;
+  } catch (e) { alert("Kunde inte uppdatera delningen: " + e.message); }
 }
 function copyShareLink() {
   const el = $("shareLink");
@@ -902,7 +932,7 @@ return {
   exportProject, openImportProject, importProject, openImportStrips, stripsFromManus, importStripsFile, stripboardFromManus,
   openSiteSettings, saveSiteSettings, uploadLogo, removeLogo,
   openProjectSettings, saveProjectSettings,
-  openShare, copyShareLink, revokeShare,
+  openShare, copyShareLink, revokeShare, updateShareComponents,
   openCast, addCastMember, editCastMember, removeCastMember, logout, closeOv, toast,
   reloadAfterConflict, overwriteAfterConflict
 };

@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends tini \
  && mkdir -p /data && chown node:node /data
 
 COPY --from=build /app/node_modules ./node_modules
-COPY package.json server.js db.js ./
+COPY package.json server.js db.js store.js validate.js ./
 COPY public ./public
 
 USER node

@@ -72,29 +72,56 @@
     return String(Math.floor(min / 60)).padStart(2, "0") + ":" + String(min % 60).padStart(2, "0");
   }
 
-  /* ---- datum ---- */
+  /* ---- datum ----
+     Kanonisk representation för en inspelningsdag är strängen "YYYY-MM-DD".
+     Ingen Date/epoch lagras. När vi MÅSTE räkna kalender (veckodag, datum-
+     differens, +1 dag) parsar vi ALLTID vid LOKAL middag ("...T12:00:00",
+     ingen Z) och läser LOKALA delar (getDate osv), aldrig toISOString().
+     Middagsankaret gör att sommartidsbytet (kl 02–03) och midnatt inte kan
+     knuffa dagen till gårdagen/morgondagen, oavsett webbläsarens tidszon.
+     Se docs/datetime-canonical.md. */
+
+  function ymd(y, m, d) {
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  }
+  /* "YYYY-MM-DD" vid lokal middag, eller null om ogiltigt. */
+  function parseLocalNoon(iso) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(iso || ""))) return null;
+    const d = new Date(iso + "T12:00:00");
+    return isNaN(d) ? null : d;
+  }
 
   function dateSv(iso, long) {
-    const d = new Date(iso + "T12:00:00");
-    if (isNaN(d)) return iso || "";
+    const d = parseLocalNoon(iso);
+    if (!d) return iso || "";
     return `${long ? SV_DAYS_LONG[d.getDay()] : SV_DAYS[d.getDay()]} ${d.getDate()} ${SV_MON[d.getMonth()]} ${d.getFullYear()}`;
   }
 
   function dateShort(iso) {
-    const d = new Date(iso + "T12:00:00");
-    if (isNaN(d)) return { m: "", d: "" };
+    const d = parseLocalNoon(iso);
+    if (!d) return { m: "", d: "" };
     return { m: SV_MON[d.getMonth()].toUpperCase(), d: String(d.getDate()).padStart(2, "0") };
   }
 
   function todayIso() {
     const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return ymd(d.getFullYear(), d.getMonth() + 1, d.getDate());
   }
 
   function daysBetween(isoA, isoB) {
-    const a = new Date(isoA + "T12:00:00"), b = new Date(isoB + "T12:00:00");
-    if (isNaN(a) || isNaN(b)) return Infinity;
+    const a = parseLocalNoon(isoA), b = parseLocalNoon(isoB);
+    if (!a || !b) return Infinity;
+    // Middagsankare: en DST-dag är 23 eller 25 h, men round() suger upp ±1 h.
     return Math.round((a - b) / 86400000);
+  }
+
+  /* "YYYY-MM-DD" + n dygn → "YYYY-MM-DD". DST-/tidszonssäkert: parsar vid
+     lokal middag, stegar med setDate(), läser tillbaka LOKALA delar. */
+  function addDays(iso, n) {
+    const d = parseLocalNoon(iso);
+    if (!d) return "";
+    d.setDate(d.getDate() + (n | 0));
+    return ymd(d.getFullYear(), d.getMonth() + 1, d.getDate());
   }
 
   /* Exakt datummatch vinner; annars den dag som ligger närmast i tid. Har HELA
@@ -184,7 +211,7 @@
   return {
     SV_DAYS, SV_DAYS_LONG, SV_MON, DAY_LIMIT_MIN,
     parseEst, fmtEst, parsePages, fmtPages, t2m, m2t,
-    dateSv, dateShort, todayIso, daysBetween, closestDayIndex,
+    dateSv, dateShort, todayIso, daysBetween, addDays, closestDayIndex,
     stripClass, recalcDay, dayTotals, isLongDay, reorderStrips
   };
 });
