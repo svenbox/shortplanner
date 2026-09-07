@@ -214,7 +214,7 @@ async function openProject(id) {
     getStripboard: () => state.stripboard
   });
   DPR.mount($("tab-dpr"), state.dpr, {
-    onChange: () => markDirty("dpr"),
+    onChange: () => { markDirty("dpr"); updateShootBtn(); },
     onScriptChange: () => { markDirty("script"); SC.refreshRullplan(); },
     getScript: () => state.script,
     getCallsheet: () => state.callsheet,
@@ -222,6 +222,7 @@ async function openProject(id) {
   });
   renderVersions();
   updateCounts();
+  updateShootBtn();
   setTab("stripboard");
   /* Rullar till dagens datum i stripboardet när projektet öppnas -- ett
      rAF-varv så layouten hunnit räknas ut sedan fliken faktiskt blev
@@ -581,6 +582,20 @@ function updateCounts() {
 }
 
 /* ---------- inspelningsläge ---------- */
+/* 🎬-knappen i topplisten dyker upp bara när det finns en DPR-dag inom
+   ±1 dygn från idag -- alltså på inspelningsdagar. Annars göms den (menyn
+   är redan trång) och man når läget via DPR-fliken. */
+function updateShootBtn() {
+  const btn = $("btnShoot");
+  if (!btn) return;
+  const days = (state.dpr && state.dpr.days) || [];
+  let near = false;
+  if (window.SBCore && SBCore.daysBetween) {
+    const today = SBCore.todayIso();
+    near = days.some(d => d.date_iso && Math.abs(SBCore.daysBetween(d.date_iso, today)) <= 1);
+  }
+  btn.style.display = near ? "" : "none";
+}
 function openShootDay() {
   const days = (state.dpr && state.dpr.days) || [];
   if (!days.length) { toast("Skapa en DPR för dagen först (DPR-fliken → 🎬)"); return; }
@@ -950,7 +965,7 @@ document.addEventListener("DOMContentLoaded", init);
 
 return {
   goProjects, openProject, openNewProject, createProject, renameProject, duplicateProject, deleteProject,
-  setTab, openShootDay, closeShootDay, openVersions, openSaveVersion, saveVersion, restoreVersion, renameVersion, deleteVersion, downloadVersion,
+  setTab, openShootDay, closeShootDay, updateShootBtn, openVersions, openSaveVersion, saveVersion, restoreVersion, renameVersion, deleteVersion, downloadVersion,
   exportProject, openImportProject, importProject, openImportStrips, stripsFromManus, importStripsFile, stripboardFromManus,
   openSiteSettings, saveSiteSettings, uploadLogo, removeLogo,
   openProjectSettings, saveProjectSettings,

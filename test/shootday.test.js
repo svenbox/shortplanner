@@ -136,3 +136,57 @@ test("curStep / isLunch", () => {
   assert.equal(SD.isLunch(SD.curStep(d)), true);
   assert.equal(SD.isLunch(scene({ set: "KÖK" })), false);
 });
+
+/* ---------------- v2 ---------------- */
+test("dayStarted / pressStart — startskärmen tills första stegets start stämplats", () => {
+  const d = day([scene({ actualStart: "" }), scene({ num: "2" })]);
+  assert.equal(SD.dayStarted(d), false);
+  SD.pressStart(d, "08:58");
+  assert.equal(d.scenes[0].actualStart, "08:58");
+  assert.equal(d.times.firstShot, "08:58", "första tagningen matas in när dagen startar på en scen");
+  assert.equal(SD.dayStarted(d), true);
+  SD.pressStart(d, "09:30");
+  assert.equal(d.scenes[0].actualStart, "08:58", "startar inte om");
+});
+
+test("setCurrent — hoppar pekaren, stämplar start, rör inga statusar; klampas till intervallet", () => {
+  const d = day([scene({ actualStart: "09:00", status: "" }), scene({ num: "2" }), scene({ num: "3" })]);
+  SD.setCurrent(d, 2, "11:15");
+  assert.equal(d.currentIdx, 2);
+  assert.equal(d.scenes[2].actualStart, "11:15");
+  assert.equal(d.scenes[1].status, "", "mellansteg lämnas orört (ej avklarat)");
+  assert.equal(d.scenes[1].actualStart, "", "mellansteg får ingen start");
+  SD.setCurrent(d, 0, "11:20");
+  assert.equal(d.currentIdx, 0, "bakåthopp ok");
+  assert.equal(d.scenes[0].actualStart, "09:00", "rör inte en redan satt start vid bakåthopp");
+  SD.setCurrent(d, 99, "12:00");
+  assert.equal(d.currentIdx, 2, "klampas till sista steget");
+});
+
+test("setActualStart — giltig tid sätts, ogiltig ignoreras, kedjan hålls konsekvent", () => {
+  const d = day([scene({ actualStart: "09:00", actualEnd: "10:00", status: "done" }), scene({ num: "2", actualStart: "10:00" })], { currentIdx: 1, times: { firstShot: "09:00" } });
+  assert.equal(SD.setActualStart(d, 1, "10:12"), true);
+  assert.equal(d.scenes[1].actualStart, "10:12");
+  assert.equal(d.scenes[0].actualEnd, "10:12", "föregående stegs slut flyttas med (var samma som gamla starten)");
+  assert.equal(SD.setActualStart(d, 1, "kaka"), false, "ogiltig -> ignoreras");
+  assert.equal(d.scenes[1].actualStart, "10:12", "oförändrad efter ogiltig inmatning");
+  assert.equal(SD.setActualStart(d, 0, "08:55"), true);
+  assert.equal(d.times.firstShot, "08:55", "DPR-dagens firstShot flyttas med när den var härledd från just den tiden");
+});
+
+test("isMove / stepKind", () => {
+  assert.equal(SD.isMove(info({ label: "Förflyttning till studio" })), true);
+  assert.equal(SD.isMove(info({ label: "Company move" })), true);
+  assert.equal(SD.isMove(info({ label: "Lunch" })), false);
+  assert.equal(SD.stepKind(scene()), "scene");
+  assert.equal(SD.stepKind(info({ label: "LUNCH" })), "lunch");
+  assert.equal(SD.stepKind(info({ label: "Flytt" })), "move");
+  assert.equal(SD.stepKind(info({ label: "Säkerhetsgenomgång" })), "info");
+});
+
+test("plannedWrapMinutes — planerad start + Σ est", () => {
+  const steps = [scene({ start: "08:00", est: "1h" }), info({ label: "Lunch", est: "45m", time: "12:00" }), scene({ num: "2", est: "2h" })];
+  // 08:00 (480) + 60 + 45 + 120 = 705 = 11:45
+  assert.equal(SD.plannedWrapMinutes(steps), 705);
+  assert.equal(SD.plannedWrapMinutes([]), null);
+});

@@ -7,8 +7,12 @@
    rapporterar ändringar via opts.onChange -> app.js markDirty("dpr").
    Ingen egen lagring, ingen serverdel. Kräver nät (autosave som vanligt).
 
+   v2: startskärm ("Starta dagen"), tryck-välj aktuellt steg i steglistan,
+   tryck-korrigera den stämplade starttiden, lunch/förflyttning med egna
+   ikoner.
+
    Exponeras som window.SD i webbläsaren; går även att require:a i Node så
-   den rena logiken (wrapMinutes, press*) kan testas —
+   den rena logiken (wrapMinutes, press*, setCurrent …) kan testas —
    test/shootday.test.js. */
 (function (root, factory) {
   const api = factory();
@@ -31,18 +35,39 @@
   function effEst(step) {
     return Math.max(0, parseEst(step && step.est) + (Number(step && step.slipMin) || 0));
   }
-
   function curStep(day) {
     const steps = (day && day.scenes) || [];
     return steps[day.currentIdx || 0] || null;
   }
-  function isLunch(step) {
-    return /lunch/i.test((step && (step.label || step.set)) || "");
+  function isLunch(step) { return /lunch|rast/i.test((step && (step.label || step.set)) || ""); }
+  function isMove(step) { return /förflyttning|flytt|company\s*move|\bmove\b/i.test((step && (step.label || step.set)) || ""); }
+  function stepKind(step) {
+    if (!step || step.type === "scene") return "scene";
+    if (isLunch(step)) return "lunch";
+    if (isMove(step)) return "move";
+    return "info";
+  }
+  function dayStarted(day) {
+    return ((day && day.scenes) || []).some(s => s.actualStart);
+  }
+  function plannedStartMin(steps) {
+    const first = (steps || [])[0];
+    if (!first) return null;
+    return t2m(first.start || first.time || "");
+  }
+  /* Planerad wrap = första stegets planerade start + Σ effEst för alla steg.
+     Visas på startskärmen innan dagen börjat. */
+  function plannedWrapMinutes(steps) {
+    const base = plannedStartMin(steps);
+    if (base == null) return null;
+    let total = 0;
+    (steps || []).forEach(s => { total += effEst(s); });
+    return base + total;
   }
 
-  /* Beräknad wrap: nu + Σ(est + slip) för aktuellt och senare steg som inte
-     är klara, minus den tid som redan förflutit på det aktuella steget.
-     Returnerar minuter sedan midnatt (kan överstiga 1440 -> m2t slår runt). */
+  /* Rullande beräknad wrap: nu + Σ(est + slip) för aktuellt och senare steg
+     som inte är klara, minus förfluten tid på aktuellt steg. Minuter sedan
+     midnatt (kan överstiga 1440 -> m2t slår runt). */
   function wrapMinutes(steps, curIdx, nowMin) {
     steps = steps || [];
     let total = 0;
@@ -61,9 +86,8 @@
     return nowMin + total - Math.min(Math.max(elapsed, 0), curBudget);
   }
 
-  /* "ok" | "warn" | "over" mot arbetstidsslutet (minuter). "" om okänt. */
   function wrapClass(wrapMin, arbetEndMin) {
-    if (arbetEndMin == null) return "";
+    if (arbetEndMin == null || wrapMin == null) return "";
     if (wrapMin <= arbetEndMin) return "ok";
     if (wrapMin <= arbetEndMin + 60) return "warn";
     return "over";
@@ -74,29 +98,59 @@
   function autofillTimes(day, step) {
     day.times = day.times || {};
     if (step.type === "scene" && step.actualStart && !day.times.firstShot) day.times.firstShot = step.actualStart;
+    if (isLunch(step) && step.actualStart && !day.times.lunchOut) day.times.lunchOut = step.actualStart;
     if (isLunch(step) && step.actualEnd && !day.times.lunchIn) day.times.lunchIn = step.actualEnd;
     const steps = day.scenes || [];
     if (steps.indexOf(step) === steps.length - 1 && step.actualEnd && !day.times.campWrap) day.times.campWrap = step.actualEnd;
   }
 
-  /* Flytta pekaren ett steg framåt (om möjligt) och stämpla nästa stegs
-     faktiska start om den saknas. */
   function stepForward(day, nowStr) {
     const steps = day.scenes || [];
     if ((day.currentIdx || 0) < steps.length - 1) {
       day.currentIdx = (day.currentIdx || 0) + 1;
       const nx = steps[day.currentIdx];
       if (nx && !nx.actualStart) nx.actualStart = nowStr;
-      if (nx && isLunch(nx) && nx.actualStart && !(day.times = day.times || {}).lunchOut) day.times.lunchOut = nx.actualStart;
+      if (nx) autofillTimes(day, nx);
     }
   }
 
   function ensureStarted(day, nowStr) {
     const s = curStep(day);
-    if (s && !s.actualStart) {
-      s.actualStart = nowStr;
-      if (isLunch(s)) { day.times = day.times || {}; if (!day.times.lunchOut) day.times.lunchOut = nowStr; }
+    if (s && !s.actualStart) { s.actualStart = nowStr; autofillTimes(day, s); }
+  }
+  /* "Starta dagen" — stämplar aktuellt (första) stegets faktiska start. */
+  function pressStart(day, nowStr) { ensureStarted(day, nowStr); }
+
+  /* Tryck-välj: hoppa pekaren till valt steg. Stämplar dess start om den
+     saknas; rör inga statusar (framåthopp lämnar mellanliggande scener
+     som ej avklarade, bakåthopp behåller allt). */
+  function setCurrent(day, idx, nowStr) {
+    const steps = day.scenes || [];
+    if (!steps.length) return;
+    idx = Math.max(0, Math.min(idx | 0, steps.length - 1));
+    day.currentIdx = idx;
+    const s = steps[idx];
+    if (s && !s.actualStart) { s.actualStart = nowStr; autofillTimes(day, s); }
+  }
+
+  /* Tryck-korrigera en stämplad starttid. Ogiltig "HH:MM" -> ignoreras.
+     Håller kedjan konsekvent: om föregående stegs slut var samma som den
+     gamla starten flyttas det med, och DPR-dagens härledda tider likaså. */
+  function setActualStart(day, idx, value) {
+    const steps = day.scenes || [];
+    const s = steps[idx];
+    if (!s) return false;
+    value = String(value || "").trim();
+    if (value && t2m(value) == null) return false;
+    const old = s.actualStart;
+    s.actualStart = value;
+    if (idx > 0 && steps[idx - 1] && steps[idx - 1].actualEnd && steps[idx - 1].actualEnd === old) {
+      steps[idx - 1].actualEnd = value;
     }
+    day.times = day.times || {};
+    if (s.type === "scene" && day.times.firstShot === old) day.times.firstShot = value;
+    if (isLunch(s) && day.times.lunchOut === old) day.times.lunchOut = value;
+    return true;
   }
 
   function pressDone(day, nowStr) {
@@ -116,7 +170,7 @@
   }
   function pressSkip(day, nowStr) {
     const s = curStep(day); if (!s) return;
-    s.status = "";          // hoppa pekaren, lämna som ej avklarad
+    s.status = "";
     stepForward(day, nowStr);
   }
   function pressSlip(day, n) {
@@ -131,15 +185,20 @@
 
   let el = null, day = null, di = 0, onChange = null, closeCb = null, toast = () => {}, timer = null;
 
-  function nowStr() { const d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function nowStr() { const d = new Date(); return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
   function nowMin() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
-  function nowClock() { const d = new Date(); return nowStr() + ":" + String(d.getSeconds()).padStart(2, "0"); }
+  function nowClock() { const d = new Date(); return nowStr() + ":" + pad(d.getSeconds()); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
   function save() { if (onChange) onChange(); }
 
+  function stepIcon(s) {
+    const k = stepKind(s);
+    return k === "lunch" ? "☕" : k === "move" ? "🚚" : k === "info" ? "ⓘ" : "🎬";
+  }
   function stepTitle(s) {
     if (!s) return "";
-    if (s.type === "info") return esc(s.label || "Paus");
+    if (s.type === "info") return esc(s.label || (isLunch(s) ? "Lunch" : isMove(s) ? "Förflyttning" : "Paus"));
     return "Sc " + esc(s.num || "?");
   }
   function stepSub(s) {
@@ -148,9 +207,7 @@
     return [s.ie, s.set].filter(Boolean).map(esc).join(" · ").toLowerCase();
   }
 
-  function act(fn) {
-    return () => { fn(); save(); render(); };
-  }
+  function act(fn) { return () => { fn(); save(); render(); }; }
 
   function render() {
     if (!el || !day) return;
@@ -159,12 +216,7 @@
     const curIdx = day.currentIdx || 0;
     const done = steps.filter(s => s.type !== "info" && (s.status === "done" || s.status === "partial")).length;
     const total = steps.filter(s => s.type !== "info").length;
-    const wrap = wrapMinutes(steps, curIdx, nowMin());
     const arbetEnd = t2m(day.plannedWrapEnd);
-    const wc = wrapClass(wrap, arbetEnd);
-    const next = steps[curIdx + 1];
-    const atEnd = curIdx >= steps.length - 1;
-    const allHandled = total > 0 && steps.every(s => s.status);
 
     if (!steps.length) {
       el.innerHTML = shell(`<p class="sd-empty">Den här dagens call sheet har inga scener.</p>`);
@@ -172,8 +224,10 @@
       return;
     }
 
+    const allHandled = total > 0 && steps.every(s => s.status);
     if (allHandled) {
       const last = steps[steps.length - 1];
+      const wrap = wrapMinutes(steps, curIdx, nowMin());
       el.innerHTML = shell(`
         <div class="sd-done">
           <div class="sd-done-check">✓</div>
@@ -185,18 +239,32 @@
       return;
     }
 
+    /* Startskärm — dagen har inte börjat än. */
+    if (!dayStarted(day)) {
+      const first = steps[0];
+      const pw = plannedWrapMinutes(steps);
+      el.innerHTML = shell(`
+        <div class="sd-start">
+          <div class="sd-start-call">${day.plannedCrewCall ? "General call " + esc(day.plannedCrewCall) : ""}</div>
+          <div class="sd-start-first">${stepIcon(first)} ${stepTitle(first)}${stepSub(first) ? " · " + stepSub(first) : ""}</div>
+          <div class="sd-start-planwrap">${pw != null ? "Planerad wrap " + m2t(pw) : ""}</div>
+          <button class="sd-btn sd-btn-done sd-start-btn" data-sd="start">▶ Starta dagen</button>
+        </div>
+        ${steplist(steps, curIdx, done, total)}
+      `);
+      wire();
+      return;
+    }
+
+    const wrap = wrapMinutes(steps, curIdx, nowMin());
+    const wc = wrapClass(wrap, arbetEnd);
+    const next = steps[curIdx + 1];
     const isScene = cur && cur.type === "scene";
-    const rows = cur ? [
-      ["call", day.plannedCrewCall],
-      ["planerad start", isScene ? cur.start : (cur.time || "")],
-      ["faktisk start", cur.actualStart, cur.actualStart && cur.actualStart !== cur.start],
-      ["beräknad wrap", m2t(wrap), true, wc]
-    ] : [];
 
     el.innerHTML = shell(`
       <div class="sd-card">
         <div class="sd-step-head">
-          <span class="sd-step-icon">${cur && cur.type === "info" ? "⏸" : "🎬"}</span>
+          <span class="sd-step-icon">${stepIcon(cur)}</span>
           <div>
             <div class="sd-step-title">${stepTitle(cur)}</div>
             <div class="sd-step-sub">${stepSub(cur)}</div>
@@ -204,10 +272,10 @@
           ${(cur && cur.slipMin) ? `<span class="sd-slip-badge">+${cur.slipMin} min</span>` : ""}
         </div>
         <table class="sd-times">
-          ${rows.map(r => `<tr class="${r[3] ? "sd-t-" + r[3] : ""}">
-            <td class="${r[2] ? "sd-t-strong" : ""}">${esc(r[1] || "—")}</td>
-            <td>${esc(r[0])}${r[0] === "beräknad wrap" && wc === "over" ? " ⚠" : (r[0] === "beräknad wrap" && wc === "warn" ? " ⚠" : "")}</td>
-          </tr>`).join("")}
+          <tr><td>${esc(day.plannedCrewCall || "—")}</td><td>call</td></tr>
+          <tr><td>${esc((isScene ? cur.start : cur.time) || "—")}</td><td>planerad start</td></tr>
+          <tr><td class="sd-t-edit" data-sd="editstart">${cur.actualStart ? esc(cur.actualStart) : "sätt tid"} ✎</td><td>faktisk start</td></tr>
+          <tr class="${wc ? "sd-t-" + wc : ""}"><td class="sd-t-strong" id="sd-wrapval">${m2t(wrap)}</td><td>beräknad wrap${wc === "warn" || wc === "over" ? " ⚠" : ""}</td></tr>
         </table>
       </div>
 
@@ -215,7 +283,7 @@
 
       <div class="sd-btns">
         <button class="sd-btn sd-btn-done" data-sd="done">✓ Klar</button>
-        ${isScene ? `<button class="sd-btn" data-sd="partial">◐ Delvis</button>` : `<button class="sd-btn" data-sd="skip2">→ Hoppa över</button>`}
+        ${isScene ? `<button class="sd-btn" data-sd="partial">◐ Delvis</button>` : `<button class="sd-btn" data-sd="skip">→ Hoppa över</button>`}
       </div>
       <div class="sd-btns">
         ${isScene ? `<button class="sd-btn" data-sd="skip">→ Hoppa över</button>` : `<span></span>`}
@@ -226,15 +294,32 @@
         <button class="sd-btn sd-btn-slip" data-sd="s20">+20 min</button>
       </div>
 
-      <div class="sd-progress">
-        <div class="sd-progress-label"><span>Dagens scener</span><span>${done} / ${total} klara</span></div>
-        <div class="sd-dots">${steps.map((s, i) => {
-          const cls = s.type === "info" ? "info" : (s.status === "done" ? "done" : s.status === "partial" ? "partial" : (i === curIdx ? "cur" : "todo"));
-          return `<span class="sd-dot sd-dot-${cls}"></span>`;
-        }).join("")}</div>
-      </div>
+      ${steplist(steps, curIdx, done, total)}
     `);
     wire();
+  }
+
+  /* Tappbar steglista — hoppa pekaren genom att trycka på en rad. */
+  function steplist(steps, curIdx, done, total) {
+    return `
+      <div class="sd-progress">
+        <div class="sd-progress-label"><span>Dagens steg — tryck för att hoppa</span><span>${done} / ${total} scener klara</span></div>
+        <div class="sd-steplist">
+          ${steps.map((s, i) => {
+            const st = s.status === "done" ? "done" : s.status === "partial" ? "partial"
+              : (i === curIdx ? "cur" : (s.type === "info" ? "info" : "todo"));
+            const plan = s.type === "scene" ? (s.start || "") : (s.time || "");
+            const time = s.actualStart
+              ? esc(s.actualStart) + (s.status === "done" && s.actualEnd ? "–" + esc(s.actualEnd) : "")
+              : (plan ? esc(plan) : "");
+            return `<button class="sd-steprow sd-steprow-${st}" data-sd="go:${i}">
+              <span class="sd-steprow-dot"></span>
+              <span class="sd-steprow-label">${stepIcon(s)} ${stepTitle(s)}</span>
+              <span class="sd-steprow-t">${time}</span>
+            </button>`;
+          }).join("")}
+        </div>
+      </div>`;
   }
 
   function wrapedLabel(wrap, arbetEnd) {
@@ -256,14 +341,34 @@
       </div>`;
   }
 
+  function beginEditStart() {
+    const td = el.querySelector('[data-sd="editstart"]');
+    if (!td) return;
+    const cur = curStep(day);
+    td.innerHTML = `<input type="time" id="sd-edit" value="${esc((cur && cur.actualStart) || "")}">`;
+    const inp = el.querySelector("#sd-edit");
+    if (!inp) return;
+    inp.focus();
+    let committed = false;
+    const commit = () => {
+      if (committed) return; committed = true;
+      setActualStart(day, day.currentIdx || 0, inp.value);
+      save(); render();
+    };
+    inp.addEventListener("change", commit);
+    inp.addEventListener("blur", commit);
+  }
+
   function wire() {
     el.querySelectorAll("[data-sd]").forEach(b => {
       const k = b.getAttribute("data-sd");
+      if (k.indexOf("go:") === 0) { b.onclick = act(() => setCurrent(day, +k.slice(3), nowStr())); return; }
+      if (k === "editstart") { b.onclick = beginEditStart; return; }
       b.onclick = {
+        start: act(() => pressStart(day, nowStr())),
         done: act(() => pressDone(day, nowStr())),
         partial: act(() => pressPartial(day, nowStr())),
         skip: act(() => pressSkip(day, nowStr())),
-        skip2: act(() => pressSkip(day, nowStr())),
         back: act(() => pressBack(day)),
         s10: act(() => pressSlip(day, 10)),
         s20: act(() => pressSlip(day, 20)),
@@ -273,20 +378,17 @@
   }
 
   function tick() {
-    if (!el) return;
+    if (!el || !day) return;
     const c = el.querySelector("#sd-clock");
     if (c) c.textContent = "nu " + nowClock();
-    // beräknad wrap kryper med klockan — uppdatera bara den raden
-    const steps = (day && day.scenes) || [];
+    const steps = day.scenes || [];
+    if (!dayStarted(day)) return;
     const wrap = wrapMinutes(steps, day.currentIdx || 0, nowMin());
-    const arbetEnd = t2m(day.plannedWrapEnd);
-    const wc = wrapClass(wrap, arbetEnd);
+    const wc = wrapClass(wrap, t2m(day.plannedWrapEnd));
     const row = el.querySelector(".sd-times tr:last-child");
-    if (row) {
-      row.className = wc ? "sd-t-" + wc : "";
-      const td0 = row.querySelector("td");
-      if (td0) td0.textContent = m2t(wrap);
-    }
+    const val = el.querySelector("#sd-wrapval");
+    if (row) row.className = wc ? "sd-t-" + wc : "";
+    if (val) val.textContent = m2t(wrap);
   }
 
   function open(container, dprDoc, dayIndex, options) {
@@ -299,9 +401,7 @@
     toast = options.toast || (() => {});
     if (!day) { if (closeCb) closeCb(); return; }
     if (!day.scenes) day.scenes = [];
-    if (day.currentIdx == null) day.currentIdx = 0;
-    ensureStarted(day, nowStr());
-    save();
+    if (day.currentIdx == null) { day.currentIdx = 0; save(); }
     render();
     clearInterval(timer);
     timer = setInterval(tick, 1000);
@@ -315,8 +415,8 @@
 
   return {
     open, close,
-    // ren logik för test
-    effEst, wrapMinutes, wrapClass, curStep, isLunch,
-    pressDone, pressPartial, pressSkip, pressSlip, pressBack, stepForward, ensureStarted, autofillTimes
+    effEst, wrapMinutes, wrapClass, plannedWrapMinutes, curStep, isLunch, isMove, stepKind, dayStarted,
+    pressStart, pressDone, pressPartial, pressSkip, pressSlip, pressBack,
+    stepForward, ensureStarted, autofillTimes, setCurrent, setActualStart
   };
 });

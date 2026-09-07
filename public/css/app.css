@@ -843,3 +843,26 @@ body.sd-open { overflow: hidden; }
 .sd-done-title { font-size: 24px; font-weight: 700; margin-top: 8px; }
 .sd-done-wrap { font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 6px; }
 .sd-done-sub { font-size: 14px; color: var(--text-secondary); margin-top: 6px; }
+
+/* shoot day mode v2 */
+.sd-start { text-align: center; padding: 28px 0 18px; }
+.sd-start-call { font-size: 15px; color: var(--text-secondary); }
+.sd-start-first { font-size: 22px; font-weight: 700; margin: 10px 0 4px; }
+.sd-start-planwrap { font-size: 14px; color: var(--text-secondary); margin-bottom: 20px; }
+.sd-start-btn { width: 100%; min-height: 64px; font-size: 19px; }
+.sd-t-edit { cursor: pointer; }
+.sd-times .sd-t-edit { color: var(--accent); }
+.sd-times #sd-edit { font: inherit; padding: 2px 4px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--bg); color: var(--text); }
+.sd-steplist { display: flex; flex-direction: column; gap: 4px; max-height: 260px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.sd-steprow { display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; padding: 9px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text); font-size: 14px; cursor: pointer; }
+.sd-steprow:active { transform: scale(0.99); }
+.sd-steprow-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border-strong); flex: 0 0 auto; }
+.sd-steprow-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sd-steprow-t { color: var(--text-muted); font-size: 12px; font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+.sd-steprow-cur { border-color: var(--accent); background: var(--accent-bg); font-weight: 700; }
+.sd-steprow-cur .sd-steprow-dot { background: var(--accent); }
+.sd-steprow-done .sd-steprow-dot { background: var(--success); }
+.sd-steprow-done .sd-steprow-label { color: var(--text-secondary); }
+.sd-steprow-partial .sd-steprow-dot { background: var(--warning); }
+.sd-steprow-info { opacity: 0.85; }
+.sd-steprow-info .sd-steprow-dot { background: var(--s-move); }
