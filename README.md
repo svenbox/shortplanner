@@ -4,9 +4,11 @@
 
 Stripboard, call sheets, sides and a film-stock budget for film production — self-hosted, one container, one SQLite file, one password.
 
-Built for short, low-budget productions where a single person (often the 1st AD or producer) runs the schedule, and the rest of the team just needs to read it on a phone with no signal.
+Why? I'm a indie producer, fed up with paying huge fees to crappy software for planning a short film production. With great help from Claude, I've built this web-based app. It's been tested in the field and my team loved it. 
 
-> **Note:** the application interface is currently Swedish only. This README is translated; the app itself is not (yet). Feature names below give the Swedish tab label in parentheses.
+It's optimized for short, low-budget productions where a single person (often the 1st AD or producer) runs the schedule, and the rest of the team just needs to read it on a phone. Say farewell to printing call sheets! 
+
+> **Note:** the application interface is currently Swedish only. This README is translated; the app itself is not (yet). Feature names below give the Swedish tab label in parentheses. 
 
 ![Stripboard](docs/screenshots/stripboard.png)
 ![Call sheet](docs/screenshots/callsheet.png)
