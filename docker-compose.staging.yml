@@ -8,6 +8,7 @@ services:
       PORT: "3000"
       DATA_DIR: "/data"
       BUILD_ID: "${BUILD_ID:-}"
+      DEMO_MODE: "${DEMO_MODE:-}"
     volumes:
       - shortplanner-staging-data:/data
     ports:

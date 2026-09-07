@@ -97,6 +97,7 @@ async function doLogin(ev) {
     $("loginPw").value = "";
     showApp();
     await goProjects();
+    maybeShowDemoIntro();
   } catch (e) {
     $("loginErr").textContent = e.message;
   }
@@ -136,14 +137,15 @@ async function loadProjects() {
       <div class="proj-meta">Ändrad ${esc(fmtDateTime(p.updated_at))}</div>
       <div class="proj-actions" onclick="event.stopPropagation()">
         <button class="btn btn-sm" onclick="App.renameProject(${p.id})">Byt namn</button>
-        <button class="btn btn-sm" onclick="App.duplicateProject(${p.id})">Duplicera</button>
-        <button class="btn btn-sm btn-danger" onclick="App.deleteProject(${p.id})">Ta bort</button>
+        ${isDemo() ? "" : `<button class="btn btn-sm" onclick="App.duplicateProject(${p.id})">Duplicera</button>
+        <button class="btn btn-sm btn-danger" onclick="App.deleteProject(${p.id})">Ta bort</button>`}
       </div>
     </div>`).join("");
   $("projEmpty").classList.toggle("hidden", state.projects.length > 0);
 }
 
 function openNewProject() {
+  if (blockedByDemo()) return;
   $("npName").value = "";
   openOv("ovNewProject");
   setTimeout(() => $("npName").focus(), 50);
@@ -163,11 +165,13 @@ async function renameProject(id) {
   await loadProjects();
 }
 async function duplicateProject(id) {
+  if (blockedByDemo()) return;
   await api("POST", `/api/projects/${id}/duplicate`, {});
   toast("Kopia skapad");
   await loadProjects();
 }
 async function deleteProject(id) {
+  if (blockedByDemo()) return;
   const p = state.projects.find(x => x.id === id);
   if (!confirm(`Ta bort "${p ? p.name : id}" med alla versioner? Går inte att ångra.`)) return;
   await api("DELETE", "/api/projects/" + id);
@@ -393,6 +397,43 @@ async function loadSite() {
   } catch (e) { state.site = null; }
   applySiteFeatures();
   applySiteBranding();
+  applyDemoMode();
+}
+
+/* ---------- demoläge ---------- */
+function isDemo() { return !!(state.site && state.site.demo); }
+
+function applyDemoMode() {
+  const demo = isDemo();
+  document.body.classList.toggle("demo", demo);
+  const badge = $("demoBadge");
+  if (badge) badge.classList.toggle("hidden", !demo);
+  const hint = $("loginDemoHint");
+  if (hint) {
+    hint.classList.toggle("hidden", !demo);
+    if (demo) hint.textContent = "Publik demo – logga in med lösenordet demo. Allt nollställs varje natt.";
+  }
+  ["#view-projects .btn-add", "#view-projects .btn[onclick*=\"openImportProject\"]"].forEach(sel => {
+    const b = document.querySelector(sel);
+    if (b) { b.classList.toggle("is-disabled", demo); if (demo) b.title = "Avstängt i demoläget"; }
+  });
+}
+
+function openDemoInfo() { openOv("ovDemo"); }
+
+/* Intro-overlayn visas en gång per flik-session efter inloggning. */
+function maybeShowDemoIntro() {
+  if (!isDemo()) return;
+  try { if (sessionStorage.getItem("sp_demo_seen") === "1") return; } catch (_) {}
+  openOv("ovDemo");
+  try { sessionStorage.setItem("sp_demo_seen", "1"); } catch (_) {}
+}
+
+/* true om anropet stoppades av demoläget (och popup visades) */
+function blockedByDemo() {
+  if (!isDemo()) return false;
+  openOv("ovDemo");
+  return true;
 }
 function applySiteFeatures() {
   const f = (state.site && state.site.features) || {};
@@ -715,6 +756,7 @@ async function exportProject() {
   window.location = `/api/projects/${state.project.id}/export`;
 }
 function openImportProject() {
+  if (blockedByDemo()) return;
   $("ipText").value = "";
   $("ipFile").value = "";
   openOv("ovImportProject");
@@ -980,9 +1022,10 @@ async function init() {
   const m = location.pathname.match(/^\/p\/(\d+)/);
   await loadProjects();
   if (m) {
-    try { await openProject(parseInt(m[1], 10)); return; } catch (e) { /* projektet finns inte längre */ }
+    try { await openProject(parseInt(m[1], 10)); maybeShowDemoIntro(); return; } catch (e) { /* projektet finns inte längre */ }
   }
   await goProjects();
+  maybeShowDemoIntro();
 }
 
 document.addEventListener("DOMContentLoaded", init);
@@ -995,6 +1038,7 @@ return {
   openProjectSettings, saveProjectSettings,
   openShare, copyShareLink, revokeShare, updateShareComponents,
   openCast, addCastMember, editCastMember, removeCastMember, logout, closeOv, toast,
+  openDemoInfo,
   reloadAfterConflict, overwriteAfterConflict
 };
 })();

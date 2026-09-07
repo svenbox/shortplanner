@@ -13,6 +13,12 @@ It's optimized for short, low-budget productions where a single person (often th
 ![Stripboard](docs/screenshots/stripboard.png)
 ![Call sheet](docs/screenshots/callsheet.png)
 
+## Live demo
+
+**<https://shortplanner-demo.soxbox.uk>** — password **`demo`**
+
+A public instance you can click around in. It runs on the fictional **"Skuggspel"** project (no real production data) and **everything resets to that state every night at 00:00 Europe/Stockholm**, so edit freely. Creating, importing, duplicating and deleting projects is turned off there; everything else works. Run by whoever maintains this repo, on a home server — it may be slow or down.
+
 ## Features
 
 - **Stripboard** — drag-and-drop strips (works on a touch screen), automatically calculated start times, colour coding for INT/EXT, day/night, meals and company moves, page and time totals per day. On-the-day warnings when a day breaks a working-hours or rest rule (long day, no meal break, too little turnaround from the previous shooting day) — thresholds set per project. Import scenes from an imported script, or from a stripboard JSON file (from another Shortplanner install).
@@ -251,6 +257,16 @@ GET    /api/resolve-maps-link?url=                         follows a short Googl
 ```
 
 `PUT .../doc/:kind` supports optimistic locking: pass `baseUpdatedAt` from the last fetched document and the server responds 409 if someone else saved in between.
+
+## Running a public demo
+
+Set `DEMO_MODE=1` and the app becomes safe to expose to anyone: creating, importing, duplicating and deleting projects is refused (403), and the client shows a "DEMO" badge plus an intro overlay. Everything else — editing documents, versions, sharing — still works, so pair it with a scheduled reset.
+
+`deploy/docker-compose.demo.yml` is a ready-made service (`DEMO_MODE=1`, trivial password `demo`, its own volume, localhost port 8092 — put your proxy in front). `deploy/demo-reset.sh` restores the instance from a seed database and is meant to run from cron; its header comment shows how to capture the seed from an instance in the state you want. Example crontab line for a nightly reset in the host's timezone:
+
+```
+0 0 * * *  /path/to/shortplanner/deploy/demo-reset.sh >> /var/log/sp-demo-reset.log 2>&1
+```
 
 ## Running locally without Docker
 

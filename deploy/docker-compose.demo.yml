@@ -1,0 +1,29 @@
+## Publik demo-instans: DEMO_MODE=1 (projekt kan inte skapas/importeras/
+## dupliceras/raderas) plus nattlig nollställning via deploy/demo-reset.sh.
+##
+##   docker compose -f deploy/docker-compose.demo.yml up -d --build
+##
+## Binder bara till localhost — sätt din egen reverse proxy (Caddy/nginx/
+## Traefik, se README) framför port 8092. Lösenordet är med flit trivialt
+## och tänkt att stå i din publika dokumentation.
+services:
+  shortplanner-demo:
+    build:
+      context: ..
+    container_name: shortplanner-demo
+    restart: unless-stopped
+    environment:
+      PORT: "3000"
+      DATA_DIR: "/data"
+      APP_PASSWORD: "demo"
+      DEMO_MODE: "1"
+      SESSION_DAYS: "1"
+      BUILD_ID: "${BUILD_ID:-}"
+      WEATHER_CONTACT: "${WEATHER_CONTACT:-}"
+    volumes:
+      - shortplanner-demo-data:/data
+    ports:
+      - "127.0.0.1:${HOST_PORT:-8092}:3000"
+
+volumes:
+  shortplanner-demo-data:

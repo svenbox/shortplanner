@@ -5,3 +5,6 @@ data/
 .DS_Store
 .vscode/
 .idea/
+
+# demo-instansens seed-databas (skapas lokalt, se deploy/demo-reset.sh)
+deploy/demo-seed/

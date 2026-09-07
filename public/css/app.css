@@ -885,3 +885,15 @@ body.sd-open { overflow: hidden; }
 .sb-scope .day-warn-over { background: var(--danger); color: #fff; border-color: var(--danger); }
 .sb-scope .day-warn-warn { background: var(--warning-bg); color: var(--warning); border-color: var(--warning); }
 .sb-scope .df-num.df-over { color: var(--danger); font-weight: 700; }
+
+/* demo-sajt: badge i topplisten, avstängda knappar, intro-overlay */
+.demo-badge { font: 800 11px/1 var(--font, system-ui, sans-serif); letter-spacing: .1em;
+  background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning);
+  padding: 4px 8px; border-radius: 5px; cursor: pointer; align-self: center; }
+.demo-badge:hover { filter: brightness(1.05); }
+.btn.is-disabled { opacity: .45; }
+.login-demo-hint { font-size: 12.5px; color: var(--warning); background: var(--warning-bg);
+  border: 1px solid var(--warning); border-radius: 6px; padding: 7px 9px; margin: 0; }
+#ovDemo .modal { max-width: 460px; }
+#ovDemo .modal p { font-size: 13.5px; line-height: 1.5; color: var(--text-secondary); margin: 10px 0; }
+#ovDemo .modal a { color: var(--accent); }

@@ -16,6 +16,12 @@ const PASSWORD = process.env.APP_PASSWORD || "";
 const SESSION_DAYS = parseInt(process.env.SESSION_DAYS || "30", 10);
 const COOKIE = "sp_session";
 
+/* Demoläge (DEMO_MODE=1): en publik demo som nollställs regelbundet. Det
+   befintliga projektet får redigeras fritt, men projekt kan inte skapas,
+   importeras, dupliceras eller raderas -- se noDemo() nedan. Klienten
+   hämtar flaggan via /api/site/public och visar en banner + intro. */
+const DEMO_MODE = process.env.DEMO_MODE === "1";
+
 /* Build-id: en hash av de statiska tillgångarna. Ändras vid varje ombyggnad
    som rör client-koden, så en flik som stått öppen kan upptäcka att den kör
    en gammal version (X-App-Version-headern + GET /api/version) och erbjuda
@@ -46,6 +52,9 @@ if (!PASSWORD) {
 }
 if (PASSWORD.length < 8) {
   console.warn("VARNING: APP_PASSWORD är kortare än 8 tecken.");
+}
+if (DEMO_MODE) {
+  console.log("Demoläge aktivt (DEMO_MODE=1): projekt kan inte skapas, importeras, dupliceras eller raderas.");
 }
 
 const app = express();
@@ -124,6 +133,16 @@ function auth(req, res, next) {
   res.status(401).json({ error: "Ej inloggad" });
 }
 
+/* Stäng av projektskapande/-radering i demoläge. Läggs efter auth. */
+function noDemo(req, res, next) {
+  if (DEMO_MODE) {
+    return res.status(403).json({
+      error: "Det här är en demo-sajt — nya projekt kan inte skapas, importeras eller tas bort här. Koden finns på GitHub: github.com/svenbox/shortplanner"
+    });
+  }
+  next();
+}
+
 /* startdata (EMPTY_*) och dok-/versionslagret bor i ./store */
 
 /* ---------- auth-endpoints ---------- */
@@ -179,7 +198,8 @@ app.get("/api/site/public", (req, res) => {
     company: { name: c.company.name, website: c.company.website },
     hasLogo: !!(c.logo && c.logo.ext),
     features: c.features,
-    locale: c.locale
+    locale: c.locale,
+    demo: DEMO_MODE
   });
 });
 
@@ -223,7 +243,7 @@ app.get("/api/projects", auth, (req, res) => {
   }));
 });
 
-app.post("/api/projects", auth, (req, res) => {
+app.post("/api/projects", auth, noDemo, (req, res) => {
   const name = String((req.body && req.body.name) || "").trim() || "Nytt projekt";
   const ts = now();
   const info = db.prepare("INSERT INTO projects (name, created_at, updated_at) VALUES (?,?,?)").run(name, ts, ts);
@@ -243,12 +263,12 @@ app.patch("/api/projects/:id", auth, (req, res) => {
   res.json({ ok: true });
 });
 
-app.delete("/api/projects/:id", auth, (req, res) => {
+app.delete("/api/projects/:id", auth, noDemo, (req, res) => {
   db.prepare("DELETE FROM projects WHERE id = ?").run(req.params.id);
   res.json({ ok: true });
 });
 
-app.post("/api/projects/:id/duplicate", auth, (req, res) => {
+app.post("/api/projects/:id/duplicate", auth, noDemo, (req, res) => {
   const p = db.prepare("SELECT * FROM projects WHERE id = ?").get(req.params.id);
   if (!p) return res.status(404).json({ error: "Finns inte" });
   const ts = now();
@@ -439,7 +459,7 @@ app.get("/api/projects/:id/export", auth, (req, res) => {
   res.json(payload);
 });
 
-app.post("/api/projects/import", auth, (req, res) => {
+app.post("/api/projects/import", auth, noDemo, (req, res) => {
   /* Hela payloaden valideras (struktur + storleksgränser) INNAN något rör
      databasen. Aldrig lita på JSON bara för att den parsade. */
   try {

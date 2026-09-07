@@ -9,6 +9,12 @@ Byggt för korta, låg­budget­produktioner där en enda person (ofta 1:e AD el
 ![Stripboard](docs/screenshots/stripboard.png)
 ![Call sheet](docs/screenshots/callsheet.png)
 
+## Livedemo
+
+**<https://shortplanner-demo.soxbox.uk>** — lösenord **`demo`**
+
+En publik instans att klicka runt i. Den kör det påhittade projektet **”Skuggspel”** (ingen verklig produktionsdata) och **allt nollställs till det läget varje natt kl 00:00** (svensk tid), så ändra fritt. Att skapa, importera, duplicera och ta bort projekt är avstängt där; allt annat fungerar. Drivs av den som underhåller repot, på en hemmaserver — kan vara långsam eller nere.
+
 ## Funktioner
 
 - **Stripboard** — dra och släpp strips (funkar på pekskärm), automatiskt beräknade starttider, färgkodning INT/EXT, dag/natt, rast/lunch och förflyttning, sid- och tidssummor per dag. Varningar på dagen när en dag bryter mot en arbetstids- eller viloregel (lång dag, ingen rast/lunch, för kort dygnsvila efter föregående inspelningsdag) — gränsvärden per projekt. Importera scener från ett importerat manus, eller från en stripboard-JSON (från en annan Shortplanner-installation).
@@ -247,6 +253,16 @@ GET    /api/resolve-maps-link?url=                           följer en kort Goo
 ```
 
 `PUT .../doc/:kind` stödjer optimistisk låsning: skicka med `baseUpdatedAt` från senast hämtade dokument, servern svarar 409 om någon annan hunnit spara emellan.
+
+## Köra en publik demo
+
+Sätt `DEMO_MODE=1` så blir appen trygg att exponera för vem som helst: att skapa, importera, duplicera och ta bort projekt nekas (403), och klienten visar en ”DEMO”-badge plus en intro-overlay. Allt annat — redigera dokument, versioner, delning — funkar fortfarande, så kombinera med en schemalagd nollställning.
+
+`deploy/docker-compose.demo.yml` är en färdig tjänst (`DEMO_MODE=1`, trivialt lösenord `demo`, egen volym, localhost-port 8092 — sätt din proxy framför). `deploy/demo-reset.sh` återställer instansen från en seed-databas och är tänkt att köras från cron; kommentaren överst i skriptet visar hur man fångar seed-filen från en instans i önskat läge. Exempelrad i crontab för nattlig nollställning i värdens tidszon:
+
+```
+0 0 * * *  /sökväg/till/shortplanner/deploy/demo-reset.sh >> /var/log/sp-demo-reset.log 2>&1
+```
 
 ## Köra lokalt utan Docker
 

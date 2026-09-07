@@ -18,6 +18,7 @@
   <form class="login-card" id="loginForm" autocomplete="on">
     <h1>Shortplanner</h1>
     <p>Stripboard och call sheets. Ange lösenordet för att fortsätta.</p>
+    <p class="login-demo-hint hidden" id="loginDemoHint"></p>
     <input type="password" id="loginPw" placeholder="Lösenord" autocomplete="current-password" required>
     <div class="login-err" id="loginErr"></div>
     <button class="btn btn-primary" type="submit" style="justify-content:center">Logga in</button>
@@ -28,6 +29,7 @@
 <div id="app" class="hidden">
   <div class="topbar">
     <div class="brand" onclick="App.goProjects()">Shortplanner<span>stripboard &amp; call sheets</span></div>
+    <button class="demo-badge hidden" id="demoBadge" onclick="App.openDemoInfo()" title="Om den här demon">DEMO</button>
     <div class="crumb" id="crumb"></div>
     <div class="save-state" id="saveState"></div>
     <div class="ml-auto" style="display:flex; gap:7px; flex-wrap:wrap;">
@@ -85,6 +87,19 @@
 </div>
 
 <!-- modaler -->
+<div class="overlay" id="ovDemo">
+  <div class="modal">
+    <h3>🎬 Shortplanner – demo</h3>
+    <p>Det här är en publik demo. Allt du ändrar <strong>nollställs varje natt kl 00:00</strong> (svensk tid) till exempelprojektet <strong>”Skuggspel”</strong> – ett påhittat projekt, ingen verklig produktionsdata.</p>
+    <p>Du kan prova allt fritt. Det enda som är avstängt här är att skapa, importera, duplicera och ta bort projekt.</p>
+    <p>Källkoden, en egen installation och all dokumentation finns på GitHub:<br>
+      <a href="https://github.com/svenbox/shortplanner" target="_blank" rel="noopener">github.com/svenbox/shortplanner</a></p>
+    <div class="modal-actions">
+      <a class="btn" href="https://github.com/svenbox/shortplanner" target="_blank" rel="noopener">Till GitHub</a>
+      <button class="btn btn-primary" onclick="App.closeOv('ovDemo')">Börja utforska</button>
+    </div>
+  </div>
+</div>
 <div class="overlay" id="ovNewProject">
   <div class="modal">
     <h3>Nytt projekt</h3>

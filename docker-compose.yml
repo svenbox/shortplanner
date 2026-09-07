@@ -13,6 +13,9 @@ services:
       # BUILD_ID=$(git rev-parse --short HEAD) före `docker compose up` om
       # du hellre vill ha git-sha som versionsstämpel.
       BUILD_ID: "${BUILD_ID:-}"
+      # DEMO_MODE=1 -> publik demo: projekt kan inte skapas/importeras/raderas,
+      # klienten visar en demo-banner. Se deploy/docker-compose.demo.yml.
+      DEMO_MODE: "${DEMO_MODE:-}"
     volumes:
       - shortplanner-data:/data
     ports:
