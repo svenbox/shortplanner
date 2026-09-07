@@ -16,7 +16,7 @@
 
 const SHELL = [
   "/", "/index.html", "/view.html", "/css/app.css",
-  "/js/app.js", "/js/view.js", "/js/stripboard.js", "/js/callsheet.js",
+  "/js/app.js", "/js/view.js", "/js/stripboard-core.js", "/js/stripboard.js", "/js/callsheet.js",
   "/js/script.js", "/js/dpr.js",
   "/js/vendor/qrcode-generator.js", "/js/vendor/pdf.min.js",
   "/manifest.json", "/icon.svg"

@@ -297,9 +297,17 @@ a { color: var(--accent); }
 .sb-scope .strip.break { background: var(--s-break); color: #3a0f22; }
 .sb-scope .strip.move { background: var(--s-move); color: #2a2a2a; }
 .sb-scope .strip.dragging { opacity: 0.35; }
+/* Under ett pågående drag ska raden vara genomskinlig för elementFromPoint
+   så vi kan hitta strippen under fingret; handtaget behåller pekhändelser
+   (pointer capture ligger på det). */
+.sb-scope .strip.dragging { pointer-events: none; }
+.sb-scope .strip.dragging .c-handle { pointer-events: auto; }
 .sb-scope .strip.drop-before { box-shadow: inset 0 3px 0 0 var(--accent); }
 .sb-scope .strip.drop-after { box-shadow: inset 0 -3px 0 0 var(--accent); }
-.sb-scope .c-handle { cursor: grab; color: rgba(0,0,0,0.35); justify-content: center; user-select: none; font-size: 13px; }
+/* touch-action:none => sidan scrollar inte när man drar från handtaget på en
+   pekskärm. Resten av strippen scrollar som vanligt. */
+.sb-scope .c-handle { cursor: grab; color: rgba(0,0,0,0.35); justify-content: center; user-select: none; font-size: 13px; touch-action: none; }
+.sb-scope .strip.dragging .c-handle { cursor: grabbing; }
 .sb-scope .strip.banner .c-handle { color: rgba(255,255,255,0.5); }
 .sb-scope .c-num { font-weight: 700; justify-content: center; font-size: 13px; }
 .sb-scope .c-set { font-weight: 600; text-transform: uppercase; font-size: 11.5px; letter-spacing: 0.01em; }

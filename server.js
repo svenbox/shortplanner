@@ -20,7 +20,7 @@ function computeBuildId() {
     const dir = path.join(__dirname, "public");
     const files = [
       "index.html", "view.html", "sw.js", "manifest.json", "css/app.css",
-      "js/app.js", "js/view.js", "js/stripboard.js", "js/callsheet.js", "js/script.js", "js/dpr.js",
+      "js/app.js", "js/view.js", "js/stripboard-core.js", "js/stripboard.js", "js/callsheet.js", "js/script.js", "js/dpr.js",
       "js/vendor/qrcode-generator.js", "js/vendor/pdf.min.js"
     ];
     const h = crypto.createHash("sha1");

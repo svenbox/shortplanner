@@ -11,136 +11,20 @@ let castPickerEl = null;
 
 function notify() { opts.onChange(DATA); }
 
-/* ===== hjälpfunktioner ===== */
-const SV_DAYS = ["sön","mån","tis","ons","tors","fre","lör"];
-const SV_DAYS_LONG = ["Söndag","Måndag","Tisdag","Onsdag","Torsdag","Fredag","Lördag"];
-const SV_MON = ["jan","feb","mar","apr","maj","jun","jul","aug","sep","okt","nov","dec"];
+/* ===== domänlogik =====
+   Tidsräkning, dagssummor, strip-klassificering och flyttlogik bor i
+   stripboard-core.js (ren, testad i test/stripboard-core.test.js, beteende
+   dokumenterat i docs/stripboard-time-rules.md). Här plockas de in som
+   lokala namn så resten av filen ser likadan ut som förr. */
+const SBCore = window.SBCore;
+const {
+  parseEst, fmtEst, parsePages, fmtPages, t2m, m2t,
+  dateSv, dateShort, todayIso, daysBetween, closestDayIndex,
+  stripClass, dayTotals, recalcDay
+} = SBCore;
 
-function parseEst(s) {
-  if (!s) return 0;
-  s = String(s).trim().toLowerCase();
-  let m = 0, hit = false;
-  const h = s.match(/(\d+)\s*h/); if (h) { m += parseInt(h[1]) * 60; hit = true; }
-  const mm = s.match(/(\d+)\s*m/); if (mm) { m += parseInt(mm[1]); hit = true; }
-  if (!hit) { const n = s.match(/^(\d+)$/); if (n) m = parseInt(n[1]); }
-  return m;
-}
-function fmtEst(min) {
-  if (!min) return "";
-  const h = Math.floor(min / 60), m = min % 60;
-  return h ? (m ? `${h}h ${m}m` : `${h}h 0m`) : `${m}m`;
-}
-function parsePages(s) {
-  if (!s) return 0;
-  s = String(s).trim();
-  const full = s.match(/^(\d+)\s+(\d+)\s*\/\s*8$/);
-  if (full) return parseInt(full[1]) * 8 + parseInt(full[2]);
-  const frac = s.match(/^(\d+)\s*\/\s*8$/);
-  if (frac) return parseInt(frac[1]);
-  const whole = s.match(/^(\d+)$/);
-  if (whole) return parseInt(whole[1]) * 8;
-  return 0;
-}
-function fmtPages(e) {
-  if (!e) return "";
-  const w = Math.floor(e / 8), f = e % 8;
-  if (w && f) return `${w} ${f}/8`;
-  if (w) return `${w} 0/8`;
-  return `${f}/8`;
-}
-function t2m(s) {
-  if (!s) return null;
-  const m = String(s).match(/(\d{1,2})[:.](\d{2})/);
-  if (!m) return null;
-  return parseInt(m[1]) * 60 + parseInt(m[2]);
-}
-function m2t(min) {
-  min = ((min % 1440) + 1440) % 1440;
-  return String(Math.floor(min / 60)).padStart(2, "0") + ":" + String(min % 60).padStart(2, "0");
-}
-function dateSv(iso, long) {
-  const d = new Date(iso + "T12:00:00");
-  if (isNaN(d)) return iso || "";
-  return `${long ? SV_DAYS_LONG[d.getDay()] : SV_DAYS[d.getDay()]} ${d.getDate()} ${SV_MON[d.getMonth()]} ${d.getFullYear()}`;
-}
-function dateShort(iso) {
-  const d = new Date(iso + "T12:00:00");
-  if (isNaN(d)) return { m: "", d: "" };
-  return { m: SV_MON[d.getMonth()].toUpperCase(), d: String(d.getDate()).padStart(2, "0") };
-}
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
 
-/* ===== "dagens datum"-navigering =====
-   Delad av Stripboard, Call sheet och Dagsmanus (alla anropar SB.closestDayIndex
-   direkt, samma mönster som de redan återanvänder SB.parsePages/fmtPages).
-   Exakt datummatchning vinner; annars den dag som ligger närmast i tid.
-   Har HELA schemat redan passerat (idag efter sista dagen) återgår vi till
-   första dagen istället för att fastna på den sista redan avklarade dagen —
-   mer användbart att börja om från toppen än att visa gårdagens historia. */
-function todayIso() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-function daysBetween(isoA, isoB) {
-  const a = new Date(isoA + "T12:00:00"), b = new Date(isoB + "T12:00:00");
-  if (isNaN(a) || isNaN(b)) return Infinity;
-  return Math.round((a - b) / 86400000);
-}
-function closestDayIndex(days, field) {
-  field = field || "date";
-  const valid = (days || []).map((d, i) => ({ i, date: d[field] })).filter(x => x.date);
-  if (!valid.length) return 0;
-  const today = todayIso();
-  const exact = valid.find(x => x.date === today);
-  if (exact) return exact.i;
-  const sorted = [...valid].sort((a, b) => a.date < b.date ? -1 : (a.date > b.date ? 1 : 0));
-  if (today > sorted[sorted.length - 1].date) return sorted[0].i;
-  if (today < sorted[0].date) return sorted[0].i;
-  let best = sorted[0], bestDiff = Math.abs(daysBetween(today, sorted[0].date));
-  sorted.forEach(x => {
-    const diff = Math.abs(daysBetween(today, x.date));
-    if (diff < bestDiff) { best = x; bestDiff = diff; }
-  });
-  return best.i;
-}
-
-/* ===== beräkningar ===== */
-function stripClass(s) {
-  const set = s.set || "";
-  const extra = /rast|lunch/i.test(set) ? " break" : /förflyttning|flytt/i.test(set) ? " move" : "";
-  if (s.type === "banner") return "banner" + extra;
-  const night = /natt|night/i.test(s.dn || "");
-  const ext = /^ext/i.test(s.ie || "");
-  return (ext ? "ext-" : "int-") + (night ? "night" : "day") + extra;
-}
-function dayTotals(day) {
-  let pages = 0, mins = 0, scenes = 0;
-  day.strips.forEach(s => {
-    mins += parseEst(s.est);
-    if (s.type === "scene") { pages += parsePages(s.pages); scenes++; }
-  });
-  const start = t2m(day.start) ?? 0;
-  let end = start + mins;
-  const last = day.strips[day.strips.length - 1];
-  if (last) {
-    const ls = t2m(last.start);
-    if (ls != null) {
-      let le = ls + parseEst(last.est);
-      if (le < start) le += 1440;
-      end = Math.max(end, le);
-    }
-  }
-  return { pages, mins, scenes, start, end, span: end - start };
-}
-function recalcDay(day) {
-  let run = t2m(day.start);
-  if (run == null) run = 0;
-  day.strips.forEach(s => {
-    if (s.lock && t2m(s.start) != null) run = t2m(s.start);
-    s.start = m2t(run);
-    run += parseEst(s.est);
-  });
-}
 function recalcAll() {
   DATA.days.forEach(recalcDay);
   notify(); render(); opts.toast("Starttider omräknade");
@@ -193,7 +77,7 @@ function stripRow(s, dayIdx, i) {
   const lock = s.lock ? "on" : "";
   if (isB) {
     return `<div class="strip ${stripClass(s)} grid" data-day="${dayIdx}" data-idx="${i}" draggable="false">
-      <div class="c-handle" onmousedown="SB.grabOn(this)">⋮⋮</div>
+      <div class="c-handle" onpointerdown="SB.grabOn(this,event)">⋮⋮</div>
       <div class="c-num"><span class="banner-i">i</span></div>
       ${cell("c-set", s.set, base + ".set", "Info / förflyttning / lunch")}
       <div class="c-ie"></div><div class="c-dn"></div><div class="c-cast"></div>
@@ -205,7 +89,7 @@ function stripRow(s, dayIdx, i) {
     </div>`;
   }
   return `<div class="strip ${stripClass(s)} grid" data-day="${dayIdx}" data-idx="${i}" draggable="false">
-    <div class="c-handle" onmousedown="SB.grabOn(this)">⋮⋮</div>
+    <div class="c-handle" onpointerdown="SB.grabOn(this,event)">⋮⋮</div>
     ${cell("c-num", s.num, base + ".num", "#")}
     ${cell("c-set", s.set, base + ".set", "Scenrubrik")}
     ${sel("c-ie", s.ie, base + ".ie", IE_OPTS)}
@@ -248,6 +132,7 @@ function render() {
       <span class="day-start-wrap">Start <input type="time" value="${esc(day.start)}" onchange="SB.setDayField(${di},'start',this.value); SB.recalcOne(${di})" style="font:inherit; color:inherit; background:transparent; border:1px solid var(--border); border-radius:4px; padding:1px 4px;"></span>
       <span style="margin-left:auto; display:flex; gap:6px;">
         <button class="btn btn-sm" onclick="SB.recalcOne(${di})">⟳ Tider</button>
+        <button class="btn btn-sm" onclick="SB.dupDay(${di})" title="Skapa en kopia av dagen direkt efter — bra som mall för nästa inspelningsdag">⧉ Duplicera dag</button>
         <button class="btn btn-sm btn-danger" onclick="SB.delDay(${di})">Ta bort dag</button>
       </span>
     </div>`;
@@ -285,7 +170,6 @@ function render() {
   root.querySelector('[data-sb="board"]').innerHTML = html;
   wireCells();
   wireSelects();
-  wireDnD();
 }
 
 /* ===== redigering ===== */
@@ -397,6 +281,22 @@ function delDay(di) {
   DATA.days.splice(di, 1);
   notify(); render();
 }
+/* Duplicerar en hel dag (alla strips) och lägger kopian direkt efter originalet.
+   Datumet lämnas tomt — kopian är tänkt som mall för nästa dag, så användaren
+   sätter det riktiga datumet. Scennummer följer med oförändrade; justeras vid
+   behov (samma scen kan spelas över två dagar). Starttider räknas om från
+   dagens starttid, lås behålls. */
+function dupDay(di) {
+  const src = DATA.days[di];
+  if (!src) return;
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.label = src.label + " (kopia)";
+  copy.date = "";
+  recalcDay(copy);
+  DATA.days.splice(di + 1, 0, copy);
+  notify(); render();
+  opts.toast(`${src.label} duplicerad — sätt datum på "${copy.label}"`);
+}
 
 /* ===== bygga stripboard från manus / importera ===== */
 /* Delar upp en slugline ("INT. KÖK - DAG") i I/E, set och D/N. Svenska +
@@ -487,56 +387,106 @@ function loadStripboard(obj) {
   return { ok: true, days: DATA.days.length, scenes };
 }
 
-/* ===== drag & drop ===== */
-let dragSrc = null;
-function grabOn(h) { const row = h.closest(".strip"); if (row) row.draggable = true; }
-function wireDnD() {
-  root.querySelectorAll(".strip").forEach(row => {
-    row.addEventListener("dragstart", ev => {
-      dragSrc = { day: +row.dataset.day, idx: +row.dataset.idx };
-      row.classList.add("dragging");
-      ev.dataTransfer.effectAllowed = "move";
-      try { ev.dataTransfer.setData("text/plain", "strip"); } catch (e) {}
-    });
-    row.addEventListener("dragend", () => {
-      row.draggable = false;
-      row.classList.remove("dragging");
-      root.querySelectorAll(".drop-before,.drop-after").forEach(e => e.classList.remove("drop-before", "drop-after"));
-      dragSrc = null;
-    });
-    row.addEventListener("dragover", ev => {
-      if (!dragSrc) return;
-      ev.preventDefault();
-      const r = row.getBoundingClientRect();
-      const after = (ev.clientY - r.top) > r.height / 2;
-      root.querySelectorAll(".drop-before,.drop-after").forEach(e => e.classList.remove("drop-before", "drop-after"));
-      row.classList.add(after ? "drop-after" : "drop-before");
-    });
-    row.addEventListener("drop", ev => {
-      if (!dragSrc) return;
-      ev.preventDefault(); ev.stopPropagation();
-      const r = row.getBoundingClientRect();
-      const after = (ev.clientY - r.top) > r.height / 2;
-      moveStrip(dragSrc, +row.dataset.day, +row.dataset.idx + (after ? 1 : 0));
-    });
-  });
-  root.querySelectorAll(".day-body").forEach(body => {
-    body.addEventListener("dragover", ev => { if (dragSrc) ev.preventDefault(); });
-    body.addEventListener("drop", ev => {
-      if (!dragSrc) return;
-      if (ev.target.closest(".strip")) return;
-      ev.preventDefault();
-      moveStrip(dragSrc, +body.dataset.day, listFor(+body.dataset.day).length);
-    });
-  });
+/* ===== drag & drop =====
+   Pointer Events istället för den inbyggda HTML5-drag-and-drop:en, som inte
+   fungerar med touch (iOS Safari startar aldrig `dragstart` från ett finger,
+   Android är opålitligt). En och samma kodväg för mus, touch och penna.
+   Draget startar bara från handtaget (⋮⋮), efter en liten rörelsetröskel så
+   att en vanlig tryckning inte kapar. `.c-handle` har `touch-action:none` i
+   CSS så sidan inte scrollar när man drar därifrån. */
+let drag = null;
+const DRAG_THRESHOLD = 5;   // px innan ett drag "tar"
+const EDGE = 64;            // px från kanten där autoscroll börjar
+
+function clearDropMarks() {
+  root.querySelectorAll(".drop-before,.drop-after").forEach(e => e.classList.remove("drop-before", "drop-after"));
+}
+
+/* Anropas från handtagets onpointerdown i markupen. */
+function grabOn(handle, ev) {
+  if (readOnly || !ev) return;
+  if (ev.pointerType === "mouse" && ev.button !== 0) return;
+  const row = handle.closest(".strip");
+  if (!row) return;
+  ev.preventDefault();
+  drag = {
+    handle, row,
+    src: { day: +row.dataset.day, idx: +row.dataset.idx },
+    pointerId: ev.pointerId,
+    startY: ev.clientY,
+    lastX: ev.clientX, lastY: ev.clientY,
+    active: false, target: null, raf: 0
+  };
+  try { handle.setPointerCapture(ev.pointerId); } catch (e) {}
+  handle.addEventListener("pointermove", onDragMove);
+  handle.addEventListener("pointerup", onDragEnd);
+  handle.addEventListener("pointercancel", onDragEnd);
+}
+
+function onDragMove(ev) {
+  if (!drag) return;
+  drag.lastX = ev.clientX;
+  drag.lastY = ev.clientY;
+  if (!drag.active) {
+    if (Math.abs(ev.clientY - drag.startY) < DRAG_THRESHOLD) return;
+    drag.active = true;
+    drag.row.classList.add("dragging");
+    document.body.style.userSelect = "none";
+    autoScrollTick();
+  }
+  ev.preventDefault();
+  updateDropTarget();
+}
+
+function updateDropTarget() {
+  clearDropMarks();
+  drag.target = null;
+  const el = document.elementFromPoint(drag.lastX, drag.lastY);
+  if (!el) return;
+  const overRow = el.closest(".strip");
+  if (overRow && overRow !== drag.row && root.contains(overRow)) {
+    const r = overRow.getBoundingClientRect();
+    const after = (drag.lastY - r.top) > r.height / 2;
+    overRow.classList.add(after ? "drop-after" : "drop-before");
+    drag.target = { day: +overRow.dataset.day, idx: +overRow.dataset.idx + (after ? 1 : 0) };
+    return;
+  }
+  const overBody = el.closest(".day-body");
+  if (overBody && root.contains(overBody)) {
+    drag.target = { day: +overBody.dataset.day, idx: listFor(+overBody.dataset.day).length };
+  }
+}
+
+function autoScrollTick() {
+  if (!drag || !drag.active) return;
+  const y = drag.lastY;
+  let dy = 0;
+  if (y < EDGE) dy = -Math.ceil((EDGE - y) / 6);
+  else if (y > window.innerHeight - EDGE) dy = Math.ceil((y - (window.innerHeight - EDGE)) / 6);
+  if (dy) { window.scrollBy(0, dy); updateDropTarget(); }
+  drag.raf = requestAnimationFrame(autoScrollTick);
+}
+
+function onDragEnd(ev) {
+  if (!drag) return;
+  const d = drag;
+  drag = null;
+  if (d.raf) cancelAnimationFrame(d.raf);
+  d.handle.removeEventListener("pointermove", onDragMove);
+  d.handle.removeEventListener("pointerup", onDragEnd);
+  d.handle.removeEventListener("pointercancel", onDragEnd);
+  try { d.handle.releasePointerCapture(d.pointerId); } catch (e) {}
+  d.row.classList.remove("dragging");
+  document.body.style.userSelect = "";
+  clearDropMarks();
+  if (d.active && d.target && ev.type !== "pointercancel") {
+    moveStrip(d.src, d.target.day, d.target.idx);
+  }
 }
 function moveStrip(src, tDay, tIdx) {
   const from = listFor(src.day), to = listFor(tDay);
-  if (src.day === tDay && (tIdx === src.idx || tIdx === src.idx + 1)) { dragSrc = null; render(); return; }
-  const [s] = from.splice(src.idx, 1);
-  if (src.day === tDay && tIdx > src.idx) tIdx--;
-  to.splice(tIdx, 0, s);
-  dragSrc = null;
+  const moved = SBCore.reorderStrips(from, src.idx, to, tIdx);
+  if (!moved) { render(); return; }
   if (tDay >= 0) recalcDay(DATA.days[tDay]);
   if (src.day >= 0 && src.day !== tDay) recalcDay(DATA.days[src.day]);
   notify(); render();
@@ -606,7 +556,7 @@ function lockdown(el) {
   el.querySelectorAll("button").forEach(b => { if (b.getAttribute("onclick") !== "window.print()") b.remove(); });
   el.querySelectorAll("input,select,textarea").forEach(i => { i.disabled = true; });
   el.querySelectorAll("[contenteditable]").forEach(c => c.setAttribute("contenteditable", "false"));
-  el.querySelectorAll(".c-handle").forEach(h => { h.replaceChildren(); h.removeAttribute("onmousedown"); h.style.cursor = "default"; });
+  el.querySelectorAll(".c-handle").forEach(h => { h.replaceChildren(); h.removeAttribute("onpointerdown"); h.style.cursor = "default"; });
   el.querySelectorAll(".lock-dot").forEach(h => h.remove());
 }
 function mount(el, data, options) {
@@ -659,7 +609,7 @@ function scrollToClosestDay() {
 
 return {
   mount, unmount, getData, render,
-  recalcAll, recalcOne, addDay, delDay, setDayField,
+  recalcAll, recalcOne, addDay, delDay, dupDay, setDayField,
   addStrip, delStrip, toggleLock, grabOn, makeCallSheet, toggleCastPicker,
   closestDayIndex, todayIso, scrollToClosestDay,
   generateFromScript, loadStripboard, sluglineParts, scenesPresent,
