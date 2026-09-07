@@ -179,7 +179,48 @@ En dag flaggas som för lång när `span > 720` minuter (**strikt större än** 
 
 Konstant i core: `DAY_LIMIT_MIN = 720`, hjälpare `isLongDay(span)`.
 
-## 10. Flytta en strip — `reorderStrips(from, fromIdx, to, toIdx) → bool`
+## 10. Arbetstids- och vilovarningar — `dayWarnings(day, prevDay, limits) → [{ level, text }]`
+
+Bedömer en dag mot tre regler och returnerar noll eller flera varningar.
+`level` är `"over"` (röd) eller `"warn"` (gul). Renderas av `stripboard.js` som
+ett `.day-warns`-block i dagfoten; en `"over"`-varning gör dessutom dagens
+`span`-siffra röd (`.df-num.df-over`), utöver 12-timmarsregelns gula flagg.
+
+Gränsvärden (`limits`, alla i minuter) med `WORK_LIMITS` som standard:
+
+| Nyckel | Standard | Betyder |
+|---|---|---|
+| `maxWorkdayMin` | `600` (10h) | Max arbetstid per dag, exkl. rast/lunch |
+| `mealBreakByMin` | `300` (5h) | Lunch ska börja senast så här långt efter samling |
+| `minRestMin` | `660` (11h) | Min. vila mellan två inspelningsdagar |
+
+Klienten läser dessa från meta-doket (Projektinfo: `maxWorkdayHrs` /
+`mealBreakByHrs` / `minRestHrs`, i timmar) via `app.js` `workLimits()`; tomt
+fält → standard.
+
+**Regel 1 — arbetstid.** `arbetstid = dayTotals(day).span − Σ parseEst(s.est)`
+för strips där `s.set` matchar `/rast|lunch/i` (`isBreak`). Är `arbetstid >
+maxWorkdayMin` → `{ level: "over", text: "Arbetstid 11h 30m (över 10h 0m)" }`
+(båda via `fmtEst`). Rast/lunch räknas alltså **inte** som arbetstid här, till
+skillnad från `dayTotals.mins` (avsnitt 8) som räknar in allt.
+
+**Regel 2 — lunch.** Finns ingen strip som matchar `/rast|lunch/i` →
+`{ level: "warn", text: "Ingen rast eller lunch inplanerad" }`. Finns en, men
+`t2m(förstaRasten.start) − t2m(day.start) > mealBreakByMin` →
+`{ level: "warn", text: "Lunch 6h 0m efter samling" }`. Otolkbara tider →
+regeln hoppas tyst.
+
+**Regel 3 — dygnsvila.** Enda regeln som tittar **över dygnsgränsen**. Körs
+bara om `prevDay` finns, båda dagarna har `date`, och
+`daysBetween(day.date, prevDay.date) === 1` (två på varandra följande
+kalenderdagar — en vilodag emellan → ingen varning). Då:
+`vila = (1440 + t2m(day.start)) − dayTotals(prevDay).end`. Är `vila <
+minRestMin` → `{ level: "over", text: "8h 0m vila efter Dag 2" }` (`prevDay.label`,
+`fmtEst(max(0, vila))`).
+
+Tom dag, ingen `day.start` eller inga strips → `[]` (inga varningar).
+
+## 11. Flytta en strip — `reorderStrips(from, fromIdx, to, toIdx) → bool`
 
 Ren array-operation, utbruten ur `moveStrip` i `stripboard.js`.
 
@@ -198,7 +239,7 @@ I `stripboard.js` `moveStrip` ovanpå detta:
   strips i boneyard behåller sin gamla `start`-text tills de dras in på en dag.
 - En no-op-flytt ritar bara om, kör inte `notify()` (inget sparas).
 
-## 11. Övrigt
+## 12. Övrigt
 
 - `addStrip(di, type)`: den nya stripens `start` = föregående strips
   `start + est`, annars dagens `start`, annars `""` (boneyard utan föregående).

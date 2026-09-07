@@ -26,11 +26,20 @@ Or with Docker: `docker compose up -d --build` (see the README for full instruct
 
 There are no build steps — the client is vanilla JS served directly (`public/js/*.js`). Change a file, reload the page.
 
+## Tests and checks
+
+```bash
+npm test        # node --test — pure domain logic (stripboard times, dates, shoot day, validation)
+npm run lint    # node --check over every first-party .js file
+```
+
+Both run in CI (GitHub Actions) on every push and pull request, together with a Docker build + smoke test. The pure, testable logic lives in `public/js/stripboard-core.js`, `public/js/shootday.js`, `store.js` and `validate.js`; their rules are pinned by `test/*.test.js` and by `docs/stripboard-time-rules.md` / `docs/datetime-canonical.md` — change behaviour there deliberately, updating the doc and the tests in the same change.
+
 ## Sending a pull request
 
 - One focused change per PR — several small ones rather than one large.
 - Follow the existing code style (no frameworks, no transpilation steps, comments in Swedish where the rest of the file already is).
-- Test manually in the browser before submitting — there's no automated test suite yet.
+- Run `npm test` and `npm run lint`, and test manually in the browser, before submitting.
 - Describe *why* the change is needed, not just what it does.
 
 ## Architecture in brief

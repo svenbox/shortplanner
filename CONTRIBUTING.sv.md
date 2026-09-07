@@ -26,11 +26,20 @@ Eller med Docker: `docker compose up -d --build` (se README för fullständiga i
 
 Det finns inga byggsteg — klienten är vanilla JS som serveras direkt (`public/js/*.js`). Ändra en fil, ladda om sidan.
 
+## Tester och kontroller
+
+```bash
+npm test        # node --test — ren domänlogik (stripboardtider, datum, inspelningsläge, validering)
+npm run lint    # node --check över varje förstapartsfil (.js)
+```
+
+Båda körs i CI (GitHub Actions) vid varje push och pull request, tillsammans med ett Docker-bygge + smoke-test. Den rena, testbara logiken bor i `public/js/stripboard-core.js`, `public/js/shootday.js`, `store.js` och `validate.js`; reglerna är låsta av `test/*.test.js` och av `docs/stripboard-time-rules.md` / `docs/datetime-canonical.md` — ändra beteende där medvetet, och uppdatera dokumentet och testerna i samma ändring.
+
 ## Skicka en pull request
 
 - Ett fokuserat ändringsförslag per PR — hellre flera små än en stor.
 - Följ den befintliga kodstilen (inga ramverk, inga transpilerings-steg, kommentarer på svenska där resten av filen redan är det).
-- Testa manuellt i webbläsaren innan du skickar in — det finns inget automatiserat testsvit än.
+- Kör `npm test` och `npm run lint`, och testa manuellt i webbläsaren, innan du skickar in.
 - Beskriv *varför* ändringen behövs, inte bara vad den gör.
 
 ## Arkitektur i korthet

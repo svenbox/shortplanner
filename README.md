@@ -15,14 +15,15 @@ It's optimized for short, low-budget productions where a single person (often th
 
 ## Features
 
-- **Stripboard** — drag-and-drop strips, automatically calculated start times, colour coding for INT/EXT, day/night, meals and company moves, page and time totals per day. Import scenes from an imported script, or from a stripboard JSON file (from another Shortplanner install).
-- **Call sheets** (*Call sheets*) — generated from a stripboard day with one click, then freely editable. Weather is fetched automatically (SMHI / MET Norway), cast call times are derived from the schedule, locations carry QR codes to Google Maps, and an edit toggle guards against accidental changes.
+- **Stripboard** — drag-and-drop strips (works on a touch screen), automatically calculated start times, colour coding for INT/EXT, day/night, meals and company moves, page and time totals per day. On-the-day warnings when a day breaks a working-hours or rest rule (long day, no meal break, too little turnaround from the previous shooting day) — thresholds set per project. Import scenes from an imported script, or from a stripboard JSON file (from another Shortplanner install).
+- **Call sheets** (*Call sheets*) — generated from a stripboard day with one click, then freely editable. Weather is fetched automatically (SMHI / MET Norway), cast call times are derived from the schedule, locations carry QR codes to Google Maps, and an edit toggle guards against accidental changes. A call sheet whose stripboard day changed after it was generated is flagged as stale.
 - **Script** (*Manus*) — import a script (PDF or Fountain) and see each scene's status against the plan (scheduled / boneyard / missing).
 - **Sides** (*Dagsmanus*) — pages for each shooting day, derived live from script + stripboard, print-optimised (A5).
 - **Reel budget** (*Rullplan*) — a budget for physical film stock (16 mm): screen time, shooting ratio, reels, with an actuals column you fill in at wrap and a budget-burn block (budget / used / remaining).
 - **DPR** — daily production report generated from the call sheet: scene status, pages shot, actual times.
+- **Shoot day mode** (*Inspelningsläge*) — a stripped-down full-screen view for the 1st AD's phone during the shoot: step through the day one item at a time (scenes, meals, moves) with large buttons that stamp the actual times, so the DPR fills itself in. Pick the current step out of order, correct a stamped time by tapping it.
 - **Cast register** (*Skådespelare*) — a small register (ID, role, name) that drives a multi-check dropdown in both the stripboard's cast column and the call sheet's schedule.
-- **Sharing** (*Dela*) — one read-only link per project, no login required for the recipient, respecting the site's feature on/off flags.
+- **Sharing** (*Dela*) — one read-only link per project, no login required for the recipient, with a per-component pick of what the link exposes (stripboard, call sheets, script, sides, reel budget); respects the site's feature on/off flags.
 - **Locations with QR** — coordinates, parking / toilet / facilities and a safety note per location. Print the call sheet and every location becomes a scannable QR code to Google Maps.
 - **Offline reading** — install as an app (PWA); the most recently fetched call sheet / stripboard / sides can be read with no signal on location.
 - **Site settings** (*Inställningar*) — company name / logo (replacing Shortplanner's built-in one), turn off tabs (Reel budget / DPR) you don't use.
@@ -104,20 +105,21 @@ Then open **https://shortplanner.example.com** and log in with the password from
 
 ## How the app is used
 
-**Projects** is the starting point. Create an empty project, or duplicate / import an existing one. **Projektinfo** (*Project info*, in the top bar inside a project) holds the basics — title, company, producer, director, DP, 1st AD, location manager, shooting dates, format — which pre-fill new call sheets as they are created.
+**Projects** is the starting point. Create an empty project, or duplicate / import an existing one. **Projektinfo** (*Project info*, in the top bar inside a project) holds the basics — title, company, producer, director, DP, 1st AD, location manager, shooting dates, format — which pre-fill new call sheets as they are created. It also holds the working-hours rules the stripboard checks each day against: max workday, latest meal break after call, minimum rest between shooting days (in hours; blank = the defaults 10 / 5 / 11).
 
 **⚙ Inställningar** (*Settings*, on the project list) applies to the whole install: company name / logo for call sheets, and on/off for the Reel budget and DPR tabs if you don't use them.
 
 **The Stripboard tab**
 
-- Drag the handle (⋮⋮) to move a strip — within a day, between days, or to and from the *Ej schemalagt* (*Unscheduled*) bank at the bottom.
+- Drag the handle (⋮⋮) to move a strip — within a day, between days, or to and from the *Ej schemalagt* (*Unscheduled*) bank at the bottom. Works with a mouse or a finger. The **⋯** menu on a strip moves it to a specific day (or to *Ej schemalagt*) without dragging.
 - Pages, est. time, I/E and DAY/NIGHT are dropdowns. I/E and DAY/NIGHT drive the strip's colour.
 - Change the est. time and the following start times are recalculated automatically.
 - 🔒 locks a start time so it isn't moved on recalculation. Type a time in manually and it locks automatically — that's how you keep deliberate gaps in the day.
-- Days over 12 hours are flagged amber in the day footer.
+- Days over 12 hours are flagged amber in the day footer. Separately, the day footer shows a warning line when a day breaks one of the working-hours rules from **Projektinfo**: working time (day span minus meal/break strips) over the limit, no meal break scheduled or the meal starting too long after call, or less than the minimum rest between the end of the previous shooting day and this day's call. A red warning also turns that day's span figure red.
+- **Duplicera dag** (*Duplicate day*) in the day footer copies a whole shooting day (strips and all, date cleared) as a new day.
 - **📥 Importera scener** (*Import scenes*) creates one strip per scene in an imported script (into "Ej schemalagt", in script order), or reads a whole stripboard file (JSON, from another Shortplanner install or a project you exported earlier).
 
-**Skapa call sheet →** (*Create call sheet*) in a day footer builds a call sheet from that day: schedule with info rows and a total row, call times (30 min before day start, hair/make-up 60 min before), working hours and a cast list from the scenes' role IDs. Run it again for the same day and the schedule is updated while the locations, contacts, weather and cast times you filled in are kept.
+**Skapa call sheet →** (*Create call sheet*) in a day footer builds a call sheet from that day: schedule with info rows and a total row, call times (30 min before day start, hair/make-up 60 min before), working hours and a cast list from the scenes' role IDs. Once a call sheet exists for that day the button reads **Uppdatera call sheet →** (*Update call sheet*) — run it again and the schedule is updated while the locations, contacts, weather and cast times you filled in are kept. The Call sheets tab shows a stale-plan banner if the stripboard day was changed after the call sheet was last generated.
 
 Write `MOS` in a scene's set/heading field to mark that it is shot without sound — an established industry term ("Mit Out Sound"), with no special behaviour in the app but good to know.
 
@@ -128,6 +130,8 @@ Write `MOS` in a scene's set/heading field to mark that it is shot without sound
 **The Reel budget tab** (*Rullplan*) budgets physical film: screen time per scene (proposed proportional to the script pages, overridable by hand), shooting ratio (editable, default 14:1), reels (11 min/reel). Turn on Redigera (*Edit*) to enter what was actually rolled per scene and mark a day as wrapped — the budget-burn block then shows budget / used / remaining.
 
 **The DPR tab** (Daily Production Report, internal — not included in shared links) is generated from a day's call sheet: tick scenes off as done / partial / moved / cut, pages shot, actual vs planned times.
+
+**Shoot day mode** (*Inspelningsläge*). A 🎬 button appears in the top bar on shooting days (when a DPR day is within a day of today), and there is one in the DPR tab too. It opens a full-screen view built for the 1st AD's phone on set: a "start the day" screen, then one step at a time — scenes, and the meal / company-move rows from the call sheet — with the general call, planned start, stamped actual start and a rolling estimated wrap that creeps with the clock (green / amber / red against the planned wrap). Big buttons: **✓ Klar** (*Done*, stamps the actual end and moves on), **◐ Delvis** (*Partial*), **→ Hoppa över** (*Skip* — just moves the pointer, leaves the step unmarked), **◂ Backa** (*Back*), **+10 / +20 min** (adds slip to the current step). Tap any row in the step list to make it the current one out of order; tap ✎ on the actual-start line to correct a stamped time. Everything writes straight into the DPR day — lunch out/in, first shot and camera wrap fill themselves in. It needs a network (autosave as usual).
 
 **Cast.** The **Skådespelare** (*Cast*) button in the top bar opens a small register: ID, role/character and (optionally) the actor's name. Add and remove freely, edit role/name by clicking in the fields. The ID is what you write in the stripboard's cast column.
 
@@ -145,7 +149,7 @@ In both the stripboard's cast column and the call sheet's schedule, the cast fie
 
 > Always check the QR codes before a plan goes out to the team: print to PDF (or for real) and scan every code, not just a sample.
 
-**Sharing.** The **Dela** (*Share*) button in the top bar generates a read-only link (`/share/<token>`) to the project's stripboard, call sheets, script, sides and reel budget — no login required to view it, all editing controls removed, and DPR (internal) never included. **Ta bort delning** (*Remove sharing*) invalidates the link immediately.
+**Sharing.** The **Dela** (*Share*) button in the top bar generates a read-only link (`/share/<token>`) — no login required to view it, all editing controls removed. Five checkboxes choose what the link exposes: Stripboard, Call sheet, Manus (*Script*), Dagsmanus (*Sides*), Rullplan (*Reel budget*). All are on to begin with; tick one off and it takes effect on the same link immediately (the token doesn't change). The script text is only sent when Manus or Dagsmanus is shared — with only Rullplan ticked, the link gets scene numbers, sluglines and page/screen-time figures but no script body. DPR (internal) is never included. **Ta bort delning** (*Remove sharing*) invalidates the link immediately.
 
 **Versions.** Everything is saved continuously — the indicator in the top bar shows *Sparat HH:MM* (*Saved*). When you want to freeze a state, click **Spara version** (*Save version*) and name it. On **Återställ** (*Restore*), the current state is first saved automatically as *Före återställning* (*Before restore*), so you can never paint yourself into a corner. Edit the same project on two devices at once and the app warns you and lets you choose which version wins, instead of silently overwriting.
 
@@ -229,9 +233,9 @@ GET    /api/projects/:id
 PATCH  /api/projects/:id                 { name }
 DELETE /api/projects/:id
 POST   /api/projects/:id/duplicate
-POST   /api/projects/:id/share                             → { token, url } (creates if needed, else existing)
+POST   /api/projects/:id/share       { components? }       → { token, url, components } (creates if needed, else existing)
 DELETE /api/projects/:id/share                             invalidates the share link
-GET    /api/share/:token                                   public, unauthenticated — stripboard/callsheet/script/site
+GET    /api/share/:token                                   public, unauthenticated — the selected docs + site + components[]
 PUT    /api/projects/:id/doc/:kind       { data, baseUpdatedAt? }  kind = stripboard | callsheet | script | dpr | meta
 GET    /api/projects/:id/export
 POST   /api/projects/import
