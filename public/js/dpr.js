@@ -318,7 +318,9 @@ function rerenderDay() {
     return;
   }
   activeDay = Math.max(0, Math.min(activeDay, DATA.days.length - 1));
+  const _scrollY = (typeof window !== "undefined") ? window.scrollY : 0;
   out.innerHTML = renderDay(activeDay);
+  if (typeof window !== "undefined" && window.scrollY !== _scrollY) window.scrollTo(0, _scrollY);
   root.classList.toggle("edit-mode", editMode);
   setEditable(out);
 }

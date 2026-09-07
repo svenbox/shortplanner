@@ -194,6 +194,55 @@
     return span > DAY_LIMIT_MIN;
   }
 
+  /* Standardgränser (minuter) för arbetstids-/vilokontrollen. Kan sättas
+     per projekt i Projektinfo -- en produktion på ett annat avtal ska
+     kunna ändra dem. */
+  const WORK_LIMITS = { maxWorkdayMin: 600, mealBreakByMin: 300, minRestMin: 660 };
+
+  function isBreak(strip) { return /rast|lunch/i.test((strip && strip.set) || ""); }
+
+  /* Varningar som ska stå PÅ dagen i stripboardet (inte bara i en toppsiffra).
+     - Arbetstid (span minus rast/lunch) över gränsen  -> level "over"
+     - Ingen rast/lunch, eller lunch långt efter samling -> level "warn"
+     - För kort vila mot föregående inspelningsdag       -> level "over"
+     prevDay = föregående dag i listan (eller null). limits slås ihop med
+     WORK_LIMITS. Returnerar [{ level, text }]. */
+  function dayWarnings(day, prevDay, limits) {
+    const L = Object.assign({}, WORK_LIMITS, limits || {});
+    const out = [];
+    const strips = (day && day.strips) || [];
+    if (!day || !day.start || !strips.length) return out;
+
+    const t = dayTotals(day);
+    const startM = t2m(day.start);
+    const breakMin = strips.reduce((a, s) => a + (isBreak(s) ? parseEst(s.est) : 0), 0);
+    const workMin = t.span - breakMin;
+
+    if (workMin > L.maxWorkdayMin) {
+      out.push({ level: "over", text: `Arbetstid ${fmtEst(workMin)} (över ${fmtEst(L.maxWorkdayMin)})` });
+    }
+
+    const firstBreak = strips.find(isBreak);
+    if (!firstBreak) {
+      out.push({ level: "warn", text: "Ingen rast eller lunch inplanerad" });
+    } else if (startM != null && t2m(firstBreak.start) != null) {
+      const afterCall = t2m(firstBreak.start) - startM;
+      if (afterCall > L.mealBreakByMin) out.push({ level: "warn", text: `Lunch ${fmtEst(afterCall)} efter samling` });
+    }
+
+    if (prevDay && prevDay.start && day.date && prevDay.date && startM != null) {
+      const gap = daysBetween(day.date, prevDay.date);
+      if (gap === 1) {
+        const prevEnd = dayTotals(prevDay).end;      // min sedan prevDays dygnsstart, kan vara > 1440
+        const rest = (1440 + startM) - prevEnd;       // vila fram till dagens samling
+        if (rest < L.minRestMin) {
+          out.push({ level: "over", text: `${fmtEst(Math.max(0, rest))} vila efter ${prevDay.label || "föregående dag"}` });
+        }
+      }
+    }
+    return out;
+  }
+
   /* ---- flytta strip (ren array-del av moveStrip) ---- */
 
   /* Flyttar ett element mellan (eller inom) två arrayer. Returnerar false om
@@ -209,9 +258,9 @@
   }
 
   return {
-    SV_DAYS, SV_DAYS_LONG, SV_MON, DAY_LIMIT_MIN,
+    SV_DAYS, SV_DAYS_LONG, SV_MON, DAY_LIMIT_MIN, WORK_LIMITS,
     parseEst, fmtEst, parsePages, fmtPages, t2m, m2t,
     dateSv, dateShort, todayIso, daysBetween, addDays, closestDayIndex,
-    stripClass, recalcDay, dayTotals, isLongDay, reorderStrips
+    stripClass, recalcDay, dayTotals, isLongDay, isBreak, dayWarnings, reorderStrips
   };
 });

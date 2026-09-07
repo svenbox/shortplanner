@@ -392,3 +392,104 @@ test("closestDayIndex — hela schemat i framtiden → första dagen", () => {
   const days = [{ date: "2099-01-01" }, { date: "2099-01-02" }];
   assert.equal(C.closestDayIndex(days, "date"), 0);
 });
+
+/* ------------------------------------------------------------------ */
+/* dayWarnings — arbetstids-/vilokontroll */
+const wday = (o) => Object.assign({ label: "D", date: "", start: "08:00", strips: [] }, o);
+const wstrips = (specs) => specs.map(s => Object.assign({ type: "scene", set: "", est: "", start: "", lock: false }, s));
+const texts = (arr) => arr.map(w => w.text);
+
+test("dayWarnings — arbetstid över gränsen (exkl. rast/lunch) → level over", () => {
+  const d = wday({ start: "06:00", strips: wstrips([
+    { est: "6h", start: "06:00" },
+    { set: "Lunch", est: "45m", start: "12:00" },
+    { est: "5h 30m", start: "12:45" }
+  ]) });
+  C.recalcDay(d);
+  const w = C.dayWarnings(d, null, null);          // standard: 10h
+  // span 06:00 -> 18:15 = 12h15; minus 45m lunch = 11h30 arbetstid > 10h
+  const over = w.find(x => /Arbetstid/.test(x.text));
+  assert.ok(over, "arbetstidsvarning finns");
+  assert.equal(over.level, "over");
+  assert.match(over.text, /11h 30m/);
+});
+
+test("dayWarnings — arbetstid precis under gränsen → ingen varning", () => {
+  const d = wday({ start: "08:00", strips: wstrips([
+    { est: "4h", start: "08:00" },
+    { set: "Lunch", est: "45m", start: "12:00" },
+    { est: "5h", start: "12:45" }
+  ]) });
+  C.recalcDay(d);
+  // span 08:00->17:45 = 9h45; minus 45m = 9h arbetstid < 10h
+  assert.equal(C.dayWarnings(d, null, null).some(x => /Arbetstid/.test(x.text)), false);
+});
+
+test("dayWarnings — ingen rast/lunch alls", () => {
+  const d = wday({ start: "08:00", strips: wstrips([{ est: "3h", start: "08:00" }]) });
+  C.recalcDay(d);
+  assert.ok(texts(C.dayWarnings(d, null, null)).includes("Ingen rast eller lunch inplanerad"));
+});
+
+test("dayWarnings — lunch mer än 5h efter samling", () => {
+  const d = wday({ start: "07:00", strips: wstrips([
+    { est: "5h 30m", start: "07:00" },
+    { set: "Lunch", est: "45m", start: "12:30" }
+  ]) });
+  C.recalcDay(d);
+  const meal = C.dayWarnings(d, null, null).find(x => /efter samling/.test(x.text));
+  assert.ok(meal);
+  assert.equal(meal.level, "warn");
+  assert.match(meal.text, /5h 30m efter samling/);
+});
+
+test("dayWarnings — lunch inom 5h → ingen mealvarning", () => {
+  const d = wday({ start: "08:00", strips: wstrips([
+    { est: "3h", start: "08:00" },
+    { set: "Rast", est: "30m", start: "11:00" }
+  ]) });
+  C.recalcDay(d);
+  assert.equal(C.dayWarnings(d, null, null).some(x => /efter samling/.test(x.text)), false);
+});
+
+test("dayWarnings — för kort vila mot föregående dag (över dygnsgränsen)", () => {
+  const prev = wday({ label: "Dag 2", date: "2026-11-10", start: "10:00", strips: wstrips([
+    { est: "13h", start: "10:00" }   // wrappar 23:00
+  ]) });
+  C.recalcDay(prev);
+  const today = wday({ label: "Dag 3", date: "2026-11-11", start: "07:00", strips: wstrips([{ est: "4h", start: "07:00" }]) });
+  C.recalcDay(today);
+  const rest = C.dayWarnings(today, prev, null).find(x => /vila efter/.test(x.text));
+  assert.ok(rest, "vilovarning finns");
+  assert.equal(rest.level, "over");
+  assert.match(rest.text, /8h 0m vila efter Dag 2/);
+});
+
+test("dayWarnings — tillräcklig vila → ingen vilovarning", () => {
+  const prev = wday({ label: "Dag 1", date: "2026-11-09", start: "08:00", strips: wstrips([{ est: "9h", start: "08:00" }]) }); // wrap 17:00
+  C.recalcDay(prev);
+  const today = wday({ label: "Dag 2", date: "2026-11-10", start: "08:00", strips: wstrips([{ est: "4h", start: "08:00" }]) }); // 15h vila
+  C.recalcDay(today);
+  assert.equal(C.dayWarnings(today, prev, null).some(x => /vila efter/.test(x.text)), false);
+});
+
+test("dayWarnings — vilodag emellan (gap > 1 dygn) → ingen vilovarning", () => {
+  const prev = wday({ label: "Dag 1", date: "2026-11-09", start: "08:00", strips: wstrips([{ est: "13h", start: "08:00" }]) });
+  C.recalcDay(prev);
+  const today = wday({ label: "Dag 2", date: "2026-11-12", start: "07:00", strips: wstrips([{ est: "4h", start: "07:00" }]) }); // 2 dagars gap
+  C.recalcDay(today);
+  assert.equal(C.dayWarnings(today, prev, null).some(x => /vila efter/.test(x.text)), false);
+});
+
+test("dayWarnings — egna gränsvärden via limits", () => {
+  const d = wday({ start: "08:00", strips: wstrips([{ est: "8h", start: "08:00" }]) });
+  C.recalcDay(d);
+  // 8h span, ingen rast. Standard 10h -> ingen arbetstidsvarning. Gräns 6h -> varning.
+  assert.equal(C.dayWarnings(d, null, {}).some(x => /Arbetstid/.test(x.text)), false);
+  assert.equal(C.dayWarnings(d, null, { maxWorkdayMin: 360 }).some(x => /Arbetstid/.test(x.text)), true);
+});
+
+test("dayWarnings — tom dag / ingen starttid → inga varningar", () => {
+  assert.deepEqual(C.dayWarnings(wday({ strips: [] }), null, null), []);
+  assert.deepEqual(C.dayWarnings(wday({ start: "", strips: wstrips([{ est: "1h" }]) }), null, null), []);
+});

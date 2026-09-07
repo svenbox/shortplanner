@@ -215,6 +215,15 @@
       <div style="flex:1"><label for="psFormat">Format</label><input type="text" id="psFormat" placeholder="16mm / digitalt"></div>
       <div style="flex:1"><label for="psAspect">Bildförhållande</label><input type="text" id="psAspect" placeholder="1.85:1"></div>
     </div>
+    <div class="imp-sec">
+      <strong>Arbetstidsregler</strong>
+      <p class="imp-hint">Stripboardet varnar på dagen när en dag bryter mot dessa. Timmar; tomt = standard.</p>
+      <div style="display:flex; gap:10px;">
+        <div style="flex:1"><label for="psMaxWorkday">Max arbetstid/dag</label><input type="text" id="psMaxWorkday" inputmode="decimal" placeholder="10"></div>
+        <div style="flex:1"><label for="psMealBy">Lunch senast efter</label><input type="text" id="psMealBy" inputmode="decimal" placeholder="5"></div>
+        <div style="flex:1"><label for="psMinRest">Min. vila mellan dagar</label><input type="text" id="psMinRest" inputmode="decimal" placeholder="11"></div>
+      </div>
+    </div>
     <div class="modal-actions">
       <button class="btn" onclick="App.closeOv('ovProjectSettings')">Avbryt</button>
       <button class="btn btn-primary" onclick="App.saveProjectSettings()">Spara</button>

@@ -151,9 +151,31 @@ const importProject = db.transaction((payload) => {
   return { id, name };
 });
 
+/* Vad delningsrouten får skicka av script-doket beroende på vilka
+   komponenter länken visar. Upphovsrätten till manuset ligger sällan hos
+   produktionen — full brödtext (scenernas `body`) och `draft`-texten går
+   BARA ut när Manus eller Dagsmanus faktiskt delas. Rullplan behöver bara
+   siffror/struktur (nummer, slugline, sidor, skärmtid) — inte texten. */
+function redactScriptForShare(script, comps) {
+  const c = Array.isArray(comps) ? comps : [];
+  if (!script) return EMPTY_SCRIPT();
+  if (c.includes("manus") || c.includes("sides")) return script;      // texten är hela poängen
+  if (c.includes("rullplan")) {
+    return Object.assign({}, script, {
+      draft: "", draftDate: "",
+      scenes: (script.scenes || []).map(s => ({
+        number: s.number, slugline: s.slugline,
+        scriptPage: s.scriptPage, scriptPageEnd: s.scriptPageEnd,
+        screenTimeSec: s.screenTimeSec, negActualMin: s.negActualMin
+      }))
+    });
+  }
+  return EMPTY_SCRIPT();
+}
+
 module.exports = {
   now,
   EMPTY_STRIPBOARD, EMPTY_CALLSHEET, EMPTY_SCRIPT, EMPTY_DPR, EMPTY_META,
   getDoc, putDoc, docUpdatedAtMap, shareUpdatedAt,
-  listVersions, createVersion, restoreVersion, importProject, VERSIONED
+  listVersions, createVersion, restoreVersion, importProject, redactScriptForShare, VERSIONED
 };

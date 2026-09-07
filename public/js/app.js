@@ -482,7 +482,8 @@ async function removeLogo() {
 const PS_FIELDS = {
   psTitle: "title", psCompany: "company", psProducer: "producer", psProducerPhone: "producerPhone",
   psDirector: "director", psDop: "dop", psFirstAD: "firstAD", psLocationManager: "locationManager",
-  psShootStart: "shootStart", psShootEnd: "shootEnd", psFormat: "format", psAspect: "aspectRatio"
+  psShootStart: "shootStart", psShootEnd: "shootEnd", psFormat: "format", psAspect: "aspectRatio",
+  psMaxWorkday: "maxWorkdayHrs", psMealBy: "mealBreakByHrs", psMinRest: "minRestHrs"
 };
 function openProjectSettings() {
   if (!state.project) return;
@@ -495,6 +496,9 @@ function saveProjectSettings() {
   Object.keys(PS_FIELDS).forEach(id => { m[PS_FIELDS[id]] = $(id).value.trim(); });
   markDirty("meta");
   closeOv("ovProjectSettings");
+  /* Nya gränsvärden -> rita om stripboardet så arbetstids-/vilovarningarna
+     stämmer. */
+  if (state.tab === "stripboard") SB.render();
   toast("Projektinfo sparad");
 }
 
@@ -553,6 +557,9 @@ function setTab(name) {
   if (name === "sides") SC.refreshSides();
   if (name === "rullplan") SC.refreshRullplan();
   if (name === "dpr") DPR.refreshDpr();
+  /* Rita om call sheeten vid flikbyte så "planen är nyare"-varningen
+     stämmer mot stripboardets aktuella ändringstid. */
+  if (name === "callsheet") CS.rerenderDay();
   updateDocTitle();
 }
 
@@ -896,6 +903,7 @@ function csMountOpts() {
     castRoster: () => state.stripboard.cast || [],
     shareUrl: shareUrlFor(),
     onDayChange: (d) => { state.activeCsDayLabel = d.label; updateDocTitle(); },
+    stripboardUpdatedAt: () => (state.docUpdatedAt && state.docUpdatedAt.stripboard) || null,
     logoUrl: (state.site && state.site.hasLogo) ? ("/logo?v=" + state.logoVer) : null,
     companyName: (state.site && state.site.company && state.site.company.name) || "",
     toast
@@ -905,10 +913,26 @@ function remountCallSheet() {
   CS.mount($("tab-callsheet"), state.callsheet, csMountOpts());
 }
 
+/* Gränsvärden för arbetstids-/vilokontrollen -- lagras som timmar (sträng)
+   i meta-doket (Projektinfo), tomt = standard. */
+function hrsToMin(v, defHrs) {
+  const n = parseFloat(String(v == null ? "" : v).replace(",", "."));
+  return (isFinite(n) && n > 0) ? Math.round(n * 60) : defHrs * 60;
+}
+function workLimits() {
+  const m = state.meta || {};
+  return {
+    maxWorkdayMin: hrsToMin(m.maxWorkdayHrs, 10),
+    mealBreakByMin: hrsToMin(m.mealBreakByHrs, 5),
+    minRestMin: hrsToMin(m.minRestHrs, 11)
+  };
+}
 function mountStripboard() {
   SB.mount($("tab-stripboard"), state.stripboard, {
     onChange: () => { markDirty("stripboard"); SC.refreshSides(); SC.refreshRullplan(); },
     onCallSheet: onCallSheetFromStripboard,
+    hasCallSheet: (label) => ((state.callsheet && state.callsheet.days) || []).some(d => d.label === label),
+    limits: workLimits,
     toast
   });
 }

@@ -210,4 +210,36 @@ test("validateShareComponents — rensar, ordnar kanoniskt, avvisar okänt", () 
   assert.throws(() => V.validateShareComponents("stripboard"), /måste vara en lista/);
 });
 
+/* ============ redactScriptForShare (manusläckan i delningsrouten) ============ */
+test("redactScriptForShare — full brödtext bara när Manus eller Dagsmanus delas", () => {
+  const script = {
+    draft: "3:e utkast", draftDate: "2025-11-27", targetLengthSec: 900, shootingRatio: 12,
+    rullplanWrapped: { "Dag 1": true },
+    scenes: [
+      { number: "1", slugline: "INT. KÖK - DAG", scriptPage: 1, scriptPageEnd: 2, screenTimeSec: 85, negActualMin: 3,
+        body: [{ kind: "action", text: "Hemlig brödtext som inte får läcka." }] }
+    ]
+  };
+  // Manus delas -> allt
+  assert.deepEqual(store.redactScriptForShare(script, ["manus"]), script);
+  // Dagsmanus delas -> allt (texten är hela poängen)
+  assert.deepEqual(store.redactScriptForShare(script, ["sides", "stripboard"]), script);
+
+  // Bara Rullplan -> siffror/struktur, INGEN body, ingen draft-text
+  const r = store.redactScriptForShare(script, ["rullplan"]);
+  assert.equal(r.draft, "");
+  assert.equal(r.draftDate, "");
+  assert.equal(r.shootingRatio, 12, "doc-nivåns siffror behålls");
+  assert.equal("body" in r.scenes[0], false, "ingen brödtext");
+  assert.equal(r.scenes[0].number, "1");
+  assert.equal(r.scenes[0].screenTimeSec, 85);
+  assert.equal(r.scenes[0].negActualMin, 3);
+  assert.equal(JSON.stringify(r).includes("Hemlig brödtext"), false);
+
+  // Varken manus/sides/rullplan -> tomt script
+  const e = store.redactScriptForShare(script, ["stripboard", "callsheet"]);
+  assert.deepEqual(e.scenes, []);
+  assert.equal(JSON.stringify(e).includes("Hemlig"), false);
+});
+
 test.after(() => { try { db.close(); } catch (_) {} fs.rmSync(TMP, { recursive: true, force: true }); });

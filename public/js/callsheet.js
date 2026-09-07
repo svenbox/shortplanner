@@ -5,7 +5,7 @@ window.CS = (function () {
 
 let DATA = null;
 let root = null;
-let opts = { onChange() {}, toast() {}, castRoster: () => [], shareUrl: null, onDayChange() {} };
+let opts = { onChange() {}, toast() {}, castRoster: () => [], shareUrl: null, onDayChange() {}, stripboardUpdatedAt: () => null };
 let readOnly = false;
 let castPickerEl = null;
 let castAddPickerEl = null;
@@ -384,7 +384,17 @@ function renderDay(di) {
     </tr>
   `).join("");
 
+  /* "Call sheeten är äldre än planen" -- jämför när call sheeten genererades
+     mot när stripboard-doket senast ändrades. Är planen nyare: gul rad
+     överst. Tider i läsarens lokala tid (det är ett "när", inte schema). */
+  const _hhmm = (iso) => { const t = new Date(iso); return isNaN(+t) ? "" : String(t.getHours()).padStart(2, "0") + ":" + String(t.getMinutes()).padStart(2, "0"); };
+  const _sbUpd = (opts.stripboardUpdatedAt && opts.stripboardUpdatedAt()) || null;
+  const staleBanner = (d.generatedAt && _sbUpd && _sbUpd > d.generatedAt && !readOnly)
+    ? `<div class="cs-stale-banner">⚠ Planen ändrad ${_hhmm(_sbUpd)} — call sheeten gjord ${_hhmm(d.generatedAt)}. Kör <b>Uppdatera call sheet</b> från stripboardets dagfot.</div>`
+    : "";
+
   const html = `
+    ${staleBanner}
     <div class="cs-header">
       <div class="logo-area">
         <img src="/icon.svg" style="width:80px; height:auto; display:block;" alt="Shortplanner">
@@ -473,12 +483,16 @@ function renderDay(di) {
           ${routePointCard(di, d, "routeStart", "START", "☕", "var(--warning)")}
           ${isLastProductionDay(di) ? "" : routePointCard(di, d, "routeEnd", "SLUT", "🛏️", "var(--s-int-night)")}
         </div>
-        <div class="section-title">Akut / Sjukhus</div>
         ${(() => {
           const h = d.hospital || {};
+          /* Tomt akutblock trycks inte -- varken på skärm i läsläge eller i
+             utskrift. Bara i redigeringsläge (så man kan fylla i det) eller
+             när något fält faktiskt har ett värde. */
+          if (!editMode && !(h.name || h.addr || h.tel || h.note)) return "";
           const hMapUrl = locationMapUrl(h);
           const hCoordDisplay = locationCoordDisplay(h);
           return `
+        <div class="section-title">Akut / Sjukhus</div>
         <div class="loc-card" style="border-left: 3px solid #e44;">
           <span class="loc-drag-handle-spacer"></span>
           <div class="loc-num" style="color:#e44;">+</div>
@@ -569,8 +583,10 @@ function renderDay(di) {
 }
 
 function rerenderDay() {
+  const _scrollY = (typeof window !== "undefined") ? window.scrollY : 0;
   const out = root.querySelector('[data-cs="output"]');
   out.innerHTML = renderDay(activeDay);
+  if (typeof window !== "undefined" && window.scrollY !== _scrollY) window.scrollTo(0, _scrollY);
   /* Standardloggan är Shortplanners egen (generisk, ingen produktion/
      företag inbakat). Har en sajtlogga laddats upp i sajtinställningarna
      byter vi ut den mot den istället, efter render. */
@@ -661,7 +677,7 @@ function deleteNote(di, ni) {
 function addLoc(di) {
   if (readOnly) return;
   const n = DATA.days[di].locations.length + 1;
-  DATA.days[di].locations.push({ num: n, name: "Ny plats", addr: "Ange adress", note: "", lat: "", lng: "", mapUrl: "", parking: "", toilet: "", facilities: "", safety: "" });
+  DATA.days[di].locations.push({ num: n, name: "Ny plats", addr: "", note: "", lat: "", lng: "", mapUrl: "", parking: "", toilet: "", facilities: "", safety: "" });
   notify();
   rerenderDay();
 }
@@ -766,7 +782,7 @@ async function resolveMapsLink(point) {
    av försöken gav koordinater. */
 async function resolveCoordFor(point, btn) {
   const address = String(point.addr || "").split("\n")[0].trim();
-  const hasAddress = !!(address && address !== "Ange adress");
+  const hasAddress = !!address;
   if (!hasAddress && !point.mapUrl) {
     alert("Fyll i en adress eller klistra in en Google Maps-länk i koordinatfältet först.");
     return;
@@ -1059,8 +1075,8 @@ function addDay() {
     sunrise: "—",
     sunset: "—",
     notes: [],
-    locations: [{ num: 1, name: "Ange plats", addr: "Ange adress", note: "", lat: "", lng: "", mapUrl: "", parking: "", toilet: "", facilities: "", safety: "" }],
-    hospital: { name: "Ange sjukhus", addr: "Ange adress", tel: "", note: "", lat: "", lng: "", mapUrl: "" },
+    locations: [{ num: 1, name: "", addr: "", note: "", lat: "", lng: "", mapUrl: "", parking: "", toilet: "", facilities: "", safety: "" }],
+    hospital: { name: "", addr: "", tel: "", note: "", lat: "", lng: "", mapUrl: "" },
     routeStart: { name: "", addr: "", tel: "", note: "", lat: "", lng: "", mapUrl: "" },
     routeEnd: { name: "", addr: "", tel: "", note: "", lat: "", lng: "", mapUrl: "" },
     crew_contacts: [{ role: "Producent", name: "—", tel: "—" }],
@@ -1184,14 +1200,14 @@ async function fetchWeather(di) {
   if (!day.date_iso) {
     return alert("Det här datumet är inte kopplat till stripboardet ännu. Generera call sheeten från en schemalagd dag i stripboardet (\"Skapa call sheet →\") för att kunna hämta väder.");
   }
-  const isRealAddr = (a) => !!(a && a.trim() && a.trim() !== "Ange adress");
+  const isRealAddr = (a) => !!(a && a.trim());
   const firstRealLoc = (day.locations || []).find(l => isRealAddr(l.addr));
   const rawAddress = (firstRealLoc && firstRealLoc.addr)
     || (isRealAddr(day.hospital && day.hospital.addr) ? day.hospital.addr : "") || "";
   /* platsfältet innehåller ofta fri text (t.ex. "Parkering: ...") på egna rader efter adressen */
   const address = rawAddress.split("\n")[0].trim();
   if (!address) {
-    return alert("Ingen plats har en riktig adress ifylld ännu (bara \"Ange adress\"). Fyll i en adress under Platser eller Akut/Sjukhus först.");
+    return alert("Ingen plats har en adress ifylld ännu. Fyll i en adress under Platser eller Akut/Sjukhus först.");
   }
   const btn = root.querySelector(".weather-fetch-btn");
   const prevText = btn ? btn.textContent : "";

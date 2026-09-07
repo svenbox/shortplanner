@@ -20,7 +20,7 @@ const SBCore = window.SBCore;
 const {
   parseEst, fmtEst, parsePages, fmtPages, t2m, m2t,
   dateSv, dateShort, todayIso, daysBetween, addDays, closestDayIndex,
-  stripClass, dayTotals, recalcDay
+  stripClass, dayTotals, recalcDay, dayWarnings
 } = SBCore;
 
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
@@ -85,7 +85,7 @@ function stripRow(s, dayIdx, i) {
       <div class="c-pages"></div>
       ${sel("c-est", s.est, base + ".est", TIME_OPTS)}
       <div class="c-start"><span class="cell-ed" contenteditable="true" spellcheck="false" data-path="${base}.start" data-ph="–">${esc(s.start)}</span><span class="lock-dot ${lock}" onclick="SB.toggleLock(${dayIdx},${i})" title="Lås starttid">🔒</span></div>
-      <div class="c-act"><button class="row-x" onclick="SB.delStrip(${dayIdx},${i})" title="Ta bort">×</button></div>
+      <div class="c-act"><button class="row-menu" onclick="SB.stripMenu(${dayIdx},${i},event)" title="Flytta till dag …">⋯</button><button class="row-x" onclick="SB.delStrip(${dayIdx},${i})" title="Ta bort">×</button></div>
     </div>`;
   }
   return `<div class="strip ${stripClass(s)} grid" data-day="${dayIdx}" data-idx="${i}" draggable="false">
@@ -99,11 +99,16 @@ function stripRow(s, dayIdx, i) {
     ${sel("c-pages", s.pages, base + ".pages", PAGE_OPTS)}
     ${sel("c-est", s.est, base + ".est", TIME_OPTS)}
     <div class="c-start"><span class="cell-ed" contenteditable="true" spellcheck="false" data-path="${base}.start" data-ph="–">${esc(s.start)}</span><span class="lock-dot ${lock}" onclick="SB.toggleLock(${dayIdx},${i})" title="Lås starttid">🔒</span></div>
-    <div class="c-act"><button class="row-x" onclick="SB.delStrip(${dayIdx},${i})" title="Ta bort">×</button></div>
+    <div class="c-act"><button class="row-menu" onclick="SB.stripMenu(${dayIdx},${i},event)" title="Flytta till dag …">⋯</button><button class="row-x" onclick="SB.delStrip(${dayIdx},${i})" title="Ta bort">×</button></div>
   </div>`;
 }
 
 function render() {
+  /* Behåll scrollpositionen -- en inline-redigering (blur -> applyEdit ->
+     render) bygger om hela boardet och skulle annars rycka sidan uppåt, så
+     nästa klick landar på fel rad. Scrollen till "dagens datum" vid
+     projektöppning görs separat via scrollToClosestDay(). */
+  const _scrollY = (typeof window !== "undefined") ? window.scrollY : 0;
   root.querySelector('[data-sb="film"]').textContent = DATA.production.film || "Stripboard";
   root.querySelector('[data-sb="sub"]').textContent = [DATA.production.version, DATA.production.regi ? "Regi: " + DATA.production.regi : ""].filter(Boolean).join(" · ");
 
@@ -126,6 +131,8 @@ function render() {
 
   DATA.days.forEach((day, di) => {
     const t = dayTotals(day);
+    const warns = dayWarnings(day, DATA.days[di - 1] || null, opts.limits ? opts.limits() : null);
+    const dayOver = warns.some(w => w.level === "over");
     html += `<div class="day-hdr">
       <span class="day-name"><span class="cell-ed" contenteditable="true" data-path="day${di}.label">${esc(day.label)}</span></span>
       <span class="day-date"><input type="date" value="${esc(day.date)}" onchange="SB.setDayField(${di},'date',this.value)" style="font:inherit; color:inherit; background:transparent; border:1px solid var(--border); border-radius:4px; padding:1px 4px;"></span>
@@ -149,11 +156,16 @@ function render() {
       <span>Slut på ${esc(day.label)} av ${DATA.days.length}</span>
       <span style="color:#aaa">${dateSv(day.date)}</span>
       <span class="df-num">${m2t(t.start)} – ${m2t(t.end)}</span>
-      <span class="df-num ${t.span > 12 * 60 ? "df-warn" : ""}">(${fmtEst(t.span) || "0m"}${t.span > 12 * 60 ? " ⚠" : ""})</span>
+      <span class="df-num ${dayOver ? "df-over" : (t.span > 12 * 60 ? "df-warn" : "")}">(${fmtEst(t.span) || "0m"}${dayOver || t.span > 12 * 60 ? " ⚠" : ""})</span>
       <span class="df-num">${fmtPages(t.pages) || "0"} sidor</span>
       <span class="df-num" style="color:#aaa">${t.scenes} scen${t.scenes === 1 ? "" : "er"}</span>
-      <button class="btn btn-sm ml-auto" onclick="SB.makeCallSheet(${di})">Skapa call sheet →</button>
+      <button class="btn btn-sm ml-auto" onclick="SB.makeCallSheet(${di})">${(opts.hasCallSheet && opts.hasCallSheet(day.label)) ? "Uppdatera call sheet →" : "Skapa call sheet →"}</button>
     </div>`;
+    /* Arbetstids-/vilokontroll -- varningarna står på dagen, inte bara i
+       toppsiffran, för det är här man fattar beslutet. */
+    if (warns.length) {
+      html += `<div class="day-warns">${warns.map(w => `<div class="day-warn day-warn-${w.level}">⚠ ${esc(w.text)}</div>`).join("")}</div>`;
+    }
   });
 
   // ej schemalagt
@@ -170,6 +182,15 @@ function render() {
   root.querySelector('[data-sb="board"]').innerHTML = html;
   wireCells();
   wireSelects();
+
+  /* Återställ scrollen. En blur ur en cell -> applyEdit -> render() bygger om
+     hela boardet; den fokuserade cellen försvinner och webbläsaren rycker
+     sidan (ofta ända till toppen). Sätt tillbaka scrollen synkront OCH i
+     nästa frame (webbläsaren kan flytta den efter att fokus tappats). */
+  if (typeof window !== "undefined") {
+    if (window.scrollY !== _scrollY) window.scrollTo(0, _scrollY);
+    requestAnimationFrame(() => { if (window.scrollY !== _scrollY) window.scrollTo(0, _scrollY); });
+  }
 }
 
 /* ===== redigering ===== */
@@ -191,6 +212,44 @@ function applyEdit(path, v) {
   if (key === "start" && nv) s.lock = true;
   if (di >= 0 && (key === "est" || key === "start")) recalcDay(DATA.days[di]);
   notify(); render();
+}
+
+/* ===== "Flytta till dag"-meny ===== */
+let stripMenuEl = null;
+function onStripMenuDocClick(e) {
+  if (stripMenuEl && !stripMenuEl.contains(e.target)) closeStripMenu();
+}
+function closeStripMenu() {
+  if (!stripMenuEl) return;
+  stripMenuEl.remove();
+  stripMenuEl = null;
+  document.removeEventListener("click", onStripMenuDocClick, true);
+}
+function stripMenu(di, i, ev) {
+  if (ev) ev.stopPropagation();
+  if (readOnly) return;
+  if (stripMenuEl) { closeStripMenu(); return; }
+  const targets = [];
+  DATA.days.forEach((d, x) => { if (x !== di) targets.push([x, d.label || ("Dag " + (x + 1))]); });
+  if (di !== -1) targets.push([-1, "Ej schemalagt"]);
+  const menu = document.createElement("div");
+  menu.className = "strip-menu";
+  menu.innerHTML = `<div class="strip-menu-head">Flytta till</div>` +
+    (targets.length ? targets.map(([x, label]) => `<button type="button" data-to="${x}">${esc(label)}</button>`).join("")
+                    : `<div class="strip-menu-empty">Inga andra dagar</div>`);
+  document.body.appendChild(menu);
+  const r = (ev && ev.target ? ev.target : document.body).getBoundingClientRect();
+  menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - menu.offsetWidth - 8)) + "px";
+  menu.style.top = (r.bottom + 4) + "px";
+  menu.querySelectorAll("button[data-to]").forEach(b => {
+    b.addEventListener("click", () => {
+      const to = +b.getAttribute("data-to");
+      closeStripMenu();
+      moveStrip({ day: di, idx: i }, to, listFor(to).length);
+    });
+  });
+  stripMenuEl = menu;
+  setTimeout(() => document.addEventListener("click", onStripMenuDocClick, true), 0);
 }
 
 function onCastPickerDocClick(e) {
@@ -511,6 +570,7 @@ function makeCallSheet(di) {
     date: dateSv(day.date),
     date_iso: day.date,
     dayOf: `${day.label} av ${DATA.days.length}`,
+    generatedAt: new Date().toISOString(),   // för "call sheeten är äldre än planen"-varningen
     gcall: day.start,
     forsta_bild: firstScene ? firstScene.start : day.start,
     arbetstid: `${m2t(t.start)}–${m2t(t.end)}`,
@@ -519,9 +579,9 @@ function makeCallSheet(di) {
     sunrise: "—",
     sunset: "—",
     notes: [],
-    locations: locs.length ? locs.map((n, i) => ({ num: i + 1, name: n, addr: "Ange adress", note: "" }))
-                           : [{ num: 1, name: "Ange plats", addr: "Ange adress", note: "" }],
-    hospital: { name: "Ange sjukhus", addr: "Ange adress", tel: "", note: "" },
+    locations: locs.length ? locs.map((n, i) => ({ num: i + 1, name: n, addr: "", note: "" }))
+                           : [{ num: 1, name: "", addr: "", note: "" }],
+    hospital: { name: "", addr: "", tel: "", note: "" },
     crew_contacts: [
       { role: "Producent", name: DATA.production.producent || "—", tel: "—" },
       { role: "Regi", name: DATA.production.regi || "—", tel: "—" },
@@ -609,7 +669,7 @@ function scrollToClosestDay() {
 return {
   mount, unmount, getData, render,
   recalcAll, recalcOne, addDay, delDay, dupDay, setDayField,
-  addStrip, delStrip, toggleLock, grabOn, makeCallSheet, toggleCastPicker,
+  addStrip, delStrip, toggleLock, grabOn, makeCallSheet, toggleCastPicker, stripMenu,
   closestDayIndex, todayIso, scrollToClosestDay,
   generateFromScript, loadStripboard, sluglineParts, scenesPresent,
   fmtPages, fmtEst, parsePages, parseEst, dateSv

@@ -7,7 +7,7 @@ const { db, sessionSecret, getSiteConfig, setSiteConfig, DATA_DIR } = require(".
 const {
   now, EMPTY_STRIPBOARD, EMPTY_CALLSHEET, EMPTY_SCRIPT, EMPTY_DPR, EMPTY_META,
   getDoc, putDoc, docUpdatedAtMap, shareUpdatedAt,
-  listVersions, createVersion, restoreVersion, importProject
+  listVersions, createVersion, restoreVersion, importProject, redactScriptForShare
 } = require("./store");
 const { validateDoc, validateImport, validateShareComponents, IMPORT_FORMAT, SHARE_COMPONENTS } = require("./validate");
 
@@ -310,14 +310,14 @@ app.get("/api/share/:token", (req, res) => {
   const sc = getSiteConfig();
   const comps = shareComponentsOf(p);
   const has = (c) => comps.includes(c);
-  // Manus/Dagsmanus/Rullplan bygger alla på script-doket
-  const needsScript = has("manus") || has("sides") || has("rullplan");
   res.json({
     project: { id: p.id, name: p.name },
     components: comps,
     stripboard: has("stripboard") ? (getDoc(p.id, "stripboard") || EMPTY_STRIPBOARD()) : EMPTY_STRIPBOARD(),
     callsheet: has("callsheet") ? (getDoc(p.id, "callsheet") || EMPTY_CALLSHEET()) : EMPTY_CALLSHEET(),
-    script: needsScript ? (getDoc(p.id, "script") || EMPTY_SCRIPT()) : EMPTY_SCRIPT(),
+    /* script-doket beskärs efter komponenterna -- full brödtext bara när
+       Manus/Dagsmanus delas, annars som mest siffror för Rullplan. */
+    script: redactScriptForShare(getDoc(p.id, "script") || EMPTY_SCRIPT(), comps),
     site: { company: { name: sc.company.name }, hasLogo: !!(sc.logo && sc.logo.ext), features: sc.features, locale: sc.locale },
     updatedAt: shareUpdatedAt(p.id)
   });
