@@ -57,14 +57,39 @@ function generateFromCallsheet(csDayIndex) {
 
   const oldScenes = existingIdx >= 0 ? DATA.days[existingIdx].scenes : [];
   const oldByNum = {};
-  oldScenes.forEach(s => { if (s.num) oldByNum[s.num] = s; });
+  const oldInfoByPos = {};
+  oldScenes.forEach((s, i) => {
+    if (s.type === "info") oldInfoByPos[i] = s;
+    else if (s.num) oldByNum[s.num] = s;
+  });
 
-  const scenes = (csDay.scenes || []).filter(s => s.type === "scene").map(s => {
+  /* Behåll alla rader i call sheetens ordning -- scener OCH lunch/förflyttning
+     (type:"info") -- så Inspelningsläget kan gå igenom dem som egna steg.
+     "total"-raden hoppas över. Klassiska DPR-vyn renderar bara scenraderna.
+     Faktiska tider och +10/+20-slip lever per rad (actualStart/actualEnd/
+     slipMin) och används av Inspelningsläget. */
+  const scenes = (csDay.scenes || []).filter(s => s.type !== "total").map((s, i) => {
+    if (s.type === "info") {
+      const prev = oldInfoByPos[i];
+      return {
+        type: "info",
+        label: s.label || s.set || "Info", est: s.est || "", time: s.time || s.start || "",
+        status: (prev && prev.status) || "",
+        actualStart: (prev && prev.actualStart) || "",
+        actualEnd: (prev && prev.actualEnd) || "",
+        slipMin: (prev && prev.slipMin) || 0,
+        note: (prev && prev.note) || ""
+      };
+    }
     const prev = s.num ? oldByNum[s.num] : null;
     return {
-      num: s.num, ie: s.ie, set: s.set, dn: s.dn, pages: s.pages, est: s.est,
+      type: "scene",
+      num: s.num, ie: s.ie, set: s.set, dn: s.dn, pages: s.pages, est: s.est, start: s.start || "",
       status: (prev && prev.status) || "",
       pagesShot: (prev && prev.pagesShot) || "",
+      actualStart: (prev && prev.actualStart) || "",
+      actualEnd: (prev && prev.actualEnd) || "",
+      slipMin: (prev && prev.slipMin) || 0,
       note: (prev && prev.note) || ""
     };
   });
@@ -81,6 +106,7 @@ function generateFromCallsheet(csDayIndex) {
     times: existingIdx >= 0 ? DATA.days[existingIdx].times : { crewCall: "", firstShot: "", lunchOut: "", lunchIn: "", campWrap: "", cameraWrap: "" },
     weatherActual: existingIdx >= 0 ? DATA.days[existingIdx].weatherActual : { icon: "", temp: "", note: "" },
     notes: existingIdx >= 0 ? DATA.days[existingIdx].notes : "",
+    currentIdx: existingIdx >= 0 ? (DATA.days[existingIdx].currentIdx || 0) : 0,
     scenes
   };
 
@@ -135,6 +161,7 @@ function saveSceneNegActual(el, di, si) {
 function setSceneStatus(di, si, status) {
   if (readOnly || !editMode) return;
   const sc = DATA.days[di].scenes[si];
+  if (!sc || sc.type === "info") return;
   sc.status = sc.status === status ? "" : status; // klicka igen för att avmarkera
   /* Bekvämlighet: markerar man en scen som klar och ingen sidsiffra är
      ifylld än, förifyll med schemalagd sidlängd -- man justerar hellre
@@ -146,6 +173,7 @@ function setSceneStatus(di, si, status) {
 function markAllDone(di) {
   if (readOnly || !editMode) return;
   DATA.days[di].scenes.forEach(sc => {
+    if (sc.type === "info") return;
     if (!sc.status) {
       sc.status = "done";
       if (!sc.pagesShot) sc.pagesShot = sc.pages;
@@ -214,14 +242,15 @@ function sceneCard(di, si, sc) {
 
 function renderDay(di) {
   const d = DATA.days[di];
-  const scenesDone = d.scenes.filter(s => s.status === "done").length;
-  const pagesShotTotal = d.scenes.reduce((a, s) => a + (window.SB ? SB.parsePages(s.pagesShot) : 0), 0);
-  const pagesPlannedTotal = d.scenes.reduce((a, s) => a + (window.SB ? SB.parsePages(s.pages) : 0), 0);
+  const realScenes = d.scenes.filter(s => s.type !== "info");
+  const scenesDone = realScenes.filter(s => s.status === "done").length;
+  const pagesShotTotal = realScenes.reduce((a, s) => a + (window.SB ? SB.parsePages(s.pagesShot) : 0), 0);
+  const pagesPlannedTotal = realScenes.reduce((a, s) => a + (window.SB ? SB.parsePages(s.pages) : 0), 0);
   const fmtP = (e) => (window.SB && SB.fmtPages) ? (SB.fmtPages(e) || "0/8") : e;
 
   return `
     <div class="dpr-summary">
-      <span>${scenesDone} av ${d.scenes.length} scener klara</span> ·
+      <span>${scenesDone} av ${realScenes.length} scener klara</span> ·
       <span>${fmtP(pagesShotTotal)} av ${fmtP(pagesPlannedTotal)} sidor tagna</span>
     </div>
 
@@ -245,10 +274,11 @@ function renderDay(di) {
     <div class="dpr-section">
       <div class="dpr-section-head">
         <h3>Scener</h3>
+        ${readOnly ? "" : `<button class="btn btn-sm" onclick="App.openShootDay()">🎬 Inspelningsläge</button>`}
         ${readOnly || !editMode ? "" : `<button class="btn btn-sm ml-auto" onclick="DPR.markAllDone(${di})">Markera alla som klara</button>`}
       </div>
       <div class="dpr-scene-list">
-        ${d.scenes.map((sc, si) => sceneCard(di, si, sc)).join("") || `<p class="muted">Inga scener på den här dagens call sheet.</p>`}
+        ${d.scenes.map((sc, si) => sc.type === "info" ? "" : sceneCard(di, si, sc)).join("") || `<p class="muted">Inga scener på den här dagens call sheet.</p>`}
       </div>
     </div>
 

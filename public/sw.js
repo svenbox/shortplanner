@@ -17,7 +17,7 @@
 const SHELL = [
   "/", "/index.html", "/view.html", "/css/app.css",
   "/js/app.js", "/js/view.js", "/js/stripboard-core.js", "/js/stripboard.js", "/js/callsheet.js",
-  "/js/script.js", "/js/dpr.js",
+  "/js/script.js", "/js/dpr.js", "/js/shootday.js",
   "/js/vendor/qrcode-generator.js", "/js/vendor/pdf.min.js",
   "/manifest.json", "/icon.svg"
 ];
@@ -84,8 +84,10 @@ self.addEventListener("message", (e) => {
     if (!id || id === "__disabled__") { if (id === "__disabled__") await selfDestruct(); return; }
     cachedBuildId = id;
     const name = shellCacheName(id);
-    if (await caches.has(name)) return;         // redan uppdaterat
-    await precacheShell(id, true);
+    const already = await caches.has(name);
+    if (!already) { try { await precacheShell(id, true); } catch (_) { /* offline: tas vid fetch */ } }
+    /* ALLTID städa bort gamla skalcachar -- annars ligger de kvar och
+       "ny version"-bannern återkommer vid varje omladdning. */
     await dropOtherCaches([name, DATA_CACHE]);
     (await self.clients.matchAll()).forEach(c => c.postMessage({ type: "shell-updated" }));
   })());
@@ -129,10 +131,23 @@ self.addEventListener("fetch", (e) => {
   if (url.pathname.indexOf("/css/") === 0 || url.pathname.indexOf("/js/") === 0 ||
       url.pathname === "/manifest.json" || url.pathname === "/icon.svg") {
     e.respondWith((async () => {
-      // ignoreSearch: staging lägger ?v=<ts> på asset-URL:erna, prod inte -- matcha ändå
-      const cached = await caches.match(req, { ignoreSearch: true });
+      /* Läs/skriv BARA i den aktuella build-id:ns skalcache -- aldrig via
+         caches.match() över alla cachar, för då kan en kvarbliven gammal
+         skalcache serva stale kod i all evighet. ignoreSearch: staging
+         lägger ?v=<ts> på asset-URL:erna, prod inte. */
+      const cache = await caches.open(shellCacheName(await getBuildId()));
+      const cached = await cache.match(req, { ignoreSearch: true });
       const net = fetch(new Request(req, { cache: "no-store" })).then(async res => {
-        if (res.ok) { (await caches.open(shellCacheName(await getBuildId()))).put(req, res.clone()); }
+        if (res.ok) {
+          await cache.put(req, res.clone());
+          const served = res.headers.get("X-App-Version");
+          if (served && cachedBuildId && served !== cachedBuildId) {
+            /* Servern har deployats om sedan SW:n startade -- byt build-id så
+               nästa hämtning går mot rätt cache; städningen sker via
+               checkShellFreshness -> "refreshShell". */
+            cachedBuildId = served;
+          }
+        }
         return res;
       }).catch(() => null);
       return cached || (await net) || Response.error();

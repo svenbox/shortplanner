@@ -516,12 +516,15 @@ async function checkShellFreshness() {
     if (!shells.length) return;
     const srv = await fetchServerVersion();
     if (!srv) return;
-    /* Vilket som helst cachat skal med ett annat build-id än serverns
-       innebär stale kod (flera hopar sig om SW:n aldrig re-installerats). */
-    const stale = shells.some(k => { const id = k.slice("sp-shell-".length); return id !== "boot" && id !== srv; });
-    if (stale) {
+    const haveCurrent = shells.includes("sp-shell-" + srv);
+    const haveStale = shells.some(k => { const id = k.slice("sp-shell-".length); return id !== "boot" && id !== srv; });
+    if (haveStale) {
+      /* Be SW:n hämta nytt skal OCH städa bort de gamla skalcacharna. */
       if (navigator.serviceWorker.controller) navigator.serviceWorker.controller.postMessage("refreshShell");
-      $("updateBar").classList.remove("hidden");
+      /* Visa bannern bara om vi INTE redan har det aktuella skalet cachat --
+         har vi det kör vi ju redan rätt kod, och den kvarblivna gamla cachen
+         försvinner tyst. Annars: en omladdning ger nu ett rent läge. */
+      if (!haveCurrent) $("updateBar").classList.remove("hidden");
     }
   } catch (e) { /* ignoreras */ }
 }
@@ -575,6 +578,25 @@ function updateDocTitle() {
 function updateCounts() {
   $("csCount").textContent = CS.dayCount();
   $("verCount").textContent = state.versions.length;
+}
+
+/* ---------- inspelningsläge ---------- */
+function openShootDay() {
+  const days = (state.dpr && state.dpr.days) || [];
+  if (!days.length) { toast("Skapa en DPR för dagen först (DPR-fliken → 🎬)"); return; }
+  const di = (window.SBCore && SBCore.closestDayIndex) ? SBCore.closestDayIndex(days, "date_iso") : 0;
+  SD.open($("shootday"), state.dpr, di, {
+    onChange: () => { markDirty("dpr"); DPR.refreshDpr(); },
+    close: closeShootDay,
+    toast
+  });
+  $("shootday").classList.remove("hidden");
+  document.body.classList.add("sd-open");
+}
+function closeShootDay() {
+  SD.close();
+  $("shootday").classList.add("hidden");
+  document.body.classList.remove("sd-open");
 }
 
 /* ---------- versioner ---------- */
@@ -928,7 +950,7 @@ document.addEventListener("DOMContentLoaded", init);
 
 return {
   goProjects, openProject, openNewProject, createProject, renameProject, duplicateProject, deleteProject,
-  setTab, openVersions, openSaveVersion, saveVersion, restoreVersion, renameVersion, deleteVersion, downloadVersion,
+  setTab, openShootDay, closeShootDay, openVersions, openSaveVersion, saveVersion, restoreVersion, renameVersion, deleteVersion, downloadVersion,
   exportProject, openImportProject, importProject, openImportStrips, stripsFromManus, importStripsFile, stripboardFromManus,
   openSiteSettings, saveSiteSettings, uploadLogo, removeLogo,
   openProjectSettings, saveProjectSettings,
