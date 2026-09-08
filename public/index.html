@@ -39,7 +39,6 @@
       <button class="btn btn-sm" id="btnSaveVersion" onclick="App.openSaveVersion()">Spara version</button>
       <button class="btn btn-sm" id="btnExport" onclick="App.exportProject()">Exportera</button>
       <button class="btn btn-sm" id="btnShare" onclick="App.openShare()">Dela</button>
-      <button class="btn btn-sm btn-primary" id="btnShoot" onclick="App.openShootDay()" style="display:none">🎬 Inspelningsläge</button>
       <button class="btn btn-sm btn-ghost" onclick="App.logout()">Logga ut</button>
     </div>
   </div>
@@ -51,6 +50,7 @@
     <button class="tab" data-tab="sides" onclick="App.setTab('sides')">Dagsmanus</button>
     <button class="tab" data-tab="rullplan" onclick="App.setTab('rullplan')">Rullplan</button>
     <button class="tab" data-tab="dpr" onclick="App.setTab('dpr')">DPR</button>
+    <button class="tab-shoot" id="btnShoot" onclick="App.openShootDay()" title="Inspelningsläge" style="display:none">🎬 Inspelningsläge</button>
     <button class="tab" data-tab="versions" onclick="App.setTab('versions')">Versioner <span class="pill" id="verCount">0</span></button>
   </div>
 

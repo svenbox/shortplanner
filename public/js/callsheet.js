@@ -177,9 +177,10 @@ function toggleEdit(on) {
      man skrev in, istället för att vänta på att något annat råkar
      trigga en omritning. Slipper också att special-fejka rerenderDay()
      efter varje enskilt fältnamn i saveEditable(). */
-  if (!on) { rerenderDay(); return; }
-  const out = root.querySelector('[data-cs="output"]');
-  if (out) setEditable(out);
+  /* Rita alltid om -- inte bara vid avslag. Vissa fält (I/E-väljaren i
+     schemat) byts helt mellan redigerbar kontroll och ren text beroende
+     på läget, inte bara via contenteditable-flaggan. */
+  rerenderDay();
 }
 
 function saveEditable(el, dayIdx, path) {
@@ -351,11 +352,12 @@ function renderDay(di) {
       <tr class="scene-row">
         <td><span class="editable" contenteditable="false" data-day="${di}" data-path="scenes.${si}.num" onblur="CS.saveEditable(this,${di},'scenes.${si}.num')">${s.num}</span></td>
         <td>
+          ${(editMode && !readOnly) ? `
           <select onchange="CS.setSceneIE(${di},${si},this.value)" style="font-size:11px; border:1px solid var(--border); background:var(--bg); color:var(--text); border-radius:3px; padding:1px 2px;">
             <option ${s.ie==="INT"?"selected":""}>INT</option>
             <option ${s.ie==="EXT"?"selected":""}>EXT</option>
             <option ${s.ie==="I/E"?"selected":""}>I/E</option>
-          </select>
+          </select>` : `<span style="font-size:11px">${esc(s.ie || "")}</span>`}
         </td>
         <td>
           <span class="editable" contenteditable="false" data-day="${di}" data-path="scenes.${si}.set" onblur="CS.saveEditable(this,${di},'scenes.${si}.set')" style="display:block">${s.set}</span>

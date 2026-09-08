@@ -611,6 +611,7 @@ function renderRullplan() {
     rullplanRoot.innerHTML = `
       <div class="sc-page">
         <div class="page-head"><h2>Rullplan</h2></div>
+        <p class="rp-sub">Verktyg för att planera åtgången av film under inspelningen.</p>
         <div class="sc-import-empty">
           <p>Inget manus importerat ännu — Rullplan behöver manusets scener och sidlängder.</p>
           ${readOnly ? "" : `<button class="btn btn-add" onclick="App.setTab('manus')">Gå till Manus-fliken →</button>`}
@@ -741,6 +742,7 @@ function renderRullplan() {
           <button class="btn btn-sm" onclick="window.print()">🖨 Skriv ut</button>
         </div>
       </div>
+      <p class="rp-sub">Verktyg för att planera åtgången av film under inspelningen.</p>
       <p class="rp-intro">Skjutförhållande <span class="editable rp-ratio" contenteditable="false" data-ph="14" onblur="SC.saveShootingRatio(this)">${Number.isInteger(ratio) ? ratio : ratio.toFixed(1)}</span>:1 · ${REEL_CAPACITY_MIN} min/rulle. Skärmtid är föreslagen (måltid × scenens andel av manusets sidlängd); Neg: utfall autofylls från budget tills du skriver in vad som faktiskt rullades${readOnly ? "." : ". Markera en dag som wrappad för att räkna in dess utfall i Förbrukat/Kvar nedan."}</p>
       <div class="schema-scroll">
         <table class="rp-table">

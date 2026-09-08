@@ -110,6 +110,12 @@ a { color: var(--accent); }
 .tab:hover { color: var(--text); }
 .tab.active { color: var(--text); border-bottom-color: var(--accent); font-weight: 600; }
 .tab .pill { background: var(--border); color: var(--text-secondary); border-radius: 999px; padding: 0 6px; font-size: 11px; margin-left: 6px; }
+.tab-shoot {
+  align-self: center; margin: 0 2px 0 6px; padding: 4px 12px; font-size: 12.5px; font-weight: 600;
+  border: 1px solid var(--accent); border-radius: 999px; background: var(--accent-bg); color: var(--accent);
+  cursor: pointer; white-space: nowrap; flex: 0 0 auto;
+}
+.tab-shoot:hover { filter: brightness(1.03); }
 
 .page { padding: 16px; max-width: 1400px; margin: 0 auto; }
 .page-narrow { max-width: 980px; }
@@ -693,6 +699,7 @@ a { color: var(--accent); }
 }
 
 /* ===== Rullplan ===== */
+.sc-scope .rp-sub { font-size: 13px; color: var(--text-secondary); margin: -2px 0 10px; }
 .sc-scope .rp-intro { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
 .sc-scope .rp-head-actions { display: flex; gap: 8px; align-items: center; }
 /* Redigera-switch — samma komponent som DPR/call sheet, sc-scope-kopia */

@@ -11,9 +11,16 @@ Byggt för korta, låg­budget­produktioner där en enda person (ofta 1:e AD el
 
 ## Livedemo
 
-**<https://shortplanner-demo.soxbox.uk>** — lösenord **`demo`**
+### 👉 <https://shortplanner-demo.soxbox.uk> — logga in med lösenordet `demo`
 
-En publik instans att klicka runt i. Den kör det påhittade projektet **”Skuggspel”** (ingen verklig produktionsdata) och **allt nollställs till det läget varje natt kl 00:00** (svensk tid), så ändra fritt. Att skapa, importera, duplicera och ta bort projekt är avstängt där; allt annat fungerar. Drivs av den som underhåller repot, på en hemmaserver — kan vara långsam eller nere.
+En publik instans som kör exakt den här koden, så du kan prova Shortplanner utan att installera något. Den är laddad med **”Skuggspel”**, en påhittad tvådagars kortfilm (ingen verklig produktionsdata). Värt att göra:
+
+- dra strips i stripboardet och se hur starttider och dagens arbetstidsvarningar räknas om;
+- tryck **Skapa call sheet →** i en dagfot för att generera en call sheet, och slå sedan på **Redigera** för att ändra i den;
+- öppna **🎬 Inspelningsläge** (bredvid DPR-fliken) för att se steg-för-steg-läget på inspelningsplatsen;
+- öppna **Dela** för en skrivskyddad delningslänk och välj vilka delar den visar.
+
+**Allt du ändrar nollställs varje natt kl 00:00 (svensk tid)** till utgångsläget, så ändra fritt. Att skapa, importera, duplicera och ta bort projekt är avstängt; allt annat fungerar. Den körs på en hemmaserver i mån av tid — räkna med att den kan vara långsam eller nere ibland. Vill du köra en egen, se [Köra en publik demo](#köra-en-publik-demo) längre ner.
 
 ## Funktioner
 

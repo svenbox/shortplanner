@@ -15,9 +15,16 @@ It's optimized for short, low-budget productions where a single person (often th
 
 ## Live demo
 
-**<https://shortplanner-demo.soxbox.uk>** — password **`demo`**
+### 👉 <https://shortplanner-demo.soxbox.uk> — log in with the password `demo`
 
-A public instance you can click around in. It runs on the fictional **"Skuggspel"** project (no real production data) and **everything resets to that state every night at 00:00 Europe/Stockholm**, so edit freely. Creating, importing, duplicating and deleting projects is turned off there; everything else works. Run by whoever maintains this repo, on a home server — it may be slow or down.
+A public instance running this exact code, so you can try Shortplanner without installing anything. It's loaded with **"Skuggspel"**, a made-up two-day short (no real production data). Things worth doing:
+
+- drag strips around the stripboard and watch the start times and the day's working-hours warnings recalculate;
+- hit **Skapa call sheet →** in a day footer to generate a call sheet, then toggle **Redigera** to edit it;
+- open **🎬 Inspelningsläge** (next to the DPR tab) to see the on-set stepper;
+- open **Dela** to get a read-only share link and pick which parts it exposes.
+
+**Everything you change is wiped every night at 00:00 (Europe/Stockholm)** and reset to the starting state, so edit freely. Creating, importing, duplicating and deleting projects is switched off; everything else works. It runs on a home server on a best-effort basis — expect it to be slow or occasionally down. To run your own, see [Running a public demo](#running-a-public-demo) below.
 
 ## Features
 
