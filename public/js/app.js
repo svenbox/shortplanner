@@ -630,28 +630,40 @@ function updateCounts() {
 }
 
 /* ---------- inspelningsläge ---------- */
-/* 🎬-knappen i topplisten dyker upp bara när det finns en DPR-dag inom
-   ±1 dygn från idag -- alltså på inspelningsdagar. Annars göms den (menyn
-   är redan trång) och man når läget via DPR-fliken. */
+/* 🎬-knappen i menyraden syns så fort ett projekt är öppet. Läget gör
+   bara nytta på en inspelningsdag (DPR-dag inom ±1 dygn från idag) -- är
+   det inte det visar SD.open() ett meddelande om det i stället för
+   stepparen. */
 function updateShootBtn() {
   const btn = $("btnShoot");
   if (!btn) return;
+  btn.style.display = state.project ? "" : "none";
+}
+function shootInactiveReason() {
   const days = (state.dpr && state.dpr.days) || [];
-  let near = false;
-  if (window.SBCore && SBCore.daysBetween) {
-    const today = SBCore.todayIso();
-    near = days.some(d => d.date_iso && Math.abs(SBCore.daysBetween(d.date_iso, today)) <= 1);
+  if (!days.length) {
+    return "Det finns ingen DPR för det här projektet än. Skapa en från DPR-fliken (🎬) så blir inspelningsläget aktivt på inspelningsdagen.";
   }
-  btn.style.display = near ? "" : "none";
+  if (!(window.SBCore && SBCore.daysBetween)) return null;
+  const today = SBCore.todayIso();
+  const near = days.some(d => d.date_iso && Math.abs(SBCore.daysBetween(d.date_iso, today)) <= 1);
+  if (near) return null;
+  const di = SBCore.closestDayIndex ? SBCore.closestDayIndex(days, "date_iso") : 0;
+  const d = days[di] || {};
+  const which = (d.label || d.date_iso)
+    ? ` Närmaste inspelningsdag: ${d.label || d.date_iso}${d.date_iso ? " (" + d.date_iso + ")" : ""}.`
+    : "";
+  return "Inspelningsläget är bara aktivt under inspelning — på en inspelningsdag (±1 dygn)." + which + " Kom tillbaka när det är dags att filma.";
 }
 function openShootDay() {
   const days = (state.dpr && state.dpr.days) || [];
-  if (!days.length) { toast("Skapa en DPR för dagen först (DPR-fliken → 🎬)"); return; }
-  const di = (window.SBCore && SBCore.closestDayIndex) ? SBCore.closestDayIndex(days, "date_iso") : 0;
-  SD.open($("shootday"), state.dpr, di, {
+  const inactive = shootInactiveReason();
+  const di = (!inactive && window.SBCore && SBCore.closestDayIndex) ? SBCore.closestDayIndex(days, "date_iso") : 0;
+  SD.open($("shootday"), state.dpr || { days: [] }, di, {
     onChange: () => { markDirty("dpr"); DPR.refreshDpr(); },
     close: closeShootDay,
-    toast
+    toast,
+    inactive
   });
   $("shootday").classList.remove("hidden");
   document.body.classList.add("sd-open");

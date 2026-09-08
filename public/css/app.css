@@ -853,6 +853,10 @@ body.sd-open { overflow: hidden; }
 .sd-dot-info { background: var(--s-move); max-width: 10px; flex: 0 0 10px; }
 .sd-exit { display: block; width: 100%; margin-top: 22px; min-height: 46px; font-size: 15px; background: transparent; border: 1px solid var(--border); border-radius: 12px; color: var(--text-secondary); cursor: pointer; }
 .sd-empty { text-align: center; color: var(--text-muted); padding: 40px 0; }
+.sd-inactive { text-align: center; padding: 44px 8px 24px; }
+.sd-inactive-icon { font-size: 40px; opacity: .5; }
+.sd-inactive-title { font-size: 20px; font-weight: 700; margin-top: 10px; }
+.sd-inactive-msg { font-size: 14px; line-height: 1.5; color: var(--text-secondary); margin: 10px auto 0; max-width: 340px; }
 .sd-done { text-align: center; padding: 48px 0 32px; }
 .sd-done-check { font-size: 44px; color: var(--success); }
 .sd-done-title { font-size: 24px; font-weight: 700; margin-top: 8px; }

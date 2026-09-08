@@ -184,6 +184,7 @@
   /* ---------- DOM (webbläsare) ---------- */
 
   let el = null, day = null, di = 0, onChange = null, closeCb = null, toast = () => {}, timer = null;
+  let inactiveMsg = null;
 
   function pad(n) { return String(n).padStart(2, "0"); }
   function nowStr() { const d = new Date(); return pad(d.getHours()) + ":" + pad(d.getMinutes()); }
@@ -341,6 +342,26 @@
       </div>`;
   }
 
+  /* Man kan alltid öppna läget, men det gör bara nytta på en inspelningsdag.
+     Är det inte det visas det här i stället för stepparen. */
+  function renderInactive() {
+    el.innerHTML = `
+      <div class="sd-wrap">
+        <div class="sd-top">
+          <span class="sd-day">Inspelningsläge</span>
+          <span class="sd-clock">nu ${nowClock()}</span>
+        </div>
+        <div class="sd-inactive">
+          <div class="sd-inactive-icon">🎬</div>
+          <div class="sd-inactive-title">Läget är inte aktivt just nu</div>
+          <p class="sd-inactive-msg">${esc(inactiveMsg)}</p>
+        </div>
+        <button class="sd-exit" data-sd="exit">✕ Stäng</button>
+      </div>`;
+    const b = el.querySelector('[data-sd="exit"]');
+    if (b) b.onclick = () => { if (closeCb) closeCb(); };
+  }
+
   function beginEditStart() {
     const td = el.querySelector('[data-sd="editstart"]');
     if (!td) return;
@@ -399,6 +420,8 @@
     onChange = options.onChange || null;
     closeCb = options.close || null;
     toast = options.toast || (() => {});
+    inactiveMsg = options.inactive || null;
+    if (inactiveMsg) { clearInterval(timer); timer = null; renderInactive(); return; }
     if (!day) { if (closeCb) closeCb(); return; }
     if (!day.scenes) day.scenes = [];
     if (day.currentIdx == null) { day.currentIdx = 0; save(); }
@@ -410,7 +433,7 @@
   function close() {
     clearInterval(timer); timer = null;
     if (el) el.innerHTML = "";
-    el = null; day = null; onChange = null; closeCb = null;
+    el = null; day = null; onChange = null; closeCb = null; inactiveMsg = null;
   }
 
   return {
