@@ -226,7 +226,7 @@ async function openProject(id) {
   });
   renderVersions();
   updateCounts();
-  updateShootBtn();
+  applyTabVisibility();
   setTab("stripboard");
   /* Rullar till dagens datum i stripboardet när projektet öppnas -- ett
      rAF-varv så layouten hunnit räknas ut sedan fliken faktiskt blev
@@ -395,7 +395,7 @@ async function loadSite() {
     const r = await fetch("/api/site/public", { cache: "no-store", credentials: "same-origin" });
     state.site = r.ok ? await r.json() : null;
   } catch (e) { state.site = null; }
-  applySiteFeatures();
+  applyTabVisibility();
   applySiteBranding();
   applyDemoMode();
 }
@@ -435,15 +435,31 @@ function blockedByDemo() {
   openOv("ovDemo");
   return true;
 }
-function applySiteFeatures() {
+/* Flikvisning är per projekt (meta-doket, `tabs`). Saknas ett val där faller
+   vi tillbaka på sajtens gamla globala feature-flagga (bakåtkompatibelt --
+   prod har t.ex. rullplan avstängd globalt), och sist på "visa". `shootday`
+   finns bara per projekt. */
+function tabPref(key) {
+  const t = (state.meta && state.meta.tabs) || {};
+  if (key in t) return t[key] !== false;
   const f = (state.site && state.site.features) || {};
-  const hide = { rullplan: f.rullplan === false, dpr: f.dpr === false, manus: f.manus === false, sides: f.manus === false };
+  if (key !== "shootday" && key in f) return f[key] !== false;
+  return true;
+}
+function applyTabVisibility() {
+  const hide = {
+    rullplan: !tabPref("rullplan"),
+    dpr: !tabPref("dpr"),
+    manus: !tabPref("manus"),
+    sides: !tabPref("manus")
+  };
   Object.keys(hide).forEach(k => {
     const tab = document.querySelector('.tabbar .tab[data-tab="' + k + '"]');
     if (tab) tab.hidden = hide[k];
   });
   const active = document.querySelector('.tabbar .tab.active');
   if (active && active.hidden) setTab("stripboard");
+  updateShootBtn();
 }
 function applySiteBranding() {
   const name = state.site && state.site.company && state.site.company.name;
@@ -459,8 +475,6 @@ async function openSiteSettings() {
   $("ssPhone").value = c.company.phone || "";
   $("ssEmail").value = c.company.email || "";
   $("ssWeb").value = c.company.website || "";
-  $("ssRullplan").checked = c.features.rullplan !== false;
-  $("ssDpr").checked = c.features.dpr !== false;
   $("ssLocale").value = c.locale || "sv";
   $("ssLogoFile").value = "";
   renderLogoPreview(!!(c.logo && c.logo.ext));
@@ -477,14 +491,13 @@ async function saveSiteSettings() {
       name: $("ssName").value.trim(), orgnr: $("ssOrg").value.trim(), address: $("ssAddr").value.trim(),
       phone: $("ssPhone").value.trim(), email: $("ssEmail").value.trim(), website: $("ssWeb").value.trim()
     },
-    features: { rullplan: $("ssRullplan").checked, dpr: $("ssDpr").checked },
     locale: $("ssLocale").value
   };
   try {
     await api("PUT", "/api/site", patch);
     closeOv("ovSiteSettings");
     await loadSite();
-    if (state.project) { applySiteFeatures(); remountCallSheet(); }
+    if (state.project) { applyTabVisibility(); remountCallSheet(); }
     toast("Inställningar sparade");
   } catch (e) { alert("Kunde inte spara: " + e.message); }
 }
@@ -526,17 +539,22 @@ const PS_FIELDS = {
   psShootStart: "shootStart", psShootEnd: "shootEnd", psFormat: "format", psAspect: "aspectRatio",
   psMaxWorkday: "maxWorkdayHrs", psMealBy: "mealBreakByHrs", psMinRest: "minRestHrs"
 };
+const PS_TABS = { psTabRullplan: "rullplan", psTabDpr: "dpr", psTabShootday: "shootday" };
 function openProjectSettings() {
   if (!state.project) return;
   const m = state.meta || {};
   Object.keys(PS_FIELDS).forEach(id => { $(id).value = m[PS_FIELDS[id]] || ""; });
+  Object.keys(PS_TABS).forEach(id => { $(id).checked = tabPref(PS_TABS[id]); });
   openOv("ovProjectSettings");
 }
 function saveProjectSettings() {
   const m = state.meta || (state.meta = {});
   Object.keys(PS_FIELDS).forEach(id => { m[PS_FIELDS[id]] = $(id).value.trim(); });
+  m.tabs = Object.assign({}, m.tabs);
+  Object.keys(PS_TABS).forEach(id => { m.tabs[PS_TABS[id]] = $(id).checked; });
   markDirty("meta");
   closeOv("ovProjectSettings");
+  applyTabVisibility();
   /* Nya gränsvärden -> rita om stripboardet så arbetstids-/vilovarningarna
      stämmer. */
   if (state.tab === "stripboard") SB.render();
@@ -637,7 +655,7 @@ function updateCounts() {
 function updateShootBtn() {
   const btn = $("btnShoot");
   if (!btn) return;
-  btn.style.display = state.project ? "" : "none";
+  btn.style.display = (state.project && tabPref("shootday")) ? "" : "none";
 }
 function shootInactiveReason() {
   const days = (state.dpr && state.dpr.days) || [];
@@ -656,6 +674,7 @@ function shootInactiveReason() {
   return "Inspelningsläget är bara aktivt under inspelning — på en inspelningsdag (±1 dygn)." + which + " Kom tillbaka när det är dags att filma.";
 }
 function openShootDay() {
+  if (!tabPref("shootday")) { toast("Inspelningsläge är avstängt för det här projektet — slå på det i Projektinfo."); return; }
   const days = (state.dpr && state.dpr.days) || [];
   const inactive = shootInactiveReason();
   const di = (!inactive && window.SBCore && SBCore.closestDayIndex) ? SBCore.closestDayIndex(days, "date_iso") : 0;

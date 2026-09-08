@@ -128,15 +128,18 @@
     projectName = d.project.name;
     document.getElementById("viewTitle").textContent = d.project.name;
     /* Två saker gömmer en flik i delade vyn:
-       1. sajtens feature-flaggor (rullplan/dpr/manus avstängda globalt)
+       1. projektets flikval (d.tabs, per projekt) med sajtens gamla globala
+          feature-flagga (d.site.features) som fallback
        2. vilka komponenter just den här delningslänken valt att visa
           (d.components; saknas → alla, bakåtkompatibelt). */
     const f = (d.site && d.site.features) || {};
+    const t = d.tabs || {};
+    const tabOff = (key) => (key in t) ? t[key] === false : f[key] === false;
     const comps = Array.isArray(d.components) ? d.components : ["stripboard", "callsheet", "manus", "sides", "rullplan"];
     document.querySelectorAll("#viewTabbar .tab").forEach(tab => {
       const k = tab.dataset.tab;
       const featureKey = (k === "sides") ? "manus" : k;
-      const offByFeature = f[featureKey] === false;
+      const offByFeature = tabOff(featureKey);
       const offByShare = !comps.includes(k);   // dpr finns inte i comps → alltid dold (som förr)
       tab.hidden = offByFeature || offByShare;
     });

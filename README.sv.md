@@ -35,7 +35,7 @@ En publik instans som kör exakt den här koden, så du kan prova Shortplanner u
 - **Delning** — en skrivskyddad länk per projekt, ingen inloggning krävs för mottagaren, med per-komponent-val av vad länken visar (stripboard, call sheets, manus, dagsmanus, rullplan); respekterar sajtens av/på-flaggor.
 - **Platser med QR** — koordinater, parkering/toalett/faciliteter och säkerhetsnoteringar per inspelningsplats. Skriver du ut call sheeten blir varje plats en skannbar QR-kod till Google Maps.
 - **Offline-läsning** — installera som app (PWA); senast hämtad call sheet/stripboard/dagsmanus går att läsa utan täckning på inspelningsplatsen.
-- **Sajtinställningar** — företagsnamn/logga (ersätter Shortplanners inbyggda), stäng av flikar (Rullplan/DPR) du inte använder.
+- **Sajtinställningar** — företagsnamn/logga (ersätter Shortplanners inbyggda) och gränssnittsspråk, för hela installationen.
 - **Projekt & versioner** — flera produktioner i samma installation; arbetet sparas löpande, namngivna versioner fryser ett läge du kan återgå till. Optimistisk låsning varnar om samma projekt redigeras på flera enheter samtidigt.
 
 ---
@@ -114,9 +114,9 @@ Kör `deploy/docker-compose.traefik.yml` istället för `docker-compose.yml`. De
 
 ## Så används appen
 
-**Projekt** är utgångsläget. Skapa ett tomt projekt, eller duplicera/importera ett befintligt. **Projektinfo** (i topplisten inne i ett projekt) håller grunduppgifter — titel, bolag, producent, regi, foto, 1:e AD, platschef, inspelningsdatum, format — som förifyller nya call sheets när de skapas. Här ligger också arbetstidsreglerna stripboardet stämmer av varje dag mot: max arbetstid/dag, lunch senast efter samling, minsta dygnsvila mellan inspelningsdagar (i timmar; tomt = standard 10 / 5 / 11).
+**Projekt** är utgångsläget. Skapa ett tomt projekt, eller duplicera/importera ett befintligt. **Projektinfo** (i topplisten inne i ett projekt) håller grunduppgifter — titel, bolag, producent, regi, foto, 1:e AD, platschef, inspelningsdatum, format — som förifyller nya call sheets när de skapas. Här ligger också arbetstidsreglerna stripboardet stämmer av varje dag mot (max arbetstid/dag, lunch senast efter samling, minsta dygnsvila mellan inspelningsdagar — i timmar; tomt = standard 10 / 5 / 11), och vilka **flikar** projektet visar: stäng av Rullplan, DPR eller Inspelningsläge för projekt som inte använder dem.
 
-**⚙ Inställningar** (på projektlistan) gäller hela installationen: företagsnamn/logga för call sheets, och av/på för Rullplan- och DPR-flikarna om du inte använder dem.
+**⚙ Inställningar** (på projektlistan) gäller hela installationen: företagsnamn/logga för call sheets och gränssnittsspråk. Vilka flikar ett projekt visar ställs in per projekt, i **Projektinfo**.
 
 **Stripboard-fliken**
 

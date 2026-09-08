@@ -123,7 +123,9 @@ function validateDoc(kind, data) {
       break;
     }
     case "meta":
-      // Platt sträng-karta. scan() har redan kollat storlek/djup. Inget mer.
+      // Mest platta sträng-fält plus ett litet `tabs`-objekt (flikval).
+      // scan() har redan kollat storlek/djup/proto. Inget mer.
+      if ("tabs" in data && data.tabs != null && !isPlainObject(data.tabs)) throw invalid("meta.tabs måste vara ett objekt");
       break;
   }
   return data;

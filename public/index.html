@@ -239,6 +239,13 @@
         <div style="flex:1"><label for="psMinRest">Min. vila mellan dagar</label><input type="text" id="psMinRest" inputmode="decimal" placeholder="11"></div>
       </div>
     </div>
+    <div class="imp-sec">
+      <strong>Flikar</strong>
+      <p class="imp-hint">Gäller det här projektet. Avstängda flikar döljs — slå på dem igen här.</p>
+      <label class="ss-check"><input type="checkbox" id="psTabRullplan"> Visa Rullplan-fliken</label>
+      <label class="ss-check"><input type="checkbox" id="psTabDpr"> Visa DPR-fliken</label>
+      <label class="ss-check"><input type="checkbox" id="psTabShootday"> Visa Inspelningsläge</label>
+    </div>
     <div class="modal-actions">
       <button class="btn" onclick="App.closeOv('ovProjectSettings')">Avbryt</button>
       <button class="btn btn-primary" onclick="App.saveProjectSettings()">Spara</button>
@@ -270,12 +277,6 @@
         <button class="btn" onclick="App.uploadLogo()">Ladda upp</button>
         <button class="btn btn-danger" onclick="App.removeLogo()">Ta bort logga</button>
       </div>
-    </div>
-
-    <div class="imp-sec">
-      <strong>Flikar</strong>
-      <label class="ss-check"><input type="checkbox" id="ssRullplan"> Visa Rullplan-fliken</label>
-      <label class="ss-check"><input type="checkbox" id="ssDpr"> Visa DPR-fliken</label>
     </div>
 
     <div class="imp-sec">

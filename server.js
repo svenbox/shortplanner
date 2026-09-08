@@ -339,6 +339,9 @@ app.get("/api/share/:token", (req, res) => {
        Manus/Dagsmanus delas, annars som mest siffror för Rullplan. */
     script: redactScriptForShare(getDoc(p.id, "script") || EMPTY_SCRIPT(), comps),
     site: { company: { name: sc.company.name }, hasLogo: !!(sc.logo && sc.logo.ext), features: sc.features, locale: sc.locale },
+    /* Flikvisning är per projekt numera (meta.tabs); site.features är kvar
+       som global fallback. view.js slår ihop dem. */
+    tabs: (getDoc(p.id, "meta") || {}).tabs || null,
     updatedAt: shareUpdatedAt(p.id)
   });
 });

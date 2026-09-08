@@ -39,7 +39,7 @@ A public instance running this exact code, so you can try Shortplanner without i
 - **Sharing** (*Dela*) — one read-only link per project, no login required for the recipient, with a per-component pick of what the link exposes (stripboard, call sheets, script, sides, reel budget); respects the site's feature on/off flags.
 - **Locations with QR** — coordinates, parking / toilet / facilities and a safety note per location. Print the call sheet and every location becomes a scannable QR code to Google Maps.
 - **Offline reading** — install as an app (PWA); the most recently fetched call sheet / stripboard / sides can be read with no signal on location.
-- **Site settings** (*Inställningar*) — company name / logo (replacing Shortplanner's built-in one), turn off tabs (Reel budget / DPR) you don't use.
+- **Site settings** (*Inställningar*) — company name / logo (replacing Shortplanner's built-in one) and interface language, for the whole install.
 - **Projects & versions** — several productions in one install; work is saved continuously, named versions freeze a state you can return to. Optimistic locking warns if the same project is edited on more than one device at once.
 
 ---
@@ -118,9 +118,9 @@ Then open **https://shortplanner.example.com** and log in with the password from
 
 ## How the app is used
 
-**Projects** is the starting point. Create an empty project, or duplicate / import an existing one. **Projektinfo** (*Project info*, in the top bar inside a project) holds the basics — title, company, producer, director, DP, 1st AD, location manager, shooting dates, format — which pre-fill new call sheets as they are created. It also holds the working-hours rules the stripboard checks each day against: max workday, latest meal break after call, minimum rest between shooting days (in hours; blank = the defaults 10 / 5 / 11).
+**Projects** is the starting point. Create an empty project, or duplicate / import an existing one. **Projektinfo** (*Project info*, in the top bar inside a project) holds the basics — title, company, producer, director, DP, 1st AD, location manager, shooting dates, format — which pre-fill new call sheets as they are created. It also holds the working-hours rules the stripboard checks each day against (max workday, latest meal break after call, minimum rest between shooting days — in hours; blank = the defaults 10 / 5 / 11), and per-project **tab visibility**: turn off Reel budget, DPR or Shoot day mode for projects that don't use them.
 
-**⚙ Inställningar** (*Settings*, on the project list) applies to the whole install: company name / logo for call sheets, and on/off for the Reel budget and DPR tabs if you don't use them.
+**⚙ Inställningar** (*Settings*, on the project list) applies to the whole install: company name / logo for call sheets and the interface language. Which tabs a project shows is set per project, in **Projektinfo**.
 
 **The Stripboard tab**
 
