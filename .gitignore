@@ -6,5 +6,7 @@ data/
 .vscode/
 .idea/
 
-# demo-instansens seed-databas (skapas lokalt, se deploy/demo-reset.sh)
-deploy/demo-seed/
+# Demons seed-databas byggs från deploy/demo-seed/*.json och checkas in
+# (deploy/demo-seed/shortplanner.db) — bara WAL-sidofilerna ignoreras.
+deploy/demo-seed/*.db-wal
+deploy/demo-seed/*.db-shm

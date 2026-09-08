@@ -1,0 +1,3220 @@
+{
+ "format": "shortplanner/project@1",
+ "name": "Pälsen",
+ "exported_at": "2026-09-08T09:00:00.000Z",
+ "stripboard": {
+  "production": {
+   "film": "PÄLSEN",
+   "version": "Arbetskopia 2",
+   "producent": "Hedvig Palm",
+   "regi": "Måns Ekelöf"
+  },
+  "cast": [
+   {
+    "id": "1",
+    "name": "Rikard Ohlsén",
+    "role": "Doktor Gustaf Henck"
+   },
+   {
+    "id": "2",
+    "name": "Vera Lindqvist",
+    "role": "Ellen Henck"
+   },
+   {
+    "id": "3",
+    "name": "Axel Bergwall",
+    "role": "John Richardt"
+   },
+   {
+    "id": "4",
+    "name": "Sigrid Ohlsén",
+    "role": "Barnet (7)"
+   },
+   {
+    "id": "5",
+    "name": "Nils Åkerlund",
+    "role": "Kyparen"
+   },
+   {
+    "id": "6",
+    "name": "Gunnar Sjödin",
+    "role": "Apotekaren"
+   },
+   {
+    "id": "7",
+    "name": "Ester Brandt",
+    "role": "Tvätterskan"
+   },
+   {
+    "id": "8",
+    "name": "Maja Lund",
+    "role": "Tiggerskan"
+   },
+   {
+    "id": "9",
+    "name": "Petter Falk",
+    "role": "Kontorsskrivaren"
+   }
+  ],
+  "days": [
+   {
+    "label": "Tisdag - Dag 1",
+    "date": "2026-11-24",
+    "start": "08:00",
+    "strips": [
+     {
+      "type": "banner",
+      "set": "SAMLING & FRUKOST — TRAPPHUSET",
+      "est": "15m",
+      "start": "08:00",
+      "loc": "Hencks våning",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "RIGG SÄNGKAMMAREN",
+      "est": "30m",
+      "start": "08:15",
+      "loc": "Hencks våning",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "2",
+      "ie": "INT",
+      "set": "HENCKS SÄNGKAMMARE — MORGON",
+      "dn": "MORGON",
+      "cast": "1, 2",
+      "loc": "Hencks våning",
+      "pages": "7/8",
+      "est": "1h 15m",
+      "start": "08:45",
+      "note": "Frostrosor på rutan — rökmaskin + kylspray",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "3",
+      "ie": "INT",
+      "set": "HENCKS TAMBUR — MORGON",
+      "dn": "MORGON",
+      "cast": "1, 2",
+      "loc": "Hencks våning",
+      "pages": "4/8",
+      "est": "50m",
+      "start": "10:00",
+      "note": "Rekvisita: rocken med sprucken axelsöm (3 ex)",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "OMRIGG MOTTAGNINGEN",
+      "est": "25m",
+      "start": "10:50",
+      "loc": "Hencks våning",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "5",
+      "ie": "INT",
+      "set": "HENCKS MOTTAGNING — FÖRMIDDAG",
+      "dn": "MORGON",
+      "cast": "1, 7",
+      "loc": "Hencks våning",
+      "pages": "7/8",
+      "est": "45m",
+      "start": "11:15",
+      "note": "Barn i bild — max 2 tim på plats, förälder med",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "LUNCH",
+      "est": "45m",
+      "start": "12:00",
+      "loc": "Hencks våning",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "MÖRKLÄGGNING HELA VÅNINGEN",
+      "est": "45m",
+      "start": "12:45",
+      "loc": "Hencks våning",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "11",
+      "ie": "INT",
+      "set": "TRAPPUPPGÅNGEN — KVÄLL",
+      "dn": "KVÄLL",
+      "cast": "1",
+      "loc": "Hencks våning",
+      "pages": "2/8",
+      "est": "45m",
+      "start": "13:30",
+      "note": "Gaslåga — öppen låga, brandvakt",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "12",
+      "ie": "INT",
+      "set": "HENCKS TAMBUR — KVÄLL",
+      "dn": "KVÄLL",
+      "cast": "1, 2",
+      "loc": "Hencks våning",
+      "pages": "1 0/8",
+      "est": "2h 0m",
+      "start": "14:15",
+      "note": "NYCKELSCEN. Ljuset går upp i bild — ljus på dimmer",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "RAST",
+      "est": "15m",
+      "start": "16:15",
+      "loc": "Hencks våning",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "13",
+      "ie": "INT",
+      "set": "HENCKS SALONG — KVÄLL",
+      "dn": "KVÄLL",
+      "cast": "1, 2, 4",
+      "loc": "Hencks våning",
+      "pages": "7/8",
+      "est": "1h 15m",
+      "start": "16:30",
+      "note": "Levande ljus i granen. Barn i bild.",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "14",
+      "ie": "INT",
+      "set": "HENCKS SÄNGKAMMARE — NATT",
+      "dn": "NATT",
+      "cast": "1",
+      "loc": "Hencks våning",
+      "pages": "3/8",
+      "est": "45m",
+      "start": "17:45",
+      "note": "Pälsen. Blod i näsduk — mask.",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "AVRIGG",
+      "est": "30m",
+      "start": "18:30",
+      "loc": "Hencks våning",
+      "note": "",
+      "lock": false
+     }
+    ]
+   },
+   {
+    "label": "Onsdag - Dag 2",
+    "date": "2026-11-25",
+    "start": "07:00",
+    "strips": [
+     {
+      "type": "banner",
+      "set": "SAMLING — KLARA KYRKOGÅRD",
+      "est": "15m",
+      "start": "07:00",
+      "loc": "Klara kyrkogård",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "RIGG",
+      "est": "30m",
+      "start": "07:15",
+      "loc": "Klara kyrkogård",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "16",
+      "ie": "EXT",
+      "set": "KLARA KYRKOGÅRD — DAG",
+      "dn": "DAG",
+      "cast": "2, 3",
+      "loc": "Klara kyrkogård",
+      "pages": "3/8",
+      "est": "45m",
+      "start": "07:45",
+      "note": "6 SD sörjande. Snökanon om barmark.",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "FÖRFLYTTNING TILL DROTTNINGGATAN",
+      "est": "25m",
+      "start": "08:30",
+      "loc": "Drottninggatan",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "1",
+      "ie": "EXT",
+      "set": "DROTTNINGGATAN — VINTERDAG",
+      "dn": "DAG",
+      "cast": "",
+      "loc": "Drottninggatan",
+      "pages": "2/8",
+      "est": "35m",
+      "start": "08:55",
+      "note": "12 SD julhandlande. Spårvagn 08:55 och 09:20.",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "8",
+      "ie": "EXT",
+      "set": "DROTTNINGGATAN — EFTERMIDDAG",
+      "dn": "DAG",
+      "cast": "1, 8",
+      "loc": "Drottninggatan",
+      "pages": "4/8",
+      "est": "1h 15m",
+      "start": "09:30",
+      "note": "12 SD. Droska med häst — djurskötare på plats.",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "FÖRFLYTTNING TILL KUNGSHOLMEN",
+      "est": "25m",
+      "start": "10:45",
+      "loc": "Kungsholmsgatan",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "4",
+      "ie": "EXT",
+      "set": "GATAN UTANFÖR HUSET — DAG",
+      "dn": "DAG",
+      "cast": "1",
+      "loc": "Kungsholmsgatan",
+      "pages": "2/8",
+      "est": "30m",
+      "start": "11:10",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "LUNCH",
+      "est": "45m",
+      "start": "11:40",
+      "loc": "Kungsholmsgatan",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "FÖRFLYTTNING TILL APOTEKET",
+      "est": "20m",
+      "start": "12:25",
+      "loc": "Apoteket Vita Björn",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "6",
+      "ie": "INT",
+      "set": "APOTEKET — DAG",
+      "dn": "DAG",
+      "cast": "1, 6",
+      "loc": "Apoteket Vita Björn",
+      "pages": "5/8",
+      "est": "1h 0m",
+      "start": "12:45",
+      "note": "Kund i päls (SD). Apoteksinredningen är k-märkt — inget tejp.",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "10",
+      "ie": "EXT",
+      "set": "GATAN — SKYMNING",
+      "dn": "SKYMNING",
+      "cast": "1",
+      "loc": "Apoteket Vita Björn",
+      "pages": "2/8",
+      "est": "35m",
+      "start": "13:45",
+      "note": "Hårt fönster: solnedgång 14:55, blå timme till 15:20.",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "FÖRFLYTTNING TILL RYDBERG",
+      "est": "20m",
+      "start": "14:20",
+      "loc": "Restaurang Rydberg",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "9",
+      "ie": "INT",
+      "set": "RESTAURANG RYDBERG — EFTERMIDDAG",
+      "dn": "DAG",
+      "cast": "1, 5",
+      "loc": "Restaurang Rydberg",
+      "pages": "6/8",
+      "est": "1h 15m",
+      "start": "14:40",
+      "note": "10 SD gäster. Vi äger inte lokalen — öppnar för allmänheten 17:00.",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "RAST",
+      "est": "15m",
+      "start": "15:55",
+      "loc": "Restaurang Rydberg",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "FÖRFLYTTNING TILL RICHARDTS KONTOR",
+      "est": "20m",
+      "start": "16:10",
+      "loc": "Richardts kontor",
+      "note": "",
+      "lock": false
+     },
+     {
+      "type": "scene",
+      "num": "7",
+      "ie": "INT",
+      "set": "RICHARDTS KONTOR — DAG",
+      "dn": "DAG",
+      "cast": "1, 3, 9",
+      "loc": "Richardts kontor",
+      "pages": "1 7/8",
+      "est": "2h 0m",
+      "start": "16:30",
+      "note": "Störst scen i filmen. Kakelugn — eld i bild.",
+      "lock": false
+     },
+     {
+      "type": "banner",
+      "set": "AVRIGG",
+      "est": "30m",
+      "start": "18:30",
+      "loc": "Richardts kontor",
+      "note": "",
+      "lock": false
+     }
+    ]
+   }
+  ],
+  "unscheduled": [
+   {
+    "type": "scene",
+    "num": "15",
+    "ie": "INT",
+    "set": "RICHARDTS KONTOR — DAG",
+    "dn": "DAG",
+    "cast": "1, 3",
+    "loc": "Richardts kontor",
+    "pages": "3/8",
+    "est": "25m",
+    "start": "",
+    "note": "Hör ihop med sc 7 — samma dekor, samma dag. Får inte plats än.",
+    "lock": false
+   }
+  ]
+ },
+ "callsheet": {
+  "production": {
+   "film": "PÄLSEN",
+   "producent": "Hedvig Palm",
+   "producent_tel": "070-000 00 00",
+   "regi": "Måns Ekelöf",
+   "foto": "Lena Hurtig",
+   "ad": "Tobias Ranta",
+   "platschef": "Karin Wibom"
+  },
+  "days": [
+   {
+    "label": "Tisdag - Dag 1",
+    "date": "tis 24 nov 2026",
+    "date_iso": "2026-11-24",
+    "dayOf": "Tisdag - Dag 1 av 2",
+    "generatedAt": "2026-09-08T10:45:58.941Z",
+    "gcall": "08:00",
+    "forsta_bild": "08:45",
+    "arbetstid": "08:00–19:00",
+    "weather_icon": "",
+    "weather_temp": "",
+    "sunrise": "",
+    "sunset": "",
+    "notes": [
+     "Barn i bild i sc 5 och 13 — max 2 tim på plats, förälder med hela tiden.",
+     "Mörkläggning från 12:45. Ingen genomgång i trapphuset efter det."
+    ],
+    "locations": [
+     {
+      "num": 1,
+      "name": "Hencks våning",
+      "addr": "Bergsgatan 18, 112 23 Stockholm",
+      "note": "",
+      "lat": "",
+      "lng": "",
+      "mapUrl": "",
+      "parking": "Boendeparkering Bergsgatan, 6 platser bokade",
+      "toilet": "I lägenheten samt i trapphuset (bv)",
+      "facilities": "Mask & kostym i lägenheten en trappa ner. Catering på gården.",
+      "safety": "Öppen låga i sc 11 och 13 — brandvakt hela dagen. Inga skruv i bärande vägg."
+     }
+    ],
+    "hospital": {
+     "name": "S:t Görans sjukhus, Akutmottagning",
+     "addr": "S:t Göransplan 1, 112 19 Stockholm",
+     "tel": "08-587 010 00",
+     "note": "",
+     "lat": "",
+     "lng": "",
+     "mapUrl": ""
+    },
+    "routeStart": {
+     "name": "Produktionskontoret",
+     "addr": "Hantverkargatan 3, 112 21 Stockholm",
+     "tel": "",
+     "note": "",
+     "lat": "",
+     "lng": "",
+     "mapUrl": ""
+    },
+    "routeEnd": {
+     "name": "",
+     "addr": "",
+     "tel": "",
+     "note": "",
+     "lat": "",
+     "lng": "",
+     "mapUrl": ""
+    },
+    "crew_contacts": [
+     {
+      "role": "Producent",
+      "name": "Hedvig Palm",
+      "tel": "070-000 00 00"
+     },
+     {
+      "role": "Regi",
+      "name": "Måns Ekelöf",
+      "tel": "070-000 00 00"
+     },
+     {
+      "role": "Platschef",
+      "name": "Karin Wibom",
+      "tel": "070-000 00 00"
+     }
+    ],
+    "kalltider": [
+     {
+      "dept": "Regi, Foto, Platschef",
+      "time": "07:30"
+     },
+     {
+      "dept": "Scenografi, Kostym",
+      "time": "07:30"
+     },
+     {
+      "dept": "Mask & Hår",
+      "time": "07:00"
+     }
+    ],
+    "scenes": [
+     {
+      "type": "info",
+      "label": "SAMLING & FRUKOST — TRAPPHUSET",
+      "time": "08:00",
+      "est": "15m"
+     },
+     {
+      "type": "info",
+      "label": "RIGG SÄNGKAMMAREN",
+      "time": "08:15",
+      "est": "30m"
+     },
+     {
+      "type": "scene",
+      "num": "2",
+      "ie": "INT",
+      "set": "HENCKS SÄNGKAMMARE — MORGON",
+      "dn": "MORGON",
+      "cast": "1, 2",
+      "loc": "Hencks våning",
+      "pages": "7/8",
+      "est": "1h 15m",
+      "start": "08:45"
+     },
+     {
+      "type": "scene",
+      "num": "3",
+      "ie": "INT",
+      "set": "HENCKS TAMBUR — MORGON",
+      "dn": "MORGON",
+      "cast": "1, 2",
+      "loc": "Hencks våning",
+      "pages": "4/8",
+      "est": "50m",
+      "start": "10:00"
+     },
+     {
+      "type": "info",
+      "label": "OMRIGG MOTTAGNINGEN",
+      "time": "10:50",
+      "est": "25m"
+     },
+     {
+      "type": "scene",
+      "num": "5",
+      "ie": "INT",
+      "set": "HENCKS MOTTAGNING — FÖRMIDDAG",
+      "dn": "MORGON",
+      "cast": "1, 7",
+      "loc": "Hencks våning",
+      "pages": "7/8",
+      "est": "45m",
+      "start": "11:15"
+     },
+     {
+      "type": "info",
+      "label": "LUNCH",
+      "time": "12:00",
+      "est": "45m"
+     },
+     {
+      "type": "info",
+      "label": "MÖRKLÄGGNING HELA VÅNINGEN",
+      "time": "12:45",
+      "est": "45m"
+     },
+     {
+      "type": "scene",
+      "num": "11",
+      "ie": "INT",
+      "set": "TRAPPUPPGÅNGEN — KVÄLL",
+      "dn": "KVÄLL",
+      "cast": "1",
+      "loc": "Hencks våning",
+      "pages": "2/8",
+      "est": "45m",
+      "start": "13:30"
+     },
+     {
+      "type": "scene",
+      "num": "12",
+      "ie": "INT",
+      "set": "HENCKS TAMBUR — KVÄLL",
+      "dn": "KVÄLL",
+      "cast": "1, 2",
+      "loc": "Hencks våning",
+      "pages": "1 0/8",
+      "est": "2h 0m",
+      "start": "14:15"
+     },
+     {
+      "type": "info",
+      "label": "RAST",
+      "time": "16:15",
+      "est": "15m"
+     },
+     {
+      "type": "scene",
+      "num": "13",
+      "ie": "INT",
+      "set": "HENCKS SALONG — KVÄLL",
+      "dn": "KVÄLL",
+      "cast": "1, 2, 4",
+      "loc": "Hencks våning",
+      "pages": "7/8",
+      "est": "1h 15m",
+      "start": "16:30"
+     },
+     {
+      "type": "scene",
+      "num": "14",
+      "ie": "INT",
+      "set": "HENCKS SÄNGKAMMARE — NATT",
+      "dn": "NATT",
+      "cast": "1",
+      "loc": "Hencks våning",
+      "pages": "3/8",
+      "est": "45m",
+      "start": "17:45"
+     },
+     {
+      "type": "info",
+      "label": "AVRIGG",
+      "time": "18:30",
+      "est": "30m"
+     },
+     {
+      "type": "total",
+      "pages": "4 6/8",
+      "est": "11h 0m"
+     }
+    ],
+    "cast": [
+     {
+      "id": "1",
+      "name": "Rikard Ohlsén",
+      "role": "Doktor Gustaf Henck",
+      "call": "08:15",
+      "hmu": "07:45",
+      "onset": "08:45",
+      "wrap": "18:30"
+     },
+     {
+      "id": "2",
+      "name": "Vera Lindqvist",
+      "role": "Ellen Henck",
+      "call": "08:15",
+      "hmu": "07:45",
+      "onset": "08:45",
+      "wrap": "17:45"
+     },
+     {
+      "id": "4",
+      "name": "Sigrid Ohlsén",
+      "role": "Barnet (7)",
+      "call": "16:00",
+      "hmu": "15:30",
+      "onset": "16:30",
+      "wrap": "17:45"
+     },
+     {
+      "id": "7",
+      "name": "Ester Brandt",
+      "role": "Tvätterskan",
+      "call": "10:45",
+      "hmu": "10:15",
+      "onset": "11:15",
+      "wrap": "12:00"
+     }
+    ]
+   },
+   {
+    "label": "Onsdag - Dag 2",
+    "date": "ons 25 nov 2026",
+    "date_iso": "2026-11-25",
+    "dayOf": "Onsdag - Dag 2 av 2",
+    "generatedAt": "2026-09-08T10:45:58.942Z",
+    "gcall": "07:00",
+    "forsta_bild": "07:45",
+    "arbetstid": "07:00–19:00",
+    "weather_icon": "",
+    "weather_temp": "",
+    "sunrise": "",
+    "sunset": "",
+    "notes": [
+     "Fem platsbyten. Håll fordonen samlade — allt utom kontoret ligger inom 1,5 km.",
+     "Hårt fönster: solnedgång 14:55. Sc 10 måste vara i lådan senast 15:20."
+    ],
+    "locations": [
+     {
+      "num": 1,
+      "name": "Klara kyrkogård",
+      "addr": "Klara Östra Kyrkogata 1, 111 52 Stockholm",
+      "note": "",
+      "lat": "",
+      "lng": "",
+      "mapUrl": "",
+      "parking": "Lastzon Klara Östra, tillstånd för 4 fordon",
+      "toilet": "",
+      "facilities": "",
+      "safety": "Inga fordon innanför grinden. Vi filmar inte mot besökande."
+     },
+     {
+      "num": 2,
+      "name": "Drottninggatan (avspärrat kvarter)",
+      "addr": "Drottninggatan 71, 111 36 Stockholm",
+      "note": "",
+      "lat": "",
+      "lng": "",
+      "mapUrl": "",
+      "parking": "Ingen på plats — fordon på Olof Palmes gata",
+      "toilet": "",
+      "facilities": "",
+      "safety": "Häst och droska 09:30–10:45. Djurskötare på plats."
+     },
+     {
+      "num": 3,
+      "name": "Kungsholmsgatan, utanför Bergsgatan 18",
+      "addr": "Bergsgatan 18, 112 23 Stockholm",
+      "note": "",
+      "lat": "",
+      "lng": "",
+      "mapUrl": "",
+      "parking": "",
+      "toilet": "",
+      "facilities": "",
+      "safety": ""
+     },
+     {
+      "num": 4,
+      "name": "Apoteket Vita Björn",
+      "addr": "Klarabergsgatan 29, 111 21 Stockholm",
+      "note": "",
+      "lat": "",
+      "lng": "",
+      "mapUrl": "",
+      "parking": "",
+      "toilet": "",
+      "facilities": "",
+      "safety": "K-märkt inredning. Ingen tejp, inga skruvar, inga stegar mot hyllorna."
+     },
+     {
+      "num": 5,
+      "name": "Restaurang Rydberg",
+      "addr": "Kungsträdgårdsgatan 12, 111 47 Stockholm",
+      "note": "",
+      "lat": "",
+      "lng": "",
+      "mapUrl": "",
+      "parking": "",
+      "toilet": "",
+      "facilities": "Vi äger inte lokalen. Öppnar för allmänheten 17:00 — vi måste vara ute 16:45.",
+      "safety": ""
+     },
+     {
+      "num": 6,
+      "name": "Richardts kontor",
+      "addr": "Skeppsbron 32, 111 30 Stockholm",
+      "note": "",
+      "lat": "",
+      "lng": "",
+      "mapUrl": "",
+      "parking": "",
+      "toilet": "",
+      "facilities": "",
+      "safety": ""
+     }
+    ],
+    "hospital": {
+     "name": "S:t Görans sjukhus, Akutmottagning",
+     "addr": "S:t Göransplan 1, 112 19 Stockholm",
+     "tel": "08-587 010 00",
+     "note": "",
+     "lat": "",
+     "lng": "",
+     "mapUrl": ""
+    },
+    "routeStart": {
+     "name": "",
+     "addr": "",
+     "tel": "",
+     "note": "",
+     "lat": "",
+     "lng": "",
+     "mapUrl": ""
+    },
+    "routeEnd": {
+     "name": "",
+     "addr": "",
+     "tel": "",
+     "note": "",
+     "lat": "",
+     "lng": "",
+     "mapUrl": ""
+    },
+    "crew_contacts": [
+     {
+      "role": "Producent",
+      "name": "Hedvig Palm",
+      "tel": "070-000 00 00"
+     },
+     {
+      "role": "Regi",
+      "name": "Måns Ekelöf",
+      "tel": "070-000 00 00"
+     },
+     {
+      "role": "Platschef",
+      "name": "Karin Wibom",
+      "tel": "070-000 00 00"
+     }
+    ],
+    "kalltider": [
+     {
+      "dept": "Regi, Foto, Platschef",
+      "time": "06:30"
+     },
+     {
+      "dept": "Scenografi, Kostym",
+      "time": "06:30"
+     },
+     {
+      "dept": "Mask & Hår",
+      "time": "06:00"
+     }
+    ],
+    "scenes": [
+     {
+      "type": "info",
+      "label": "SAMLING — KLARA KYRKOGÅRD",
+      "time": "07:00",
+      "est": "15m"
+     },
+     {
+      "type": "info",
+      "label": "RIGG",
+      "time": "07:15",
+      "est": "30m"
+     },
+     {
+      "type": "scene",
+      "num": "16",
+      "ie": "EXT",
+      "set": "KLARA KYRKOGÅRD — DAG",
+      "dn": "DAG",
+      "cast": "2, 3",
+      "loc": "Klara kyrkogård",
+      "pages": "3/8",
+      "est": "45m",
+      "start": "07:45"
+     },
+     {
+      "type": "info",
+      "label": "FÖRFLYTTNING TILL DROTTNINGGATAN",
+      "time": "08:30",
+      "est": "25m"
+     },
+     {
+      "type": "scene",
+      "num": "1",
+      "ie": "EXT",
+      "set": "DROTTNINGGATAN — VINTERDAG",
+      "dn": "DAG",
+      "cast": "—",
+      "loc": "Drottninggatan",
+      "pages": "2/8",
+      "est": "35m",
+      "start": "08:55"
+     },
+     {
+      "type": "scene",
+      "num": "8",
+      "ie": "EXT",
+      "set": "DROTTNINGGATAN — EFTERMIDDAG",
+      "dn": "DAG",
+      "cast": "1, 8",
+      "loc": "Drottninggatan",
+      "pages": "4/8",
+      "est": "1h 15m",
+      "start": "09:30"
+     },
+     {
+      "type": "info",
+      "label": "FÖRFLYTTNING TILL KUNGSHOLMEN",
+      "time": "10:45",
+      "est": "25m"
+     },
+     {
+      "type": "scene",
+      "num": "4",
+      "ie": "EXT",
+      "set": "GATAN UTANFÖR HUSET — DAG",
+      "dn": "DAG",
+      "cast": "1",
+      "loc": "Kungsholmsgatan",
+      "pages": "2/8",
+      "est": "30m",
+      "start": "11:10"
+     },
+     {
+      "type": "info",
+      "label": "LUNCH",
+      "time": "11:40",
+      "est": "45m"
+     },
+     {
+      "type": "info",
+      "label": "FÖRFLYTTNING TILL APOTEKET",
+      "time": "12:25",
+      "est": "20m"
+     },
+     {
+      "type": "scene",
+      "num": "6",
+      "ie": "INT",
+      "set": "APOTEKET — DAG",
+      "dn": "DAG",
+      "cast": "1, 6",
+      "loc": "Apoteket Vita Björn",
+      "pages": "5/8",
+      "est": "1h 0m",
+      "start": "12:45"
+     },
+     {
+      "type": "scene",
+      "num": "10",
+      "ie": "EXT",
+      "set": "GATAN — SKYMNING",
+      "dn": "SKYMNING",
+      "cast": "1",
+      "loc": "Apoteket Vita Björn",
+      "pages": "2/8",
+      "est": "35m",
+      "start": "13:45"
+     },
+     {
+      "type": "info",
+      "label": "FÖRFLYTTNING TILL RYDBERG",
+      "time": "14:20",
+      "est": "20m"
+     },
+     {
+      "type": "scene",
+      "num": "9",
+      "ie": "INT",
+      "set": "RESTAURANG RYDBERG — EFTERMIDDAG",
+      "dn": "DAG",
+      "cast": "1, 5",
+      "loc": "Restaurang Rydberg",
+      "pages": "6/8",
+      "est": "1h 15m",
+      "start": "14:40"
+     },
+     {
+      "type": "info",
+      "label": "RAST",
+      "time": "15:55",
+      "est": "15m"
+     },
+     {
+      "type": "info",
+      "label": "FÖRFLYTTNING TILL RICHARDTS KONTOR",
+      "time": "16:10",
+      "est": "20m"
+     },
+     {
+      "type": "scene",
+      "num": "7",
+      "ie": "INT",
+      "set": "RICHARDTS KONTOR — DAG",
+      "dn": "DAG",
+      "cast": "1, 3, 9",
+      "loc": "Richardts kontor",
+      "pages": "1 7/8",
+      "est": "2h 0m",
+      "start": "16:30"
+     },
+     {
+      "type": "info",
+      "label": "AVRIGG",
+      "time": "18:30",
+      "est": "30m"
+     },
+     {
+      "type": "total",
+      "pages": "4 7/8",
+      "est": "12h 0m"
+     }
+    ],
+    "cast": [
+     {
+      "id": "1",
+      "name": "Rikard Ohlsén",
+      "role": "Doktor Gustaf Henck",
+      "call": "09:00",
+      "hmu": "08:30",
+      "onset": "09:30",
+      "wrap": "18:30"
+     },
+     {
+      "id": "2",
+      "name": "Vera Lindqvist",
+      "role": "Ellen Henck",
+      "call": "07:15",
+      "hmu": "06:45",
+      "onset": "07:45",
+      "wrap": "08:30"
+     },
+     {
+      "id": "3",
+      "name": "Axel Bergwall",
+      "role": "John Richardt",
+      "call": "07:15",
+      "hmu": "06:45",
+      "onset": "07:45",
+      "wrap": "18:30"
+     },
+     {
+      "id": "5",
+      "name": "Nils Åkerlund",
+      "role": "Kyparen",
+      "call": "14:10",
+      "hmu": "13:40",
+      "onset": "14:40",
+      "wrap": "15:55"
+     },
+     {
+      "id": "6",
+      "name": "Gunnar Sjödin",
+      "role": "Apotekaren",
+      "call": "12:15",
+      "hmu": "11:45",
+      "onset": "12:45",
+      "wrap": "13:45"
+     },
+     {
+      "id": "8",
+      "name": "Maja Lund",
+      "role": "Tiggerskan",
+      "call": "09:00",
+      "hmu": "08:30",
+      "onset": "09:30",
+      "wrap": "10:45"
+     },
+     {
+      "id": "9",
+      "name": "Petter Falk",
+      "role": "Kontorsskrivaren",
+      "call": "16:00",
+      "hmu": "15:30",
+      "onset": "16:30",
+      "wrap": "18:30"
+     }
+    ]
+   }
+  ]
+ },
+ "script": {
+  "id": null,
+  "projectId": null,
+  "title": "PÄLSEN",
+  "draft": "1st draft",
+  "draftDate": "2026-09-08",
+  "source": "pdf",
+  "importedAt": "2026-09-08T09:00:00.000Z",
+  "scenes": [
+   {
+    "number": "1",
+    "slugline": "EXT. DROTTNINGGATAN - VINTERDAG",
+    "scriptPage": 1,
+    "scriptPageEnd": 1,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Snö faller tungt över Stockholm. Skyltfönstren lyser av"
+     },
+     {
+      "kind": "action",
+      "text": "julgranar, marsipangrisar och kaskader av granris. Folk"
+     },
+     {
+      "kind": "action",
+      "text": "trängs med paket under armarna, en spårvagn skramlar"
+     },
+     {
+      "kind": "action",
+      "text": "förbi, en gatpojke säljer granris ur en kärra."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Mot strömmen går en mager man i en alltför tunn rock. Han"
+     },
+     {
+      "kind": "action",
+      "text": "håller kragen hopknuten med handen. Ingen ser på honom."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "2",
+    "slugline": "INT. HENCKS SÄNGKAMMARE - MORGON",
+    "scriptPage": 1,
+    "scriptPageEnd": 2,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Ett kalt rum. Frostrosor på rutan. En byrå med en spegel"
+     },
+     {
+      "kind": "action",
+      "text": "och ett tomt fotografialbum."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "DOKTOR GUSTAF HENCK (42), blek, sitter på sängkanten och"
+     },
+     {
+      "kind": "action",
+      "text": "knäpper skjortan. Han hostar, torrt och länge, med näven"
+     },
+     {
+      "kind": "action",
+      "text": "för munnen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "ELLEN HENCK (29) står vid spegeln med ryggen mot honom"
+     },
+     {
+      "kind": "action",
+      "text": "och sätter upp håret. Hon är vacker på ett sätt som"
+     },
+     {
+      "kind": "action",
+      "text": "rummet inte förtjänar."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Du borde ligga kvar."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Jag har mottagning till tolv."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Hon svarar inte. Sätter en nål i håret."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK (CONT'D)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Kommer du hem till middagen?"
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Jag är hos Anna. Vi ska klä granen"
+     },
+     {
+      "kind": "dialogue",
+      "text": "åt barnen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Det är julafton, Ellen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN"
+     },
+     {
+      "kind": "parenthetical",
+      "text": "(utan att vända sig om)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Ja. Det är just därför man klär"
+     },
+     {
+      "kind": "dialogue",
+      "text": "granen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck ser på hennes rygg. På den vackra nacken. Han säger"
+     },
+     {
+      "kind": "action",
+      "text": "ingenting."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ur rummet innanför ropar ett BARN på sin mor. Ellen går,"
+     },
+     {
+      "kind": "action",
+      "text": "snabbt, nästan lättad."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck blir sittande. Hostar igen. Torkar handen mot"
+     },
+     {
+      "kind": "action",
+      "text": "lakanet."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "3",
+    "slugline": "INT. HENCKS TAMBUR - MORGON",
+    "scriptPage": 2,
+    "scriptPageEnd": 2,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Mörkt och trångt. Ett par galoscher, en hattkrok, en"
+     },
+     {
+      "kind": "action",
+      "text": "oljetryckstavla med en skogsbäck."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck tar ned rocken från kroken. Den är blanksliten i"
+     },
+     {
+      "kind": "action",
+      "text": "armbågarna och har fått en ny färg av åratal av"
+     },
+     {
+      "kind": "action",
+      "text": "borstning."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "När han för in armen spricker sömmen i axeln med ett"
+     },
+     {
+      "kind": "action",
+      "text": "torrt ljud."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han står stilla. Betraktar hålet. Sticker in ett finger i"
+     },
+     {
+      "kind": "action",
+      "text": "det."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ellen kommer ut med barnet vid handen. Hon ser rocken."
+     },
+     {
+      "kind": "action",
+      "text": "Hon ser hålet. Hon säger ingenting om det."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Glöm inte att du lovade titta in"
+     },
+     {
+      "kind": "dialogue",
+      "text": "till Richardt."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Nej."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Hon går förbi honom, ut. Dörren faller igen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "4",
+    "slugline": "EXT. GATAN UTANFÖR HUSET - DAG",
+    "scriptPage": 2,
+    "scriptPageEnd": 2,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Henck kommer ut i porten. Kylan tar tag i honom med en"
+     },
+     {
+      "kind": "action",
+      "text": "gång. Han knyter näven om kragen, över det trasiga"
+     },
+     {
+      "kind": "action",
+      "text": "stället, och håller den så."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Två herrar i pälsar passerar tätt förbi. Den ene ser rakt"
+     },
+     {
+      "kind": "action",
+      "text": "igenom honom, mitt i ansiktet, och fortsätter tala."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck går."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "5",
+    "slugline": "INT. HENCKS MOTTAGNING - FÖRMIDDAG",
+    "scriptPage": 2,
+    "scriptPageEnd": 3,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Ett smalt rum innanför tamburen. En brits, en glasskåp"
+     },
+     {
+      "kind": "action",
+      "text": "med instrument, ett skrivbord med en liggare."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "En TVÄTTERSKA (35) sitter med ett BARN i knäet. Barnet"
+     },
+     {
+      "kind": "action",
+      "text": "hostar, samma torra hosta som Hencks."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck lyssnar på ryggen med stetoskopet. Han tar god tid"
+     },
+     {
+      "kind": "action",
+      "text": "på sig."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Håll honom varm. Ingen källare."
+     },
+     {
+      "kind": "dialogue",
+      "text": "Ingen tvättstuga."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "TVÄTTERSKA"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Vi bor i källaren, doktorn."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck säger ingenting. Han går till glasskåpet, häller"
+     },
+     {
+      "kind": "action",
+      "text": "upp ur en flaska i en mindre och korkar den."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "En sked på morgonen. En på kvällen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Tvätterskan börjar knyta upp en näsduk med mynt i."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK (CONT'D)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Låt den vara."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "TVÄTTERSKA"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Doktorn ska ha betalt."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Nästa gång."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Hon tackar och går med barnet."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck öppnar liggaren. Sidan är full av namn. Bakom varje"
+     },
+     {
+      "kind": "action",
+      "text": "namn står ett streck i stället för en summa."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han stänger den."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "6",
+    "slugline": "INT. APOTEKET - DAG",
+    "scriptPage": 3,
+    "scriptPageEnd": 4,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Mahogny och vitt porslin. Doften av kamfer. En KUND I"
+     },
+     {
+      "kind": "action",
+      "text": "PÄLS betjänas först, utan att någon frågar om ordningen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck väntar med hatten i handen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "APOTEKAREN (55) tar fram en liggare och vänder den mot"
+     },
+     {
+      "kind": "action",
+      "text": "honom, mycket artigt."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "APOTEKAREN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Etthundraåttiotvå kronor och femtio"
+     },
+     {
+      "kind": "dialogue",
+      "text": "öre, doktorn."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Jag vet."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "APOTEKAREN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Jag har hållit den öppen sedan i"
+     },
+     {
+      "kind": "dialogue",
+      "text": "somras."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Till nyår."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "APOTEKAREN"
+     },
+     {
+      "kind": "parenthetical",
+      "text": "(vänligt, obevekligt)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Till nyår."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han vänder liggaren tillbaka och slår igen den. Ärendet"
+     },
+     {
+      "kind": "action",
+      "text": "är avgjort."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck sätter på sig hatten. Kunden i päls går förbi honom"
+     },
+     {
+      "kind": "action",
+      "text": "med sitt paket och tar inte notis om att han står där."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "7",
+    "slugline": "INT. RICHARDTS KONTOR - DAG",
+    "scriptPage": 4,
+    "scriptPageEnd": 6,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Ett stort, varmt rum. Kakelugn, mahogny, en karaff på en"
+     },
+     {
+      "kind": "action",
+      "text": "bricka, juldagsljus genom höga fönster."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "HÄRADSHÖVDING JOHN RICHARDT (44) är bred, godmodig och"
+     },
+     {
+      "kind": "action",
+      "text": "nyrakad. Han skriver under något utan att läsa det."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "En KONTORSSKRIVARE (30) visar in Henck och försvinner."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Gustaf. Sätt dig."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck sätter sig på kanten av stolen. Han håller hatten i"
+     },
+     {
+      "kind": "action",
+      "text": "knäet."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT (CONT'D)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Du ser förkyld ut."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Det är ingenting."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Paus. Henck ser på karaffen. På kakelugnen. På"
+     },
+     {
+      "kind": "action",
+      "text": "skrivbordets gröna läder. Överallt utom på Richardt."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK (CONT'D)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Jag skulle behöva be dig om en sak."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Så be."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "action",
+      "text": "Tvåhundra kronor. Till nyåret."
+     },
+     {
+      "kind": "action",
+      "text": "Apotekaren kan inte vänta längre,"
+     },
+     {
+      "kind": "action",
+      "text": "och Ellen ska ha en klänning"
+     },
+     {
+      "kind": "action",
+      "text": "till..."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han hittar inte slutet på meningen och lämnar det."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Richardt reser sig, går till skrivbordslådan och räknar"
+     },
+     {
+      "kind": "action",
+      "text": "inte. Han lägger sedlarna framför Henck."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT"
+     },
+     {
+      "kind": "action",
+      "text": "Tag trehundra. Och nämn det aldrig"
+     },
+     {
+      "kind": "action",
+      "text": "mer."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "action",
+      "text": "Jag skriver en revers."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT"
+     },
+     {
+      "kind": "action",
+      "text": "Du skriver ingenting alls."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck lägger undan sedlarna i innerfickan. Han reser sig"
+     },
+     {
+      "kind": "action",
+      "text": "för att gå."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Richardt ser på honom. Riktigt ser på honom, för första"
+     },
+     {
+      "kind": "action",
+      "text": "gången på mycket länge."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT (CONT'D)"
+     },
+     {
+      "kind": "action",
+      "text": "Var har du din rock?"
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "action",
+      "text": "Det här är min rock."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT"
+     },
+     {
+      "kind": "action",
+      "text": "Det är fjorton grader kallt,"
+     },
+     {
+      "kind": "action",
+      "text": "Gustaf."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Richardt går ut i hallen och kommer tillbaka med en tung"
+     },
+     {
+      "kind": "action",
+      "text": "päls med sobelkrage. Han håller upp den som man håller"
+     },
+     {
+      "kind": "action",
+      "text": "upp en dörr."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT (CONT'D)"
+     },
+     {
+      "kind": "action",
+      "text": "Tag min. Jag åker droska hem. Jag"
+     },
+     {
+      "kind": "action",
+      "text": "behöver den inte förrän i morgon."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "action",
+      "text": "Nej."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT"
+     },
+     {
+      "kind": "action",
+      "text": "Gustaf."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "action",
+      "text": "Jag kan inte gå omkring på stan i"
+     },
+     {
+      "kind": "action",
+      "text": "din..."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Richardt håller bara upp pälsen. Väntar. Som man väntar"
+     },
+     {
+      "kind": "action",
+      "text": "på ett barn som ska sätta på sig sina vantar."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck ser på den. Något i honom ger vika."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han vänder sig om och låter Richardt hjälpa honom i den."
+     },
+     {
+      "kind": "action",
+      "text": "Pälsen är för stor över axlarna. Den är varm som ett helt"
+     },
+     {
+      "kind": "action",
+      "text": "rum."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT (CONT'D)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Där ser du."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck står mitt på golvet och vet inte var han ska göra"
+     },
+     {
+      "kind": "action",
+      "text": "av händerna."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "8",
+    "slugline": "EXT. DROTTNINGGATAN - EFTERMIDDAG",
+    "scriptPage": 6,
+    "scriptPageEnd": 6,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Henck går. Samma gata som i morse. Samma folk, samma"
+     },
+     {
+      "kind": "action",
+      "text": "paket, samma skyltfönster."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Men nu lyfter en HERRE hatten mot honom utan att känna"
+     },
+     {
+      "kind": "action",
+      "text": "honom."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "En TIGGERSKA (60) med förfrusna händer väljer just honom"
+     },
+     {
+      "kind": "action",
+      "text": "ur strömmen och sträcker fram kopparbunken."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck stannar. Han lägger en hel krona i den."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "TIGGERSKAN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Gud välsigne herrn."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ingen har välsignat honom på mycket länge."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "En droska bromsar av sig själv vid trottoarkanten och"
+     },
+     {
+      "kind": "action",
+      "text": "KUSKEN ser frågande ned på honom. Henck skakar på"
+     },
+     {
+      "kind": "action",
+      "text": "huvudet, nästan förlägen, och går vidare."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han stannar framför ett skyltfönster. I glaset står en"
+     },
+     {
+      "kind": "action",
+      "text": "stor, förmögen man i sobel och ser tillbaka på honom."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han rätar på ryggen. Släpper kragen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "9",
+    "slugline": "INT. RESTAURANG RYDBERG - EFTERMIDDAG",
+    "scriptPage": 6,
+    "scriptPageEnd": 7,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Ljus, stärkt linne, silver. Ett dämpat sorl av GÄSTER, en"
+     },
+     {
+      "kind": "action",
+      "text": "klirrande kaffekopp, en tidning som vänds."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck kommer in. En KYPARE (50) är framme hos honom innan"
+     },
+     {
+      "kind": "action",
+      "text": "han hunnit knäppa upp pälsen, och tar emot den som man"
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "tar emot ett spädbarn."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "KYPAREN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Herrn har fönsterbordet."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han har aldrig i sitt liv haft fönsterbordet."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck sätter sig. Duken är stärkt. Snön faller utanför"
+     },
+     {
+      "kind": "action",
+      "text": "rutan."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "KYPAREN (CONT'D)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Får det lov att vara det vanliga?"
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck ser upp på honom. Kyparen ser tillbaka,"
+     },
+     {
+      "kind": "action",
+      "text": "tjänstvillig, utan en skymt av tvivel i ansiktet."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Ja tack. Det vanliga."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Kyparen bugar och går."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck blir sittande med båda händerna på duken. Han"
+     },
+     {
+      "kind": "action",
+      "text": "börjar le. Först litet. Sedan ohejdat, som en pojke."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han skrattar till, ensam vid fönsterbordet."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "En äldre DAM vid nästa bord ser upp. Henck nickar artigt"
+     },
+     {
+      "kind": "action",
+      "text": "åt henne. Hon nickar tillbaka, som till en jämlike."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "10",
+    "slugline": "EXT. GATAN - SKYMNING",
+    "scriptPage": 7,
+    "scriptPageEnd": 7,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Blått ljus. Snöfall. Gaslyktorna tänds, en efter en,"
+     },
+     {
+      "kind": "action",
+      "text": "längs hela gatan. Kyrkklockor någonstans bortom taken."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck går hemåt med pälsen uppknäppt, för han fryser"
+     },
+     {
+      "kind": "action",
+      "text": "inte."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han går långsamt. Han vill inte att det ska ta slut."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "11",
+    "slugline": "INT. TRAPPUPPGÅNGEN - KVÄLL",
+    "scriptPage": 7,
+    "scriptPageEnd": 8,
+    "body": [
+     {
+      "kind": "action",
+      "text": "En gaslåga fladdrar i trapphuset. Henck går uppför de"
+     },
+     {
+      "kind": "action",
+      "text": "sista stegen och stannar utanför sin egen dörr."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Därinne hör han ETT SKRATT. Ellens. Ett skratt han inte"
+     },
+     {
+      "kind": "action",
+      "text": "känner igen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han står kvar en stund med nyckeln i handen."
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "12",
+    "slugline": "INT. HENCKS TAMBUR - KVÄLL",
+    "scriptPage": 8,
+    "scriptPageEnd": 9,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Han låser upp och stiger in i mörkret. Tamburen är"
+     },
+     {
+      "kind": "action",
+      "text": "osläckt. Långt inne i våningen lyser det svagt från"
+     },
+     {
+      "kind": "action",
+      "text": "salongen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han hinner inte stänga dörren innan ELLEN kommer emot"
+     },
+     {
+      "kind": "action",
+      "text": "honom genom mörkret. Hon ser silhuetten. Hon ser pälsen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN"
+     },
+     {
+      "kind": "parenthetical",
+      "text": "(lågt, andfått)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Äntligen. Jag trodde du inte skulle"
+     },
+     {
+      "kind": "dialogue",
+      "text": "våga."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Hon slår armarna om halsen på honom och kysser honom."
+     },
+     {
+      "kind": "action",
+      "text": "Länge. Inte som man kysser sin man."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN (CONT'D)"
+     },
+     {
+      "kind": "parenthetical",
+      "text": "(mot hans hals)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Han går inte förrän om en timme. Vi"
+     },
+     {
+      "kind": "dialogue",
+      "text": "har en timme."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Hon drar honom med sig mot väggen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck rör sig inte. Han står alldeles stilla inne i den"
+     },
+     {
+      "kind": "action",
+      "text": "andres päls."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ellen märker något. Hon hejdar sig. Håller andan."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Hon sträcker sig åt sidan och vrider upp ljuset."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ljuset går upp. De ser varandra."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ellen tar ett steg bakåt. Handen för munnen. Hennes"
+     },
+     {
+      "kind": "action",
+      "text": "ansikte far igenom fyra saker på två sekunder: skräck,"
+     },
+     {
+      "kind": "action",
+      "text": "ursäkt, beräkning, kyla."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN (CONT'D)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Gustaf."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck knäpper upp pälsen. Långsamt, knapp för knapp."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han hänger den på kroken, borstar av axeln med handryggen"
+     },
+     {
+      "kind": "action",
+      "text": "och vänder sig om."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Är maten färdig?"
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han går förbi henne, in i våningen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ellen blir stående ensam i den upplysta tamburen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "13",
+    "slugline": "INT. HENCKS SALONG - KVÄLL",
+    "scriptPage": 9,
+    "scriptPageEnd": 9,
+    "body": [
+     {
+      "kind": "action",
+      "text": "En liten gran med tolv ljus. BARNET (7) sitter på golvet"
+     },
+     {
+      "kind": "action",
+      "text": "med ett knippe halmbockar och pratar med dem."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Bordet är dukat för tre. Henck sitter redan. Ellen kommer"
+     },
+     {
+      "kind": "action",
+      "text": "in, sätter sig och viker ut sin servett med stora,"
+     },
+     {
+      "kind": "action",
+      "text": "noggranna rörelser."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Anna hälsar."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Tacka henne."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "ELLEN"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Vi hann inte klä granen förrän vid"
+     },
+     {
+      "kind": "dialogue",
+      "text": "fyra, hon hade sådant besvär med"
+     },
+     {
+      "kind": "dialogue",
+      "text": "pigan, och så skulle lille Gustav"
+     },
+     {
+      "kind": "dialogue",
+      "text": "ha sin gröt precis då, och då kan"
+     },
+     {
+      "kind": "dialogue",
+      "text": "man ju ingenting göra."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Hon talar. Hon talar hela tiden."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck ser på henne medan hon talar. Lugnt. Som en läkare"
+     },
+     {
+      "kind": "action",
+      "text": "ser på ett prov han redan vet svaret på."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Barnet reser sig och kommer fram med en halmbock till"
+     },
+     {
+      "kind": "action",
+      "text": "honom."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "BARNET"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Pappa. Den här är din."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Henck tar emot den. Håller den i handen. Ser på den."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Tack."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han lägger den bredvid tallriken. Han rör inte maten."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ellen fortsätter tala. Ljusen i granen brinner ned."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "14",
+    "slugline": "INT. HENCKS SÄNGKAMMARE - NATT",
+    "scriptPage": 9,
+    "scriptPageEnd": 10,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Henck sitter ensam på sängkanten med pälsen i knäet. Han"
+     },
+     {
+      "kind": "action",
+      "text": "stryker med handen över sobeln, långsamt, som över ett"
+     },
+     {
+      "kind": "action",
+      "text": "djur."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han hostar. Den här gången kommer det något i näsduken."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han ser på den. Viker ihop den. Stoppar undan den."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han blir sittande länge med pälsen."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "parenthetical",
+      "text": "(för sig själv)"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Fyra timmar."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han lutar kinden mot kragen och blundar."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "15",
+    "slugline": "INT. RICHARDTS KONTOR - DAG",
+    "scriptPage": 10,
+    "scriptPageEnd": 10,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Henck lägger pälsen över stolsryggen. Richardt skriver"
+     },
+     {
+      "kind": "action",
+      "text": "och ser knappt upp."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Tack."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "RICHARDT"
+     },
+     {
+      "kind": "dialogue",
+      "text": "För ingenting."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "character",
+      "text": "HENCK"
+     },
+     {
+      "kind": "dialogue",
+      "text": "Nej. För allt."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Richardt ser upp, men Henck har redan vänt sig om."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "transition",
+      "text": "CUT TO:"
+     }
+    ]
+   },
+   {
+    "number": "16",
+    "slugline": "EXT. KLARA KYRKOGÅRD - DAG",
+    "scriptPage": 10,
+    "scriptPageEnd": 10,
+    "body": [
+     {
+      "kind": "action",
+      "text": "Snö. En liten samling SÖRJANDE kring en öppen grav."
+     },
+     {
+      "kind": "action",
+      "text": "Prästens röst bär inte i kylan."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ellen står i svart. Bredvid henne står Richardt i sin"
+     },
+     {
+      "kind": "action",
+      "text": "päls."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Han står ett halvt steg för nära."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Ellen ser rakt fram. Efter en stund lägger hon sin hand"
+     },
+     {
+      "kind": "action",
+      "text": "innanför hans arm."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "Snön faller över den öppna graven."
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "SVART RUTA"
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "TEXT:"
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "PÄLSEN"
+     },
+     {
+      "kind": "blank",
+      "text": ""
+     },
+     {
+      "kind": "action",
+      "text": "SLUT"
+     }
+    ]
+   }
+  ]
+ },
+ "dpr": {
+  "id": null,
+  "projectId": null,
+  "days": []
+ },
+ "meta": {
+  "title": "PÄLSEN",
+  "company": "Vinterljus Film AB",
+  "producer": "Hedvig Palm",
+  "producerPhone": "070-000 00 00",
+  "director": "Måns Ekelöf",
+  "dop": "Lena Hurtig",
+  "firstAD": "Tobias Ranta",
+  "locationManager": "Karin Wibom",
+  "shootStart": "2026-11-24",
+  "shootEnd": "2026-11-25",
+  "format": "16 mm",
+  "aspectRatio": "1.37:1",
+  "maxWorkdayHrs": "10",
+  "mealBreakByHrs": "5",
+  "minRestHrs": "11"
+ },
+ "versions": []
+}

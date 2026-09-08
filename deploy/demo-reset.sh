@@ -5,13 +5,16 @@
 #
 #   0 0 * * *  /sökväg/till/shortplanner/deploy/demo-reset.sh >> /var/log/sp-demo-reset.log 2>&1
 #
-# Skapa seed-filen en gång från en instans i önskat utgångsläge (checkpointa
-# WAL:en så allt hamnar i själva .db-filen):
+# Återställer demo-instansen till deploy/demo-seed/shortplanner.db och rullar
+# sedan datumen så inspelningsdag 1 blir imorgon (scripts/demo-redate.js), så
+# att väder och 🎬 Inspelningsläge fungerar. Tänkt för cron:
 #
-#   docker compose -f deploy/docker-compose.demo.yml stop shortplanner-demo
-#   docker run --rm -v shortplanner-demo_shortplanner-demo-data:/data -v "$PWD/deploy/demo-seed":/seed alpine \
-#     sh -c 'apk add --no-cache sqlite >/dev/null; sqlite3 /data/shortplanner.db "PRAGMA wal_checkpoint(TRUNCATE);"; cp /data/shortplanner.db /seed/shortplanner.db'
-#   docker compose -f deploy/docker-compose.demo.yml start shortplanner-demo
+#   0 0 * * *  /sökväg/till/shortplanner/deploy/demo-reset.sh >> /var/log/sp-demo-reset.log 2>&1
+#
+# shortplanner.db byggs från deploy/demo-seed/*.json och checkas in i repot.
+# Bygg om den efter att ha ändrat JSON:en:
+#
+#   deploy/demo-build-seed.sh          # importerar JSON:en -> demo-seed/shortplanner.db
 
 set -euo pipefail
 
@@ -37,5 +40,7 @@ docker run --rm -v "$VOLUME":/data -v "$SEED_DIR":/seed:ro alpine sh -c "
   chown ${APP_UID}:${APP_UID} /data/shortplanner.db &&
   chmod 644 /data/shortplanner.db
 "
+# Rulla datumen (container fortfarande stoppad -> ingen skrivkonflikt).
+docker compose -f "$COMPOSE_FILE" run --rm --no-deps "$SERVICE" node scripts/demo-redate.js /data/shortplanner.db
 docker compose -f "$COMPOSE_FILE" start "$SERVICE"
-echo "$(date -Is) demo nollställd till seed"
+echo "$(date -Is) demo nollställd till seed + omdaterad"

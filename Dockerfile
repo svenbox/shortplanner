@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends tini \
 COPY --from=build /app/node_modules ./node_modules
 COPY package.json server.js db.js store.js validate.js ./
 COPY public ./public
+COPY scripts ./scripts
 
 USER node
 EXPOSE 3000

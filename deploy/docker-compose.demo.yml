@@ -10,13 +10,12 @@ services:
   shortplanner-demo:
     build:
       context: ..
-    container_name: shortplanner-demo
     restart: unless-stopped
     environment:
       PORT: "3000"
       DATA_DIR: "/data"
       APP_PASSWORD: "demo"
-      DEMO_MODE: "1"
+      DEMO_MODE: "${DEMO_MODE:-1}"
       SESSION_DAYS: "1"
       BUILD_ID: "${BUILD_ID:-}"
       WEATHER_CONTACT: "${WEATHER_CONTACT:-}"
