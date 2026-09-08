@@ -278,8 +278,8 @@ a { color: var(--accent); }
 .sb-scope .board > .day-body,
 .sb-scope .board > .day-add,
 .sb-scope .board > .day-foot,
-.sb-scope .day-body > .grid { min-width: 804px; }
-.sb-scope .grid { display: grid; grid-template-columns: 26px 46px minmax(180px,1fr) 58px 62px 78px 120px 62px 74px 68px 30px; align-items: stretch; }
+.sb-scope .day-body > .grid { min-width: 826px; }
+.sb-scope .grid { display: grid; grid-template-columns: 26px 46px minmax(180px,1fr) 58px 62px 78px 120px 62px 74px 68px 52px; align-items: stretch; }
 .sb-scope .hdr { background: var(--surface2); font-size: 9.5px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-secondary); font-weight: 600; position: sticky; top: 0; z-index: 5; border-bottom: 1px solid var(--border-strong); }
 .sb-scope .hdr > div { padding: 7px 6px; }
 .sb-scope .day-hdr { background: var(--surface); border-top: 2px solid var(--border-strong); border-bottom: 1px solid var(--border); padding: 8px 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; scroll-margin-top: 92px; }
@@ -322,7 +322,7 @@ a { color: var(--accent); }
 .sb-scope .c-dn { font-size: 10px; letter-spacing: 0.05em; }
 .sb-scope .c-cast, .sb-scope .c-loc { font-size: 11px; }
 .sb-scope .c-start { font-variant-numeric: tabular-nums; font-weight: 600; }
-.sb-scope .c-act { justify-content: center; }
+.sb-scope .strip > .c-act { justify-content: flex-end; gap: 2px; padding-right: 12px; }
 .sb-scope .cell-ed { outline: none; min-width: 8px; width: 100%; border-radius: 3px; padding: 1px 3px; margin: -1px -3px; cursor: text; }
 .sb-scope .cell-ed:hover { background: rgba(0,0,0,0.06); }
 .sb-scope .cell-ed:focus { background: rgba(255,255,255,0.85); outline: 2px solid var(--accent); color: #111; }
@@ -385,13 +385,13 @@ a { color: var(--accent); }
 }
 @media screen and (max-width: 900px) {
 .sb-scope { font-size: 12px; }
-.sb-scope .grid { grid-template-columns: 24px 40px minmax(120px,1fr) 46px 50px 56px 70px 52px 70px 68px 26px; }
+.sb-scope .grid { grid-template-columns: 24px 40px minmax(120px,1fr) 46px 50px 56px 70px 52px 70px 68px 46px; }
 .sb-scope .board > .grid,
 .sb-scope .board > .day-hdr,
 .sb-scope .board > .day-body,
 .sb-scope .board > .day-add,
 .sb-scope .board > .day-foot,
-.sb-scope .day-body > .grid { min-width: 622px; }
+.sb-scope .day-body > .grid { min-width: 642px; }
 .sb-scope .stats { gap: 6px; margin-bottom: 12px; }
 .sb-scope .stat { padding: 5px 9px; min-width: 74px; }
 .sb-scope .stat-lbl { font-size: 8.5px; }
