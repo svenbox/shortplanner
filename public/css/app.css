@@ -300,6 +300,10 @@ a { color: var(--accent); }
   width: 19px; height: 19px; border-radius: 50%;
   background: rgba(255,255,255,0.2); font-style: normal; font-size: 11px; font-weight: 600;
 }
+.sb-scope .strip.banner .c-num button.banner-i {
+  border: none; padding: 0; margin: 0; color: inherit; font-family: inherit; line-height: 1; cursor: pointer;
+}
+.sb-scope .strip.banner .c-num button.banner-i:hover { background: rgba(255,255,255,0.45); }
 .sb-scope .strip.break { background: var(--s-break); color: #3a0f22; }
 .sb-scope .strip.move { background: var(--s-move); color: #2a2a2a; }
 .sb-scope .strip.dragging { opacity: 0.35; }

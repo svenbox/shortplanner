@@ -39,8 +39,16 @@
     const steps = (day && day.scenes) || [];
     return steps[day.currentIdx || 0] || null;
   }
-  function isLunch(step) { return /lunch|rast/i.test((step && (step.label || step.set)) || ""); }
-  function isMove(step) { return /förflyttning|flytt|company\s*move|\bmove\b/i.test((step && (step.label || step.set)) || ""); }
+  /* step.kind (satt via i-cirkeln i stripboardet) vinner; annars matchas
+     texten som förr. */
+  function isLunch(step) {
+    if (step && (step.kind === "break" || step.kind === "move" || step.kind === "info")) return step.kind === "break";
+    return /lunch|rast/i.test((step && (step.label || step.set)) || "");
+  }
+  function isMove(step) {
+    if (step && (step.kind === "break" || step.kind === "move" || step.kind === "info")) return step.kind === "move";
+    return /förflyttning|flytt|company\s*move|\bmove\b/i.test((step && (step.label || step.set)) || "");
+  }
   function stepKind(step) {
     if (!step || step.type === "scene") return "scene";
     if (isLunch(step)) return "lunch";

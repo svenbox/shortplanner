@@ -147,9 +147,23 @@
 
   /* ---- strip-klassificering (lunch / rast / förflyttning / natt / ext) ---- */
 
+  /* Undertyp för en strip som inte är en scen: "break" (rast/lunch),
+     "move" (förflyttning) eller "info". Ett uttryckligt s.kind (satt via
+     i-cirkeln i stripboardet) vinner; saknas det härleds typen ur
+     set-texten precis som förr (bakåtkompatibelt). För scener finns inget
+     s.kind -- där matchar set-texten fortfarande (EGENHET: en scen som
+     heter "LUNCHRUMMET" får rast-stil). */
+  function stripKind(s) {
+    if (s && s.type !== "scene" && (s.kind === "break" || s.kind === "move" || s.kind === "info")) return s.kind;
+    const set = (s && s.set) || "";
+    if (/rast|lunch/i.test(set)) return "break";
+    if (/förflyttning|flytt/i.test(set)) return "move";
+    return "";
+  }
+
   function stripClass(s) {
-    const set = s.set || "";
-    const extra = /rast|lunch/i.test(set) ? " break" : /förflyttning|flytt/i.test(set) ? " move" : "";
+    const k = stripKind(s);
+    const extra = k === "break" ? " break" : k === "move" ? " move" : "";
     if (s.type === "banner") return "banner" + extra;
     const night = /natt|night/i.test(s.dn || "");
     const ext = /^ext/i.test(s.ie || "");
@@ -199,7 +213,7 @@
      kunna ändra dem. */
   const WORK_LIMITS = { maxWorkdayMin: 600, mealBreakByMin: 300, minRestMin: 660 };
 
-  function isBreak(strip) { return /rast|lunch/i.test((strip && strip.set) || ""); }
+  function isBreak(strip) { return stripKind(strip) === "break"; }
 
   /* Varningar som ska stå PÅ dagen i stripboardet (inte bara i en toppsiffra).
      - Arbetstid (span minus rast/lunch) över gränsen  -> level "over"
@@ -261,6 +275,6 @@
     SV_DAYS, SV_DAYS_LONG, SV_MON, DAY_LIMIT_MIN, WORK_LIMITS,
     parseEst, fmtEst, parsePages, fmtPages, t2m, m2t,
     dateSv, dateShort, todayIso, daysBetween, addDays, closestDayIndex,
-    stripClass, recalcDay, dayTotals, isLongDay, isBreak, dayWarnings, reorderStrips
+    stripClass, stripKind, recalcDay, dayTotals, isLongDay, isBreak, dayWarnings, reorderStrips
   };
 });

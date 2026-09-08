@@ -137,6 +137,13 @@ test("curStep / isLunch", () => {
   assert.equal(SD.isLunch(scene({ set: "KÖK" })), false);
 });
 
+test("isLunch / isMove — step.kind vinner över etiketten", () => {
+  assert.equal(SD.isLunch(info({ label: "Fika", kind: "break" })), true);
+  assert.equal(SD.isLunch(info({ label: "Lunch", kind: "info" })), false);
+  assert.equal(SD.isMove(info({ label: "Rigg", kind: "move" })), true);
+  assert.equal(SD.isMove(info({ label: "Förflyttning", kind: "info" })), false);
+});
+
 /* ---------------- v2 ---------------- */
 test("dayStarted / pressStart — startskärmen tills första stegets start stämplats", () => {
   const d = day([scene({ actualStart: "" }), scene({ num: "2" })]);

@@ -122,6 +122,28 @@ test("stripClass — QUIRK: scen med 'lunch' i set-namnet får break-stil", () =
   assert.equal(C.stripClass(scene({ ie: "INT", dn: "DAG", set: "LUNCHRUMMET" })), "int-day break");
 });
 
+test("stripKind / stripClass — uttryckligt s.kind vinner över texten", () => {
+  // texten säger "Fika" men strippen är märkt som rast
+  assert.equal(C.stripKind(banner({ set: "Fika", kind: "break" })), "break");
+  assert.equal(C.stripClass(banner({ set: "Fika", kind: "break" })), "banner break");
+  // texten säger "Lunch" men strippen är uttryckligen bara info
+  assert.equal(C.stripKind(banner({ set: "Lunch", kind: "info" })), "info");
+  assert.equal(C.stripClass(banner({ set: "Lunch", kind: "info" })), "banner");
+  // move
+  assert.equal(C.stripClass(banner({ set: "Rigg", kind: "move" })), "banner move");
+  // okänt kind ignoreras -> faller tillbaka på texten
+  assert.equal(C.stripClass(banner({ set: "Lunch", kind: "banan" })), "banner break");
+  // scener har inget s.kind -> texten avgör som förr
+  assert.equal(C.stripKind(scene({ set: "LUNCHRUMMET", kind: "info" })), "break");
+});
+
+test("isBreak — s.kind styr arbetstidsvarningen", () => {
+  assert.equal(C.isBreak(banner({ set: "Fika", kind: "break" })), true);
+  assert.equal(C.isBreak(banner({ set: "Lunch", kind: "info" })), false);
+  assert.equal(C.isBreak(banner({ set: "Lunch" })), true);
+  assert.equal(C.isBreak(banner({ set: "Rigg" })), false);
+});
+
 /* ------------------------------------------------------------------ */
 test("recalcDay — enkel kedja av strips", () => {
   const d = day("08:00", [scene({ est: "1h" }), scene({ est: "45m" }), scene({ est: "2h" })]);
@@ -450,6 +472,25 @@ test("dayWarnings — lunch inom 5h → ingen mealvarning", () => {
   ]) });
   C.recalcDay(d);
   assert.equal(C.dayWarnings(d, null, null).some(x => /efter samling/.test(x.text)), false);
+});
+
+test("dayWarnings — kind:'break' räknas som rast även utan matchande text", () => {
+  const d = wday({ start: "08:00", strips: wstrips([
+    { est: "3h", start: "08:00" },
+    { type: "banner", set: "Fika", kind: "break", est: "30m", start: "11:00" }
+  ]) });
+  C.recalcDay(d);
+  // "Fika" utan kind hade gett "Ingen rast eller lunch" — med kind:break försvinner den
+  assert.equal(C.dayWarnings(d, null, null).some(x => /Ingen rast/.test(x.text)), false);
+});
+
+test("dayWarnings — kind:'info' på en 'Lunch'-strip → räknas inte som rast", () => {
+  const d = wday({ start: "08:00", strips: wstrips([
+    { est: "3h", start: "08:00" },
+    { type: "banner", set: "Lunch", kind: "info", est: "30m", start: "11:00" }
+  ]) });
+  C.recalcDay(d);
+  assert.ok(texts(C.dayWarnings(d, null, null)).includes("Ingen rast eller lunch inplanerad"));
 });
 
 test("dayWarnings — för kort vila mot föregående dag (över dygnsgränsen)", () => {

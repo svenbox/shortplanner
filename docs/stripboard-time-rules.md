@@ -84,26 +84,39 @@ Inte tid, men samma mönster och används i dagssummorna.
 
 `fmtPages(19)` → `"2 3/8"`; `fmtPages(0)` → `""`.
 
-## 6. Klassificering av strips — `stripClass(s) → CSS-klasser`
+## 6. Klassificering av strips — `stripKind(s)` / `stripClass(s) → CSS-klasser`
 
-Avgör färg/typ. Lunch, rast och company move känns igen **enbart på texten i
-`s.set`**, skiftlägesokänsligt, som delsträng:
+`stripKind(s)` returnerar undertypen för en icke-scen-strip: `"break"`,
+`"move"` eller `"info"` (`""` = odefinierad).
 
-- `/rast|lunch/i` i `s.set` → lägg till klassen `break`
-- `/förflyttning|flytt/i` i `s.set` → lägg till klassen `move`
+- **Uttryckligt `s.kind`** (`"break"` / `"move"` / `"info"`, satt via i-cirkeln
+  i stripboardet) vinner — men bara för strips där `s.type !== "scene"`.
+- Saknas `s.kind` härleds typen ur **texten i `s.set`**, skiftlägesokänsligt,
+  som delsträng: `/rast|lunch/i` → `break`, `/förflyttning|flytt/i` → `move`.
+- Scener har inget `s.kind`; där matchar `s.set`-texten fortfarande (se EGENHET
+  nedan).
+
+`stripClass(s)` ovanpå `stripKind`:
+
+- `stripKind` → `break` → lägg till klassen `break`; `move` → `move`
 - `s.type === "banner"` → basklass `banner`, annars `int-`/`ext-` + `day`/`night`
 - natt om `/natt|night/i` i `s.dn`; ext om `/^ext/i` i `s.ie`
 
 | Strip | Klass |
 |---|---|
 | banner, set `"Lunch"` | `banner break` |
+| banner, set `"Fika"`, `kind: "break"` | `banner break` — **texten spelar ingen roll** |
+| banner, set `"Lunch"`, `kind: "info"` | `banner` — uttryckligen bara info |
 | banner, set `"Förflyttning till studio"` | `banner move` |
-| scen, INT/DAG, set `"LUNCHRUMMET"` | `int-day break` — **EGENHET:** en riktig scen vars set-namn innehåller "lunch" får rast-stil |
+| banner, `kind: "banan"` (okänt) | faller tillbaka på texten |
+| scen, INT/DAG, set `"LUNCHRUMMET"` | `int-day break` — **EGENHET:** en riktig scen vars set-namn innehåller "lunch" får rast-stil (scener har inget `s.kind`) |
 | scen, EXT/NATT | `ext-night` |
 
-> Det finns alltså ingen egen datatyp för lunch/rast/förflyttning — det är
-> vanliga strips (oftast `banner`) vars `set`-text matchar, plus en `est` som
-> är pausens/flyttens längd.
+> Det finns alltså ingen egen `type` för lunch/rast/förflyttning — det är
+> `type: "banner"`-strips med ett valfritt `s.kind` (eller matchande `set`-text)
+> plus en `est` som är pausens/flyttens längd. `s.kind` flödar vidare till call
+> sheetens info-rader och till Inspelningslägets steg, och `isBreak()`
+> (arbetstidsvarningen, avsnitt 10) använder samma `stripKind`.
 
 ## 7. Räkna om starttider i en dag — `recalcDay(day)`
 
@@ -199,12 +212,13 @@ Klienten läser dessa från meta-doket (Projektinfo: `maxWorkdayHrs` /
 fält → standard.
 
 **Regel 1 — arbetstid.** `arbetstid = dayTotals(day).span − Σ parseEst(s.est)`
-för strips där `s.set` matchar `/rast|lunch/i` (`isBreak`). Är `arbetstid >
+för strips där `isBreak(s)` är sant (dvs `stripKind(s) === "break"`: `s.kind`
+`"break"` eller matchande `set`-text — se avsnitt 6). Är `arbetstid >
 maxWorkdayMin` → `{ level: "over", text: "Arbetstid 11h 30m (över 10h 0m)" }`
 (båda via `fmtEst`). Rast/lunch räknas alltså **inte** som arbetstid här, till
 skillnad från `dayTotals.mins` (avsnitt 8) som räknar in allt.
 
-**Regel 2 — lunch.** Finns ingen strip som matchar `/rast|lunch/i` →
+**Regel 2 — lunch.** Finns ingen strip med `isBreak(s)` →
 `{ level: "warn", text: "Ingen rast eller lunch inplanerad" }`. Finns en, men
 `t2m(förstaRasten.start) − t2m(day.start) > mealBreakByMin` →
 `{ level: "warn", text: "Lunch 6h 0m efter samling" }`. Otolkbara tider →

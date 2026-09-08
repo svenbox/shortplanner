@@ -20,7 +20,7 @@ const SBCore = window.SBCore;
 const {
   parseEst, fmtEst, parsePages, fmtPages, t2m, m2t,
   dateSv, dateShort, todayIso, daysBetween, addDays, closestDayIndex,
-  stripClass, dayTotals, recalcDay, dayWarnings
+  stripClass, stripKind, dayTotals, recalcDay, dayWarnings
 } = SBCore;
 
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
@@ -78,7 +78,7 @@ function stripRow(s, dayIdx, i) {
   if (isB) {
     return `<div class="strip ${stripClass(s)} grid" data-day="${dayIdx}" data-idx="${i}" draggable="false">
       <div class="c-handle" onpointerdown="SB.grabOn(this,event)">⋮⋮</div>
-      <div class="c-num"><span class="banner-i">i</span></div>
+      <div class="c-num"><button type="button" class="banner-i" onclick="SB.kindMenu(${dayIdx},${i},event)" title="Välj typ: info, förflyttning eller rast/lunch">i</button></div>
       ${cell("c-set", s.set, base + ".set", "Info / förflyttning / lunch")}
       <div class="c-ie"></div><div class="c-dn"></div><div class="c-cast"></div>
       ${cell("c-loc", s.loc || "", base + ".loc", "")}
@@ -252,6 +252,38 @@ function stripMenu(di, i, ev) {
   setTimeout(() => document.addEventListener("click", onStripMenuDocClick, true), 0);
 }
 
+/* Klick på i-cirkeln på en info-strip: välj typ uttryckligen i stället för
+   att förlita sig på att set-texten matchar "rast"/"förflyttning". "Auto"
+   tar bort s.kind och låter texten avgöra igen. */
+const KIND_OPTS = [["", "Auto (av texten)"], ["info", "Info"], ["move", "Förflyttning"], ["break", "Rast eller lunch"]];
+function kindMenu(di, i, ev) {
+  if (ev) ev.stopPropagation();
+  if (readOnly) return;
+  if (stripMenuEl) { closeStripMenu(); return; }
+  const s = listFor(di)[i];
+  if (!s) return;
+  const cur = s.kind || "";
+  const menu = document.createElement("div");
+  menu.className = "strip-menu";
+  menu.innerHTML = `<div class="strip-menu-head">Typ av strip</div>` +
+    KIND_OPTS.map(([k, label]) => `<button type="button" data-kind="${k}">${k === cur ? "✓ " : ""}${esc(label)}</button>`).join("");
+  document.body.appendChild(menu);
+  const r = (ev && ev.target ? ev.target : document.body).getBoundingClientRect();
+  menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - menu.offsetWidth - 8)) + "px";
+  menu.style.top = (r.bottom + 4) + "px";
+  menu.querySelectorAll("button[data-kind]").forEach(b => {
+    b.addEventListener("click", () => {
+      const k = b.getAttribute("data-kind");
+      closeStripMenu();
+      if (k) s.kind = k; else delete s.kind;
+      notify();
+      render();
+    });
+  });
+  stripMenuEl = menu;
+  setTimeout(() => document.addEventListener("click", onStripMenuDocClick, true), 0);
+}
+
 function onCastPickerDocClick(e) {
   if (castPickerEl && !castPickerEl.contains(e.target)) closeCastPicker(true);
 }
@@ -386,7 +418,11 @@ function newSceneStrip(over) {
 }
 function normStrip(s) {
   s = s || {};
-  if (s.type === "banner") return { type: "banner", set: String(s.set || ""), loc: s.loc || "", est: s.est || "", start: s.start || "", note: s.note || "", lock: !!s.lock };
+  if (s.type === "banner") {
+    const b = { type: "banner", set: String(s.set || ""), loc: s.loc || "", est: s.est || "", start: s.start || "", note: s.note || "", lock: !!s.lock };
+    if (s.kind === "info" || s.kind === "move" || s.kind === "break") b.kind = s.kind;
+    return b;
+  }
   return newSceneStrip({
     num: String(s.num == null ? "" : s.num), ie: s.ie || "", set: String(s.set || ""), dn: s.dn || "",
     cast: s.cast || "", loc: s.loc || "", pages: s.pages || "", est: s.est || "", start: s.start || "", note: s.note || "", lock: !!s.lock
@@ -555,7 +591,7 @@ function moveStrip(src, tDay, tIdx) {
 function makeCallSheet(di) {
   const day = DATA.days[di], t = dayTotals(day);
   const scenes = day.strips.map(s => s.type === "banner"
-    ? { type: "info", label: s.set, time: s.start, est: s.est }
+    ? Object.assign({ type: "info", label: s.set, time: s.start, est: s.est }, s.kind ? { kind: s.kind } : {})
     : { type: "scene", num: s.num, ie: s.ie, set: s.set, dn: s.dn, cast: s.cast || "—", loc: s.loc || "—", pages: s.pages, est: s.est, start: s.start });
   scenes.push({ type: "total", pages: fmtPages(t.pages) || "—", est: fmtEst(t.span) || "—" });
 
@@ -609,6 +645,14 @@ function lockdown(el) {
   el.querySelectorAll(".c-cast-btn").forEach(b => {
     const span = document.createElement("span");
     span.className = "c-cast-static";
+    span.textContent = b.textContent;
+    b.replaceWith(span);
+  });
+  /* i-cirkeln på info-strips är en knapp (typ-väljaren) -- i den delade
+     vyn ska den bara vara ett märke, inte försvinna med de andra knapparna. */
+  el.querySelectorAll(".banner-i").forEach(b => {
+    const span = document.createElement("span");
+    span.className = "banner-i";
     span.textContent = b.textContent;
     b.replaceWith(span);
   });
@@ -669,7 +713,7 @@ function scrollToClosestDay() {
 return {
   mount, unmount, getData, render,
   recalcAll, recalcOne, addDay, delDay, dupDay, setDayField,
-  addStrip, delStrip, toggleLock, grabOn, makeCallSheet, toggleCastPicker, stripMenu,
+  addStrip, delStrip, toggleLock, grabOn, makeCallSheet, toggleCastPicker, stripMenu, kindMenu,
   closestDayIndex, todayIso, scrollToClosestDay,
   generateFromScript, loadStripboard, sluglineParts, scenesPresent,
   fmtPages, fmtEst, parsePages, parseEst, dateSv

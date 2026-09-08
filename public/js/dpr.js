@@ -74,6 +74,7 @@ function generateFromCallsheet(csDayIndex) {
       return {
         type: "info",
         label: s.label || s.set || "Info", est: s.est || "", time: s.time || s.start || "",
+        kind: s.kind || "",
         status: (prev && prev.status) || "",
         actualStart: (prev && prev.actualStart) || "",
         actualEnd: (prev && prev.actualEnd) || "",
