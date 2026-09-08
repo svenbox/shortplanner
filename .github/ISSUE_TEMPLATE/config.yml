@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/svenbox/shortplanner/security/advisories/new
+    about: Please report security problems privately, not as a public issue. See SECURITY.md.
+  - name: Live demo
+    url: https://shortplanner-demo.soxbox.uk
+    about: Try Shortplanner before filing an issue (password: demo).

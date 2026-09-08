@@ -1,6 +1,6 @@
 # Screenshots
 
-Images the README references. All from a made-up demo project ("Skuggspel") — no real production data.
+Images the README references. All from the made-up demo project — no real production data.
 
 | File | View |
 |---|---|
