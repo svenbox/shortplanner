@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-/* Rullar demoprojektets datum så att inspelningsdag 1 alltid är IMORGON
-   (värdens lokala datum + 1). Alla datum flyttas med samma antal dygn, så
+/* Rullar demoprojektets datum så att inspelningsdag 1 alltid är IDAG
+   (värdens lokala datum). Alla datum flyttas med samma antal dygn, så
    gapet mellan dagarna behålls. Körs av deploy/demo-reset.sh EFTER att
    seed-databasen kopierats in, mot en stoppad container.
 
-   Utan detta blir vädret tomt (SMHI ~1 vecka framåt) och 🎬 Inspelningsläge
-   göms (kräver en DPR-dag inom ett dygn från idag).
+   Med dag 1 = idag fungerar 🎬 Inspelningsläge alltid (kräver en DPR-dag
+   inom ett dygn från idag) och vädret finns (SMHI ~1 vecka framåt).
 
    Användning:  node scripts/demo-redate.js /data/shortplanner.db
 */
@@ -42,9 +42,9 @@ const sbDays = (sb && Array.isArray(sb.days) ? sb.days : []).filter(x => /^\d{4}
 if (!sbDays.length) { console.error("demo-redate: hittade inga daterade stripboard-dagar, avbryter"); process.exit(1); }
 
 const earliest = sbDays.map(x => x.date).sort()[0];
-const tomorrow = ymd(new Date(Date.now() + 86400000));
-const delta = Math.round((noon(tomorrow) - noon(earliest)) / 86400000);
-console.log(`demo-redate: dag 1 ${earliest} -> ${tomorrow} (${delta >= 0 ? "+" : ""}${delta} dygn)`);
+const today = ymd(new Date());
+const delta = Math.round((noon(today) - noon(earliest)) / 86400000);
+console.log(`demo-redate: dag 1 ${earliest} -> ${today} (${delta >= 0 ? "+" : ""}${delta} dygn)`);
 
 const upd = db.prepare("UPDATE docs SET data = ?, updated_at = ? WHERE project_id = ? AND kind = ?");
 const now = new Date().toISOString();

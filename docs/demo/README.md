@@ -4,7 +4,7 @@ These files drive the public demo at <https://shortplanner-demo.soxbox.uk>.
 
 | File | What it is |
 |---|---|
-| `../../deploy/demo-seed/palsen-project.json` | The full project (`shortplanner/project@1`) the demo is seeded from — stripboard, script, cast, project info. Imported by `deploy/demo-reset.sh` (via `scripts/demo-redate.js`, which rolls the shooting dates so day 1 is always tomorrow). |
+| `../../deploy/demo-seed/palsen-project.json` | The full project (`shortplanner/project@1`) the demo is seeded from — stripboard, script, cast, project info. Imported by `deploy/demo-reset.sh` (via `scripts/demo-redate.js`, which rolls the shooting dates so day 1 is always today). |
 | `palsen.fountain` | The screenplay in Fountain format. |
 | `palsen.pdf` | The same screenplay as a numbered shooting script (PDF) — used to exercise Shortplanner's PDF importer. |
 

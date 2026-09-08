@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 #
-# Nollställer demo-instansen till ögonblicksbilden i demo-seed/shortplanner.db.
-# Tänkt att köras från cron, t.ex. varje midnatt (värdens tidszon):
-#
-#   0 0 * * *  /sökväg/till/shortplanner/deploy/demo-reset.sh >> /var/log/sp-demo-reset.log 2>&1
-#
 # Återställer demo-instansen till deploy/demo-seed/shortplanner.db och rullar
-# sedan datumen så inspelningsdag 1 blir imorgon (scripts/demo-redate.js), så
-# att väder och 🎬 Inspelningsläge fungerar. Tänkt för cron:
+# sedan datumen så inspelningsdag 1 blir dagens datum (scripts/demo-redate.js),
+# så att väder och 🎬 Inspelningsläge fungerar. Tänkt för cron, varje midnatt:
 #
 #   0 0 * * *  /sökväg/till/shortplanner/deploy/demo-reset.sh >> /var/log/sp-demo-reset.log 2>&1
 #

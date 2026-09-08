@@ -43,11 +43,19 @@ RES="$(curl -s -X POST "http://127.0.0.1:$PORT/api/projects/import" \
   --data-binary @"$SEED_DIR/$SEED_JSON")"
 echo "  $RES"
 echo "$RES" | grep -q '"id"' || { echo "FEL: import misslyckades" >&2; exit 1; }
+PID="$(echo "$RES" | sed -n 's/.*"id":\([0-9]*\).*/\1/p')"
 
 # neutralisera sajtinställningarna (bolagsnamn syns i topplisten)
 curl -s -X PUT "http://127.0.0.1:$PORT/api/site" -H "Cookie: sp_session=$CK" \
   -H 'Content-Type: application/json' \
   -d '{"company":{"name":"Shortplanner-demo","orgnr":"","address":"","phone":"","email":"","website":""},"locale":"sv"}' >/dev/null
+
+# skapa en delningslänk direkt (alla komponenter). Token bakas in i seeden så
+# att /share/<token> fortsätter fungera efter varje nattlig nollställning —
+# annars är Dela-funktionen trasig i demon.
+curl -s -X POST "http://127.0.0.1:$PORT/api/projects/$PID/share" \
+  -H "Cookie: sp_session=$CK" -H 'Content-Type: application/json' -d '{}' >/dev/null
+echo "» delningslänk skapad"
 
 VOL="${PROJ}_shortplanner-demo-data"
 docker compose -p "$PROJ" -f "$COMPOSE_FILE" stop >/dev/null
