@@ -8,7 +8,7 @@
 
 Stripboard, call sheets, dagsmanus och produktionsbudget för filmproduktion — självhostat, en container, en SQLite-fil, ett lösenord.
 
-Byggt för korta, låg­budget­produktioner där en enda person (ofta 1:e AD eller producent) sköter schemat, och resten av teamet bara behöver läsa det på en telefon utan täckning.
+Byggt för kortare låg­budget­produktioner där en enda person (ofta 1:e AD eller producent) sköter schemat, och resten av team och skådespelare kan läsa det och call sheet på en telefon. 
 
 **Flikar:** Stripboard · Call sheets · Manus · Dagsmanus · Rullplan · DPR · Inspelningsläge · Skådespelare · Dela · Versioner · Projektinfo · Inställningar.
 
